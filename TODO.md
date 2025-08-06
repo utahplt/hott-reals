@@ -1,0 +1,29 @@
+We need to work out the lemmas for the approximation relation and use them to define negation, addition, multiplication, inverse, and order so that we can prove that the HoTT reals are the initial (embed into every other) Cauchy complete Archimedean ordered field.
+
+- Definition 11.3.2 HoTT reals inductive-inductive definition
+- Understand induction and recursion principles
+- Lemma 11.3.8 Approximation relation is reflexive
+- Lemma 11.3.9 The HoTT reals form a set
+- Lemma 11.3.10 There is a surjective mapping from Cauchy approximations of rationals to the HoTT reals
+- Lemma 11.3.11 Helper for induction
+- Lemma 11.3.12 Approximation relation is symmetric
+- Fully understand the "enhanced principle of recursion"
+- Definition 11.3.14 Lipschitz mapping
+- Lemma 11.3.15 Lift a rational lipschitz function to a real one
+- Theorem 11.3.16 Careful characterization of the approximation relation
+- Theorem 11.3.32 Characterization is equivalent to approximation relation
+- Corollary 11.3.33 Triangle inequality
+- Lemma 11.3.36 Limits of Cauchy approximations indeed behave like limits
+- Lemma 11.3.39 Extensions of Lipschitz functions are unique
+- Can build 0, 1, and negation
+- Lemma 11.3.40 Helper for defining Lipschitz extensions of two-input rational functions
+- Well-definedness of addition follows from Lemma 11.3.40
+- We also get min, max, strict and non-strict partial ordering relations, and absolute value from Lemma 11.3.40
+- Theorem 11.3.41 Archimedean principle
+- Lemma 11.3.42 - Theorem 11.3.44 Another characterization of approximation relation
+- Theorem 11.3.46 Existence and uniqueness of squaring function
+- Well-definedness of multiplication follows from Theorem 11.3.46
+- Theorem 11.3.47 A HoTT real is invertible if and only if it is apart from zero.
+- Theorem 11.3.48 The HoTT reals form an archimedean ordered field.
+- Theorem 11.49 The HoTT reals are Cauchy complete
+- Theorem 11.3.50 The Cauchy reals embed into every Cauchy complete archimedean ordered field.

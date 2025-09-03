@@ -75,7 +75,7 @@ Induction :
   (B : {x y : ℝ} → A x → A y → {ε : ℚ} {p : 0 < ε} → x ∼[ ε , p ] y → Type j) →
   Type (ℓ-max i j)
 Induction A B =
-  Σ ((x : ℚ) → A $ rational x)
+  Σ ((q : ℚ) → A $ rational q)
   (λ fRational →
   Σ ((x : (ε : ℚ) → 0 < ε → ℝ)
      (φ : CauchyApproximation x)
@@ -183,8 +183,8 @@ inductionComputationRule :
   {A : ℝ → Type i}
   {B : {x y : ℝ} → A x → A y → {ε : ℚ} {p : 0 < ε} → x ∼[ ε , p ] y → Type j} →
   (α : Induction A B)
-  (x : ℚ) →
-  induction α (rational x) ≡ (fst α) x
+  (q : ℚ) →
+  induction α (rational q) ≡ (fst α) q
 inductionComputationRule α x = refl
 
 induction-∼-computationRule :
@@ -197,6 +197,26 @@ induction-∼-computationRule :
                               (λ ε ψ → induction α (x ε ψ))
                               (λ δ ε ψ θ → induction-∼ α (φ δ ε ψ θ))
 induction-∼-computationRule α x φ = refl
+
+Induction' : {i : Level} → (ℝ → Type i) → Type i
+Induction' {_} A = 
+  Σ ((x : ℚ) → A $ rational x)
+  (λ fRational →
+  Σ ((x : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation x) → A $ limit x φ)
+  (λ fLimit →
+  ((u v : ℝ) → (φ : (ε : ℚ) (ψ : 0 < ε) → u ∼[ ε , ψ ] v)
+   (a : A u) (b : A v) →
+   PathP (λ i → A (path u v φ i)) a b)))
+
+induction' : {i : Level} {A : ℝ → Type i} →
+             Induction' A →
+             (x : ℝ) → A x
+induction' α@(fRational , fLimit , fPath) (rational q) =
+  fRational q
+induction' α@(fRational , fLimit , fPath) (limit x φ) =
+  fLimit (λ ε ψ → x ε ψ) (λ δ ε ψ θ → φ δ ε ψ θ)
+induction' α@(fRational , fLimit , fPath) (path u v φ i) =
+  fPath u v φ (induction' α u) (induction' α v) i
 
 -- TODO:
 -- equivalent-ℝ-reflexive : (u : ℝ) (ε : ℚ) (p : 0 < ε) → u ∼[ ε , p ] u

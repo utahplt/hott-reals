@@ -17,6 +17,7 @@ data Equivalent-ℝ : (ε : ℚ) → (0 < ε) → ℝ → ℝ → Type
 
 syntax Equivalent-ℝ ε p x y = x ∼[ ε , p ] y
 
+-- HoTT Definition 11.2.10
 CauchyApproximation : ((ε : ℚ) → 0 < ε → ℝ) → Type ℓ-zero
 CauchyApproximation x =
   ((δ ε : ℚ) (p : 0 < δ) (q : 0 < ε) →
@@ -55,6 +56,7 @@ data Equivalent-ℝ where
   squash :
     (u v : ℝ) (ε : ℚ) (φ : 0 < ε) → isProp $ u ∼[ ε , φ ] v
 
+-- HoTT 385, dependent Cauchy approximation
 CauchyApproximation' :
   {i j : Level}
   (A : ℝ → Type i)
@@ -118,8 +120,6 @@ Induction A B =
    (ψ : u ∼[ ε , φ ] v) →
    isProp (B a b ψ)))))
 
--- Question: Why work with Cauchy approximations over Cauchy sequences?
-
 induction :
   {i j : Level}
   {A : ℝ → Type i}
@@ -177,6 +177,26 @@ induction-∼ α@(fRational , fLimit , fPath , φ , ψ , θ , ω , π)
       (induction-∼ α ζ)
       (induction-∼ α ζ')
       i
+
+inductionComputationRule :
+  {i j : Level}
+  {A : ℝ → Type i}
+  {B : {x y : ℝ} → A x → A y → {ε : ℚ} {p : 0 < ε} → x ∼[ ε , p ] y → Type j} →
+  (α : Induction A B)
+  (x : ℚ) →
+  induction α (rational x) ≡ (fst α) x
+inductionComputationRule α x = refl
+
+induction-∼-computationRule :
+  {i j : Level}
+  {A : ℝ → Type i}
+  {B : {x y : ℝ} → A x → A y → {ε : ℚ} {p : 0 < ε} → x ∼[ ε , p ] y → Type j} →
+  (α : Induction A B)
+  (x : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation x) →
+  induction α (limit x φ) ≡ fst (snd α) x φ
+                              (λ ε ψ → induction α (x ε ψ))
+                              (λ δ ε ψ θ → induction-∼ α (φ δ ε ψ θ))
+induction-∼-computationRule α x φ = refl
 
 -- TODO:
 -- equivalent-ℝ-reflexive : (u : ℝ) (ε : ℚ) (p : 0 < ε) → u ∼[ ε , p ] u

@@ -178,16 +178,16 @@ induction-∼ α@(fRational , fLimit , fPath , φ , ψ , θ , ω , π)
       (induction-∼ α ζ')
       i
 
-inductionComputationRule :
+inductionComputationRuleRational :
   {i j : Level}
   {A : ℝ → Type i}
   {B : {x y : ℝ} → A x → A y → {ε : ℚ} {p : 0 < ε} → x ∼[ ε , p ] y → Type j} →
   (α : Induction A B)
   (q : ℚ) →
   induction α (rational q) ≡ (fst α) q
-inductionComputationRule α x = refl
+inductionComputationRuleRational α x = refl
 
-induction-∼-computationRule :
+inductionComputationRuleLimit :
   {i j : Level}
   {A : ℝ → Type i}
   {B : {x y : ℝ} → A x → A y → {ε : ℚ} {p : 0 < ε} → x ∼[ ε , p ] y → Type j} →
@@ -196,17 +196,15 @@ induction-∼-computationRule :
   induction α (limit x φ) ≡ fst (snd α) x φ
                               (λ ε ψ → induction α (x ε ψ))
                               (λ δ ε ψ θ → induction-∼ α (φ δ ε ψ θ))
-induction-∼-computationRule α x φ = refl
+inductionComputationRuleLimit α x φ = refl
 
 Induction' : {i : Level} → (ℝ → Type i) → Type i
 Induction' {_} A = 
-  Σ ((x : ℚ) → A $ rational x)
-  (λ fRational →
-  Σ ((x : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation x) → A $ limit x φ)
-  (λ fLimit →
+  ((q : ℚ) → A $ rational q) ×
+  ((x : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation x) → A $ limit x φ) ×
   ((u v : ℝ) → (φ : (ε : ℚ) (ψ : 0 < ε) → u ∼[ ε , ψ ] v)
    (a : A u) (b : A v) →
-   PathP (λ i → A (path u v φ i)) a b)))
+   PathP (λ i → A (path u v φ i)) a b)
 
 induction' : {i : Level} {A : ℝ → Type i} →
              Induction' A →
@@ -218,10 +216,41 @@ induction' α@(fRational , fLimit , fPath) (limit x φ) =
 induction' α@(fRational , fLimit , fPath) (path u v φ i) =
   fPath u v φ (induction' α u) (induction' α v) i
 
--- TODO:
--- equivalent-ℝ-reflexive : (u : ℝ) (ε : ℚ) (p : 0 < ε) → u ∼[ ε , p ] u
--- equivalent-ℝ-reflexive (rational x) ε p = {!!}
--- equivalent-ℝ-reflexive (limit x x₁) ε p = {!!}
--- equivalent-ℝ-reflexive (path u u₁ x i) ε p = {!!}
+InductionProposition : {i : Level} → (ℝ → Type i) → Type i
+InductionProposition {_} A =
+  ((q : ℚ) → A $ rational q) ×
+  ((x : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation x) → A $ limit x φ) ×
+  ((u : ℝ) → isProp (A u))
 
--- TODO: Type for lemma 1
+inductionProposition : {i : Level} {A : ℝ → Type i} →
+                       InductionProposition A →
+                       (x : ℝ) → A x
+inductionProposition α@(fRational , fLimit , φ) (rational q) =
+  fRational q
+inductionProposition α@(fRational , fLimit , φ) (limit x ψ) =
+  fLimit (λ ε θ → x ε θ) (λ δ ε θ ω → ψ δ ε θ ω)
+inductionProposition α@(fRational , fLimit , φ) (path u v ψ i) =
+  isProp→PathP (λ j → φ (path u v ψ j))
+               (inductionProposition α u)
+               (inductionProposition α v)
+               i
+
+equivalent-ℝ-reflexive : (u : ℝ) (ε : ℚ) (φ : 0 < ε) → u ∼[ ε , φ ] u
+equivalent-ℝ-reflexive u ε φ = inductionProposition (ψ , θ , ω) u
+  where
+  ψ : ((q : ℚ) → rational q ∼[ ε , φ ] rational q )
+  ψ q = rationalRational
+          q q ε φ
+          -- TODO: Need lemma that x < y → - y < -x
+          -- Maybe already proven for general ordered fields?
+          {!!}
+          (subst (λ ?x → ?x < ε) (sym (+InvR q)) φ)
+
+  θ : (x : (ε : ℚ) → 0 < ε → ℝ) (ω : CauchyApproximation x) →
+      (limit x ω) ∼[ ε , φ ] (limit x ω)
+  -- TODO: Check instances.field.rationals or something to find out how to
+  -- divide in a field
+  θ x ω = limitLimit x x ω ω {!ε / 3!} {!!} {!!} {!!} {!!} {!!} {!!} {!!}
+
+  ω : (u : ℝ) → isProp (u ∼[ ε , φ ] u)
+  ω u = squash u u ε φ

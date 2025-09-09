@@ -201,7 +201,9 @@ inductionComputationRuleLimit α x φ = refl
 Induction' : {i : Level} → (ℝ → Type i) → Type i
 Induction' {_} A = 
   ((q : ℚ) → A $ rational q) ×
-  ((x : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation x) → A $ limit x φ) ×
+  ((x : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation x) →
+   ((ε : ℚ) (φ : 0 < ε) → A $ x ε φ) →
+   A $ limit x φ) ×
   ((u v : ℝ) → (φ : (ε : ℚ) (ψ : 0 < ε) → u ∼[ ε , ψ ] v)
    (a : A u) (b : A v) →
    PathP (λ i → A (path u v φ i)) a b)
@@ -212,14 +214,16 @@ induction' : {i : Level} {A : ℝ → Type i} →
 induction' α@(fRational , fLimit , fPath) (rational q) =
   fRational q
 induction' α@(fRational , fLimit , fPath) (limit x φ) =
-  fLimit (λ ε ψ → x ε ψ) (λ δ ε ψ θ → φ δ ε ψ θ)
+  fLimit (λ ε ψ → x ε ψ) (λ δ ε ψ θ → φ δ ε ψ θ) (λ ε ψ → induction' α (x ε ψ))
 induction' α@(fRational , fLimit , fPath) (path u v φ i) =
   fPath u v φ (induction' α u) (induction' α v) i
 
 InductionProposition : {i : Level} → (ℝ → Type i) → Type i
 InductionProposition {_} A =
   ((q : ℚ) → A $ rational q) ×
-  ((x : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation x) → A $ limit x φ) ×
+  ((x : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation x) →
+   ((ε : ℚ) (ψ : 0 < ε) → A $ x ε ψ) →
+   A $ limit x φ) ×
   ((u : ℝ) → isProp (A u))
 
 inductionProposition : {i : Level} {A : ℝ → Type i} →
@@ -228,29 +232,43 @@ inductionProposition : {i : Level} {A : ℝ → Type i} →
 inductionProposition α@(fRational , fLimit , φ) (rational q) =
   fRational q
 inductionProposition α@(fRational , fLimit , φ) (limit x ψ) =
-  fLimit (λ ε θ → x ε θ) (λ δ ε θ ω → ψ δ ε θ ω)
+  fLimit (λ ε θ → x ε θ)
+         (λ δ ε θ ω → ψ δ ε θ ω)
+         (λ ε θ → inductionProposition α (x ε θ))
 inductionProposition α@(fRational , fLimit , φ) (path u v ψ i) =
   isProp→PathP (λ j → φ (path u v ψ j))
                (inductionProposition α u)
                (inductionProposition α v)
                i
 
+-- HoTT Lemma 11.3.8
 equivalent-ℝ-reflexive : (u : ℝ) (ε : ℚ) (φ : 0 < ε) → u ∼[ ε , φ ] u
-equivalent-ℝ-reflexive u ε φ = inductionProposition (ψ , θ , ω) u
+equivalent-ℝ-reflexive u = inductionProposition (ψ , θ , ω) u
   where
-  ψ : ((q : ℚ) → rational q ∼[ ε , φ ] rational q )
-  ψ q = rationalRational
+  ψ : ((q : ℚ) → ((ε : ℚ) (φ : 0 < ε) → rational q ∼[ ε , φ ] rational q))
+  ψ q ε φ = rationalRational
           q q ε φ
-          -- TODO: Need lemma that x < y → - y < -x
-          -- Maybe already proven for general ordered fields?
-          {!!}
+          (let θ : q - q ≡ - 0
+               θ = q - q ≡⟨ +InvR q ⟩ 0
+                         ≡⟨ refl ⟩ - 0 ∎
+
+               ω : - ε < - 0
+               ω = <antitone- {x = 0} {y = ε} φ
+           in subst (λ ?x → - ε < ?x) (sym θ) ω)
           (subst (λ ?x → ?x < ε) (sym (+InvR q)) φ)
 
   θ : (x : (ε : ℚ) → 0 < ε → ℝ) (ω : CauchyApproximation x) →
-      (limit x ω) ∼[ ε , φ ] (limit x ω)
+      ((δ : ℚ) (π : 0 < δ) → ((ε : ℚ) (ρ : 0 < ε) → x δ π ∼[ ε , ρ ] x δ π)) →
+      ((ε : ℚ) (π : 0 < ε) → limit x ω ∼[ ε , π ] limit x ω)
   -- TODO: Check instances.field.rationals or something to find out how to
   -- divide in a field
-  θ x ω = limitLimit x x ω ω {!ε / 3!} {!!} {!!} {!!} {!!} {!!} {!!} {!!}
+  θ x ω π ε ρ =
+    -- Need to have division definition and prove that ε - (ε/3 - ε/3) = ε
+    -- let foo : x (ε / 3) _ ∼[ ε / 3 , _ ] x (x / 3) _
+    --     foo = π (ε / 3) _ (ε / 3) _
+    -- in 
+    limitLimit x x ω ω {!!} {!!} {!!} {!!} {!!} {!!} {!!} {!!} -- limitLimit x x ω ω {!ε / 3!} {!!} {!!} {!!} {!!} {!!} {!!} {!!}
 
-  ω : (u : ℝ) → isProp (u ∼[ ε , φ ] u)
-  ω u = squash u u ε φ
+  ω : (u : ℝ) → isProp ((ε : ℚ) (π : 0 < ε) → u ∼[ ε , π ] u)
+  ω u ζ ζ' = {!!}
+    -- squash u u ε φ

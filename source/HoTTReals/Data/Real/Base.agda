@@ -1,21 +1,26 @@
 module HoTTReals.Data.Real.Base where
 
+open import Cubical.Data.Bool
 open import Cubical.Data.Rationals as ℚ
 open import Cubical.Data.Rationals.Order as ℚ
 open import Cubical.Data.Sigma
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.HLevels
 open import Cubical.Foundations.Prelude
+open import Cubical.Relation.Binary
+open import Cubical.Relation.Nullary
 
+open import HoTTReals.Algebra.Field.Instances.Rationals as ℚ
 open import HoTTReals.Data.Rationals.Order as ℚ
+open import HoTTReals.Data.Rationals.Properties as ℚ
 
 -- HoTT Definition 11.3.2
 
 data ℝ : Type
 
-data Equivalent-ℝ : (ε : ℚ) → (0 < ε) → ℝ → ℝ → Type
+data Close : (ε : ℚ) → (0 < ε) → ℝ → ℝ → Type
 
-syntax Equivalent-ℝ ε p x y = x ∼[ ε , p ] y
+syntax Close ε p x y = x ∼[ ε , p ] y
 
 -- HoTT Definition 11.2.10
 CauchyApproximation : ((ε : ℚ) → 0 < ε → ℝ) → Type ℓ-zero
@@ -32,7 +37,7 @@ data ℝ where
          ((ε : ℚ) (p : 0 < ε) → x ∼[ ε , p ] y) →
          x ≡ y
 
-data Equivalent-ℝ where
+data Close where
   rationalRational :
     (q r ε : ℚ) (φ : 0 < ε) →
     - ε < q - r → q - r < ε →
@@ -242,8 +247,8 @@ inductionProposition α@(fRational , fLimit , φ) (path u v ψ i) =
                i
 
 -- HoTT Lemma 11.3.8
-equivalent-ℝ-reflexive : (u : ℝ) (ε : ℚ) (φ : 0 < ε) → u ∼[ ε , φ ] u
-equivalent-ℝ-reflexive u = inductionProposition (ψ , θ , ω) u
+closeReflexive : BinaryRelation.isRefl (λ x y → (ε : ℚ) (φ : 0 < ε) → x ∼[ ε , φ ] y)
+closeReflexive u = inductionProposition (ψ , θ , ω) u
   where
   ψ : ((q : ℚ) → ((ε : ℚ) (φ : 0 < ε) → rational q ∼[ ε , φ ] rational q))
   ψ q ε φ = rationalRational
@@ -260,15 +265,67 @@ equivalent-ℝ-reflexive u = inductionProposition (ψ , θ , ω) u
   θ : (x : (ε : ℚ) → 0 < ε → ℝ) (ω : CauchyApproximation x) →
       ((δ : ℚ) (π : 0 < δ) → ((ε : ℚ) (ρ : 0 < ε) → x δ π ∼[ ε , ρ ] x δ π)) →
       ((ε : ℚ) (π : 0 < ε) → limit x ω ∼[ ε , π ] limit x ω)
-  -- TODO: Check instances.field.rationals or something to find out how to
-  -- divide in a field
   θ x ω π ε ρ =
-    -- Need to have division definition and prove that ε - (ε/3 - ε/3) = ε
-    -- let foo : x (ε / 3) _ ∼[ ε / 3 , _ ] x (x / 3) _
-    --     foo = π (ε / 3) _ (ε / 3) _
-    -- in 
-    limitLimit x x ω ω {!!} {!!} {!!} {!!} {!!} {!!} {!!} {!!} -- limitLimit x x ω ω {!ε / 3!} {!!} {!!} {!!} {!!} {!!} {!!} {!!}
+    let σ : ¬ 3 ≡ 0
+        σ = toWitnessFalse {Q = discreteℚ 3 0} tt
+
+        τ' : 0 < 3 [ σ ]⁻¹
+        τ' = toWitness {Q = <Dec 0 (3 [ σ ]⁻¹)} tt
+
+        τ : 0 < ε / 3 [ σ ]
+        -- TODO: Perphaps pull out into lemma for division
+        τ = subst (λ ?x → ?x < (ε / 3 [ σ ])) (·AnnihilR (3 [ σ ]⁻¹)) (<-·o 0 ε (3 [ σ ]⁻¹) τ' ρ)
+
+        υ' : (ε / 3 [ σ ] + ε / 3 [ σ ]) ≡ (2 / 3 [ σ ]) · ε
+        υ' =
+            ε / 3 [ σ ] + ε / 3 [ σ ]
+              ≡⟨ sym (·DistR+ ε ε (3 [ σ ]⁻¹)) ⟩
+            (ε + ε) · (3 [ σ ]⁻¹)
+              ≡⟨ cong (λ ?x → ?x · (3 [ σ ]⁻¹)) (2·≡self+ ε) ⟩
+            (2 · ε) · (3 [ σ ]⁻¹)
+              ≡⟨ sym (·Assoc 2 ε (3 [ σ ]⁻¹)) ⟩
+            2 · (ε · (3 [ σ ]⁻¹))
+              ≡⟨ cong (λ ?x → 2 · ?x) (·Comm ε (3 [ σ ]⁻¹)) ⟩
+            2 · ((3 [ σ ]⁻¹) · ε)
+              ≡⟨ ·Assoc 2 (3 [ σ ]⁻¹) ε ⟩
+            (2 · (3 [ σ ]⁻¹)) · ε
+              ≡⟨ refl ⟩
+            (2 / 3 [ σ ]) · ε ∎
+
+        υ : ε - (ε / 3 [ σ ] + ε / 3 [ σ ]) ≡ ε / 3 [ σ ]
+        υ =
+          ε - (ε / 3 [ σ ] + ε / 3 [ σ ])
+            ≡⟨ cong (λ ?x → ε - ?x) υ' ⟩
+          ε + (- ((2 / 3 [ σ ]) · ε))
+            ≡⟨ cong (λ ?x → ε + ?x) (-·≡-· (2 / 3 [ σ ]) ε) ⟩
+          ε + ((- 2) / 3 [ σ ]) · ε
+            ≡⟨ cong (λ ?x → ?x + ((- 2) / 3 [ σ ]) · ε) (sym (·IdL ε)) ⟩
+          1 · ε + ((- 2) / 3 [ σ ]) · ε
+            ≡⟨ sym (·DistR+ 1 ((- 2) / 3 [ σ ]) ε) ⟩
+          (1 - (2 / 3 [ σ ])) · ε
+            ≡⟨ refl ⟩
+          (3 [ σ ]⁻¹) · ε
+            ≡⟨ ·Comm (3 [ σ ]⁻¹) ε ⟩
+          ε / 3 [ σ ] ∎
+
+        ι : 0 < ε - (ε / 3 [ σ ] + ε / 3 [ σ ])
+        ι = subst (λ ?x → 0 < ?x) (sym υ) τ
+
+        κ : Close (ε - ((ε / 3 [ σ ]) + (ε / 3 [ σ ]))) ι
+                  (x (ε / 3 [ σ ]) τ) (x (ε / 3 [ σ ]) τ)
+        κ = π (ε / 3 [ σ ]) τ (ε - ((ε / 3 [ σ ]) + (ε / 3 [ σ ]))) ι
+    in limitLimit
+         x x ω ω
+         ε (ε / 3 [ σ ]) (ε / 3 [ σ ]) ρ τ τ ι
+         κ
 
   ω : (u : ℝ) → isProp ((ε : ℚ) (π : 0 < ε) → u ∼[ ε , π ] u)
-  ω u ζ ζ' = {!!}
-    -- squash u u ε φ
+  ω u = isPropΠ2 (squash u u)
+
+-- HoTT Theorem 11.3.9
+ℝ-isSet : isSet ℝ
+ℝ-isSet = reflPropRelImpliesIdentity→isSet
+            (λ x y → (ε : ℚ) (φ : 0 < ε) → x ∼[ ε , φ ] y)
+            closeReflexive
+            (λ x y → isPropΠ2 (squash x y))
+            (λ {x} {y} → path x y)

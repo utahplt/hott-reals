@@ -15,7 +15,7 @@ open import Cubical.Relation.Nullary
 
 +0< : {x y : ℚ} → 0 < x → 0 < y → 0 < x + y
 +0< {x} {y} p q = r
-  -- Don't need `subst` because the path is refl
+ -- Don't need `subst` because the path is refl
   where
   r : 0 + 0 < x + y
   r = <Monotone+ 0 x 0 y p q

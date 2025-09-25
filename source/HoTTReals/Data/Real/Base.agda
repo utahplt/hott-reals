@@ -4,11 +4,15 @@ open import Cubical.Data.Bool
 open import Cubical.Data.Rationals as ℚ
 open import Cubical.Data.Rationals.Order as ℚ
 open import Cubical.Data.Sigma
+open import Cubical.Foundations.Equiv
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.HLevels
 open import Cubical.Foundations.Prelude
+open import Cubical.Foundations.Univalence
+open import Cubical.Functions.Surjection
 open import Cubical.Relation.Binary
 open import Cubical.Relation.Nullary
+open import Cubical.HITs.PropositionalTruncation
 
 open import HoTTReals.Algebra.Field.Instances.Rationals as ℚ
 open import HoTTReals.Data.Rationals.Order as ℚ
@@ -203,8 +207,8 @@ inductionComputationRuleLimit :
                               (λ δ ε ψ θ → induction-∼ α (φ δ ε ψ θ))
 inductionComputationRuleLimit α x φ = refl
 
-Induction' : {i : Level} → (ℝ → Type i) → Type i
-Induction' {_} A = 
+Inductionℝ : {i : Level} → (ℝ → Type i) → Type i
+Inductionℝ {_} A = 
   ((q : ℚ) → A $ rational q) ×
   ((x : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation x) →
    ((ε : ℚ) (φ : 0 < ε) → A $ x ε φ) →
@@ -213,15 +217,15 @@ Induction' {_} A =
    (a : A u) (b : A v) →
    PathP (λ i → A (path u v φ i)) a b)
 
-induction' : {i : Level} {A : ℝ → Type i} →
-             Induction' A →
+inductionℝ : {i : Level} {A : ℝ → Type i} →
+             Inductionℝ A →
              (x : ℝ) → A x
-induction' α@(fRational , fLimit , fPath) (rational q) =
+inductionℝ α@(fRational , fLimit , fPath) (rational q) =
   fRational q
-induction' α@(fRational , fLimit , fPath) (limit x φ) =
-  fLimit (λ ε ψ → x ε ψ) (λ δ ε ψ θ → φ δ ε ψ θ) (λ ε ψ → induction' α (x ε ψ))
-induction' α@(fRational , fLimit , fPath) (path u v φ i) =
-  fPath u v φ (induction' α u) (induction' α v) i
+inductionℝ α@(fRational , fLimit , fPath) (limit x φ) =
+  fLimit (λ ε ψ → x ε ψ) (λ δ ε ψ θ → φ δ ε ψ θ) (λ ε ψ → inductionℝ α (x ε ψ))
+inductionℝ α@(fRational , fLimit , fPath) (path u v φ i) =
+  fPath u v φ (inductionℝ α u) (inductionℝ α v) i
 
 InductionProposition : {i : Level} → (ℝ → Type i) → Type i
 InductionProposition {_} A =
@@ -246,8 +250,55 @@ inductionProposition α@(fRational , fLimit , φ) (path u v ψ i) =
                (inductionProposition α v)
                i
 
+Induction∼ :
+  {i : Level} →
+  ({x y : ℝ} → {ε : ℚ} {φ : 0 < ε} → x ∼[ ε , φ ] y → Type i) →
+  Type i
+Induction∼ B =
+  ((q r ε : ℚ) (φ : 0 < ε) →
+   (ψ : - ε < q - r) → (θ : q - r < ε) →
+   B (rationalRational q r ε φ ψ θ)) ×
+  ((q δ ε : ℚ) (φ : 0 < δ) (ψ : 0 < ε) (θ : 0 < ε - δ) →
+   (y : (ε : ℚ) → 0 < ε → ℝ) (ω : CauchyApproximation y) →
+   (π : rational q ∼[ ε - δ , θ ] y δ φ) →
+   B π → B (rationalLimit q ε δ ψ φ θ y ω π)) ×
+  (((x : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation x)
+   (r δ ε : ℚ) (ψ : 0 < δ) (θ : 0 < ε) (ω : 0 < ε - δ)
+   (π : x δ ψ ∼[ ε - δ , ω ] rational r) →
+   B π → B (limitRational x φ r ε δ θ ψ ω π))) ×
+  (((x y : (ε : ℚ) → 0 < ε → ℝ)
+   (φ : CauchyApproximation x) (ψ : CauchyApproximation y)
+   (ε δ η : ℚ) (θ : 0 < ε) (ω : 0 < δ) (π : 0 < η) (ρ : 0 < ε - (δ + η))
+   (σ : x δ ω ∼[ ε - (δ + η) , ρ ] y η π) →
+   B σ → B (limitLimit x y φ ψ ε δ η θ ω π ρ σ))) ×
+  -- TODO: Can't tell if HoTT book omitted this on accident or if there really
+  -- is a way to consider non propositional `B`s
+  ((u v : ℝ) (ε : ℚ) (φ : 0 < ε) (ψ : u ∼[ ε , φ ] v) → isProp (B ψ))
+
+-- HoTT 387
+induction∼ :
+  {i : Level}
+  {B : {x y : ℝ} → {ε : ℚ} {φ : 0 < ε} → x ∼[ ε , φ ] y → Type i} →
+  Induction∼ B →
+  {x y : ℝ} {ε : ℚ} {φ : 0 < ε} (ρ : x ∼[ ε , φ ] y) → B ρ
+induction∼ {B = B} α@(φ , ψ , θ , ω , π) (rationalRational q r ε ρ σ τ) =
+  φ q r ε ρ σ τ
+induction∼ {B = B} α@(φ , ψ , θ , ω , π) (rationalLimit q ε δ ρ σ τ y υ β) =
+  ψ q δ ε σ ρ τ y υ β (induction∼ {B = B} α β)
+induction∼ {B = B} α@(φ , ψ , θ , ω , π) (limitRational x ρ r ε δ σ τ υ β) =
+  θ x ρ r δ ε τ σ υ β (induction∼ {B = B} α β)
+induction∼ {B = B} α@(φ , ψ , θ , ω , π) (limitLimit x y ρ σ ε δ η τ υ β γ ζ) =
+  ω x y ρ σ ε δ η τ υ β γ ζ (induction∼ {B = B} α ζ)
+induction∼ {B = B} α@(φ , ψ , θ , ω , π) (squash u v ε ρ σ σ' i) =
+  isProp→PathP
+    (λ j → π u v ε ρ (squash u v ε ρ σ σ' j))
+    (induction∼ {B = B} α σ)
+    (induction∼ {B = B} α σ')
+    i
+
 -- HoTT Lemma 11.3.8
-closeReflexive : BinaryRelation.isRefl (λ x y → (ε : ℚ) (φ : 0 < ε) → x ∼[ ε , φ ] y)
+closeReflexive :
+  BinaryRelation.isRefl (λ x y → (ε : ℚ) (φ : 0 < ε) → x ∼[ ε , φ ] y)
 closeReflexive u = inductionProposition (ψ , θ , ω) u
   where
   ψ : ((q : ℚ) → ((ε : ℚ) (φ : 0 < ε) → rational q ∼[ ε , φ ] rational q))
@@ -274,7 +325,9 @@ closeReflexive u = inductionProposition (ψ , θ , ω) u
 
         τ : 0 < ε / 3 [ σ ]
         -- TODO: Perphaps pull out into lemma for division
-        τ = subst (λ ?x → ?x < (ε / 3 [ σ ])) (·AnnihilR (3 [ σ ]⁻¹)) (<-·o 0 ε (3 [ σ ]⁻¹) τ' ρ)
+        τ = subst (λ ?x → ?x < (ε / 3 [ σ ]))
+                  (·AnnihilR (3 [ σ ]⁻¹))
+                  (<-·o 0 ε (3 [ σ ]⁻¹) τ' ρ)
 
         υ' : (ε / 3 [ σ ] + ε / 3 [ σ ]) ≡ (2 / 3 [ σ ]) · ε
         υ' =
@@ -329,3 +382,151 @@ closeReflexive u = inductionProposition (ψ , θ , ω) u
             closeReflexive
             (λ x y → isPropΠ2 (squash x y))
             (λ {x} {y} → path x y)
+
+-- HoTT Lemma 11.3.10
+limitSurjective : isSurjection (uncurry limit)
+limitSurjective = inductionProposition (φ , ψ , θ)
+  where
+  φ : (q : ℚ) → ∥ fiber (uncurry limit) (rational q) ∥₁
+  φ q = ∣ ((λ ε _ → rational q) , ψ) ,
+          path (limit (λ ε _ → rational q) ψ) (rational q) σ ∣₁
+    where
+    ψ : CauchyApproximation (λ ε _ → rational q)
+    ψ ε δ θ ω =
+      let π : 0 < ε + δ
+          π = +0< {x = ε} {y = δ} θ ω
+
+          π' : (q - q) < ε + δ
+          π' = subst (λ ?x → ?x < ε + δ) (sym (+InvR q)) π
+
+          ρ : - (ε + δ) < (q - q)
+          ρ = subst (λ ?x → - (ε + δ) < ?x)
+                    (sym (+InvR q))
+                    (<antitone- {x = 0} {y = ε + δ} π)
+      in rationalRational q q (ε + δ) (+0< {x = ε} {y = δ} θ ω) ρ π'
+
+    σ : (ε : ℚ) (τ : 0 < ε) →
+        Close ε τ (limit (λ ε₁ _ → rational q) ψ) (rational q)
+    σ ε τ =
+      let
+        υ : ¬ 2 ≡ 0
+        υ = toWitnessFalse {Q = discreteℚ 2 0} tt
+
+        υ' : 0 < 2 [ υ ]⁻¹
+        υ' = toWitness {Q = <Dec 0 (2 [ υ ]⁻¹)} tt
+
+        α : 0 < ε / 2 [ υ ]
+        α = subst (λ ?x → ?x < ε / 2 [ υ ])
+                  (·AnnihilR (2 [ υ ]⁻¹))
+                  (<-·o 0 ε (2 [ υ ]⁻¹) υ' τ)
+
+        β = ε - (ε / 2 [ υ ]) ≡ ε / 2 [ υ ]
+        β =
+          ε - (ε / 2 [ υ ])
+            ≡⟨ cong (λ ?x → ?x - (ε / 2 [ υ ])) (sym (·IdR ε)) ⟩
+          (ε · 1) - (ε · 2 [ υ ]⁻¹)
+            ≡⟨ cong (λ ?x → (ε · 1) + ?x) (-·≡·- ε (2 [ υ ]⁻¹)) ⟩
+          (ε · 1) + (ε · (- (2 [ υ ]⁻¹)))
+            ≡⟨ sym (·DistL+ ε 1 (- (2 [ υ ]⁻¹))) ⟩
+          ε · (1 + (- (2 [ υ ]⁻¹)))
+            ≡⟨ refl ⟩
+          ε / 2 [ υ ] ∎
+
+        α' : 0 < ε - (ε / 2 [ υ ])
+        α' = subst (λ ?x → 0 < ?x) (sym β) α
+
+        γ : q - q < ε - (ε / 2 [ υ ])
+        γ = subst (λ ?x → ?x < ε - (ε / 2 [ υ ])) (sym (+InvR q)) α'
+
+        γ' : - (ε - (ε / 2 [ υ ])) < q - q
+        γ' =
+          subst (λ ?x → - (ε - (ε / 2 [ υ ])) < ?x)
+                (sym (+InvR q))
+                (<antitone- {x = 0} {y = ε - (ε / 2 [ υ ])} α')
+      in limitRational
+           (λ ε _ → rational q) ψ
+           q
+           ε (ε / 2 [ υ ])
+           τ α
+           α' (rationalRational q q (ε - (ε / 2 [ υ ])) α' γ' γ)
+
+  ψ : (x : (ε : ℚ) → 0 < ε → ℝ) (θ : CauchyApproximation x) →
+      ((ε : ℚ) (ψ : 0 < ε) → ∥ fiber (uncurry limit) (x ε ψ) ∥₁) →
+      ∥ fiber (uncurry limit) (limit x θ) ∥₁
+  ψ x θ _ = ∣ ((x , θ) , refl) ∣₁
+
+  θ : (x : ℝ) → isProp ∥ fiber (uncurry limit) x ∥₁
+  θ _ = isPropPropTrunc
+
+-- TODO: HoTT Lemma 11.3.11
+
+-- HoTT Lemma 11.3.12
+closeSymmetric :
+  (u v : ℝ) (ε : ℚ) (φ : 0 < ε) → u ∼[ ε , φ ] v → v ∼[ ε , φ ] u
+closeSymmetric _ _ _ _ =
+  induction∼ {B = λ {u} {v} {ε} {φ} _ → (v ∼[ ε , φ ] u)} (φ , ψ , θ , ω , χ)
+  where
+  φ : (q r ε : ℚ) (ψ : 0 < ε) →
+      (- ε) < q - r → q - r < ε →
+      (rational r) ∼[ ε , ψ ] (rational q)
+  φ q r ε ψ ω θ = rationalRational r q ε ψ χ π
+    where
+    α : - (q - r) ≡ r - q
+    α = - (q - r)
+          ≡⟨ negateSubtract q r ⟩
+        - q + r
+          ≡⟨ +Comm (- q) r ⟩
+        r - q ∎
+
+    χ : - ε < r - q
+    χ = subst (λ ?x → - ε < ?x) α (<antitone- {x = q - r} {y = ε} θ)
+
+    π : r - q < ε 
+    π = subst2 (λ ?y ?x → ?y < ?x)
+               α (-Invol ε)
+               (<antitone- {x = - ε} {y = q - r} ω)
+
+  ψ : (q δ ε : ℚ) (φ : 0 < δ) (ψ : 0 < ε) (θ : 0 < ε - δ)
+      (y : (ε : ℚ) → 0 < ε → ℝ) (ω : CauchyApproximation y) →
+      (rational q) ∼[ (ε - δ) , θ ] (y δ φ) →
+      (y δ φ) ∼[ (ε - δ) , θ ] (rational q) →
+      (limit y ω) ∼[ ε , ψ ] (rational q)
+  ψ q δ ε φ ψ θ y ω π ρ = limitRational y ω q ε δ ψ φ θ ρ
+
+  θ : (x : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation x)
+      (r δ ε : ℚ) (ψ : 0 < δ) (θ : 0 < ε) (ω : 0 < ε - δ) →
+      (x δ ψ) ∼[ (ε - δ) , ω ] (rational r) →
+      (rational r) ∼[ (ε - δ) , ω ] (x δ ψ) →
+      (rational r) ∼[ ε , θ ]  (limit x φ)
+  θ x φ r δ ε ψ θ ω π ρ = rationalLimit r ε δ θ ψ ω x φ ρ
+
+  ω : (x y : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation x)
+      (ψ : CauchyApproximation y) (ε δ η : ℚ) (θ : 0 < ε) (ω : 0 < δ)
+      (π : 0 < η) (ρ : 0 < ε - (δ + η)) →
+      (x δ ω) ∼[ ε - (δ + η) , ρ ] (y η π) →
+      (y η π) ∼[ ε - (δ + η) , ρ ] (x δ ω) →
+      (limit y ψ) ∼[ ε , θ ] (limit x φ)
+  ω x y φ ψ ε δ η θ ω π ρ σ τ =
+    let υ : Σ (0 < ε - (η + δ)) (λ α → y η π ∼[ ε - (η + δ) , α ] x δ ω)
+        υ = subst (λ ?x → Σ (0 < (ε - ?x))
+                            (λ α → y η π ∼[ ε - ?x , α ] x δ ω))
+                  (+Comm δ η)
+                  (ρ , τ)
+    in limitLimit y x ψ φ ε η δ θ π ω (fst υ) (snd υ)
+
+  χ : (u v : ℝ) (ε : ℚ) (φ : 0 < ε) (ψ : u ∼[ ε , φ ] v) →
+      isProp (v ∼[ ε , φ ] u)
+  χ u v ε φ ψ = squash v u ε φ
+
+closeSymmetric' :
+  (u v : ℝ) (ε : ℚ) (φ : 0 < ε) → u ∼[ ε , φ ] v ≃ v ∼[ ε , φ ] u
+closeSymmetric' u v ε φ =
+  propBiimpl→Equiv
+    (squash u v ε φ)
+    (squash v u ε φ)
+    (closeSymmetric u v ε φ)
+    (closeSymmetric v u ε φ)
+
+closeSymmetric'' :
+  (u v : ℝ) (ε : ℚ) (φ : 0 < ε) → u ∼[ ε , φ ] v ≡ v ∼[ ε , φ ] u
+closeSymmetric'' u v ε φ = ua (closeSymmetric' u v ε φ)

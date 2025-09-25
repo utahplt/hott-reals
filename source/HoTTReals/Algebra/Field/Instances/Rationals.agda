@@ -106,7 +106,5 @@ hasInverseℚ = elimProp
 _[_]⁻¹ : (x : ℚ) → ¬ x ≡ 0 → ℚ
 _[_]⁻¹ = FieldStr._[_]⁻¹ $ snd ℚField
 
--- TODO: ·InvL and ·InvR
-
 _/_[_] : ℚ → (y : ℚ) → ¬ y ≡ 0 → ℚ
 x / y [ p ] = x ℚ.· (y [ p ]⁻¹)

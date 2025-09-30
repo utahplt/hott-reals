@@ -27,3 +27,8 @@ We need to work out the lemmas for the approximation relation and use them to de
 - Theorem 11.3.48 The HoTT reals form an archimedean ordered field.
 - Theorem 11.49 The HoTT reals are Cauchy complete
 - Theorem 11.3.50 The Cauchy reals embed into every Cauchy complete archimedean ordered field.
+
+- Notes
+  - Generalize to approximate fields (like Dyadic rationals) using premtric space abstraction?
+    - See https://ncatlab.org/nlab/show/Booij+premetric+space
+    - Connection to uniform spaces?

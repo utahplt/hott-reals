@@ -108,3 +108,6 @@ _[_]⁻¹ = FieldStr._[_]⁻¹ $ snd ℚField
 
 _/_[_] : ℚ → (y : ℚ) → ¬ y ≡ 0 → ℚ
 x / y [ p ] = x ℚ.· (y [ p ]⁻¹)
+
+⁻¹-inverse : (x : ℚ) (p : ¬ x ≡ 0) → x ℚ.· (x [ p ]⁻¹) ≡ 1
+⁻¹-inverse x p = snd $ hasInverseℚ x p

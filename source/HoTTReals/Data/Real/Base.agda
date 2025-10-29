@@ -1,6 +1,6 @@
 module HoTTReals.Data.Real.Base where
 
-open import Cubical.Data.Bool
+open import Cubical.Data.Bool as Bool using ()
 open import Cubical.Data.Rationals as ℚ
 open import Cubical.Data.Rationals.Order as ℚ
 open import Cubical.Data.Sigma
@@ -31,7 +31,7 @@ syntax Close ε p x y = x ∼[ ε , p ] y
 CauchyApproximation : ((ε : ℚ) → 0 < ε → ℝ) → Type ℓ-zero
 CauchyApproximation x =
   ((δ ε : ℚ) (p : 0 < δ) (q : 0 < ε) →
-   (x δ p) ∼[ δ + ε , +0< {x = δ} {y = ε} p q ] (x ε q))
+   (x δ p) ∼[ δ + ε , 0<+' {x = δ} {y = ε} p q ] (x ε q))
 
 data ℝ where
   rational : ℚ → ℝ
@@ -64,7 +64,7 @@ data Close where
     (x δ ω) ∼[ ε - (δ + η) , ρ ] (y η π) →
     limit x φ ∼[ ε , θ ] limit y ψ
   squash :
-    (u v : ℝ) (ε : ℚ) (φ : 0 < ε) → isProp $ u ∼[ ε , φ ] v
+    (ε : ℚ) (φ : 0 < ε) (u v : ℝ) → isProp $ u ∼[ ε , φ ] v
 
 -- HoTT 385, dependent Cauchy approximation
 CauchyApproximation' :
@@ -181,9 +181,9 @@ induction-∼ α@(fRational , fLimit , fPath , φ , ψ , θ , ω , π)
       μ
       (induction-∼ α μ)
 induction-∼ α@(fRational , fLimit , fPath , φ , ψ , θ , ω , π)
-  (squash u v ε ρ ζ ζ' i) =
+  (squash ε ρ u v ζ ζ' i) =
     isProp→PathP
-      (λ j → π u v ε ρ (induction α u) (induction α v) (squash u v ε ρ ζ ζ' j))
+      (λ j → π u v ε ρ (induction α u) (induction α v) (squash ε ρ u v ζ ζ' j))
       (induction-∼ α ζ)
       (induction-∼ α ζ')
       i
@@ -290,9 +290,9 @@ induction∼ {B = B} α@(φ , ψ , θ , ω , π) (limitRational x ρ r ε δ σ 
   θ x ρ r δ ε τ σ υ β (induction∼ {B = B} α β)
 induction∼ {B = B} α@(φ , ψ , θ , ω , π) (limitLimit x y ρ σ ε δ η τ υ β γ ζ) =
   ω x y ρ σ ε δ η τ υ β γ ζ (induction∼ {B = B} α ζ)
-induction∼ {B = B} α@(φ , ψ , θ , ω , π) (squash u v ε ρ σ σ' i) =
+induction∼ {B = B} α@(φ , ψ , θ , ω , π) (squash ε ρ u v σ σ' i) =
   isProp→PathP
-    (λ j → π u v ε ρ (squash u v ε ρ σ σ' j))
+    (λ j → π u v ε ρ (squash ε ρ u v σ σ' j))
     (induction∼ {B = B} α σ)
     (induction∼ {B = B} α σ')
     i
@@ -319,10 +319,10 @@ closeReflexive u = inductionProposition (ψ , θ , ω) u
       ((ε : ℚ) (π : 0 < ε) → limit x ω ∼[ ε , π ] limit x ω)
   θ x ω π ε ρ =
     let σ : ¬ 3 ≡ 0
-        σ = toWitnessFalse {Q = discreteℚ 3 0} tt
+        σ = Bool.toWitnessFalse {Q = discreteℚ 3 0} tt
 
         τ' : 0 < 3 [ σ ]⁻¹
-        τ' = toWitness {Q = <Dec 0 (3 [ σ ]⁻¹)} tt
+        τ' = Bool.toWitness {Q = <Dec 0 (3 [ σ ]⁻¹)} tt
 
         τ : 0 < ε / 3 [ σ ]
         -- TODO: Perphaps pull out into lemma for division
@@ -374,14 +374,14 @@ closeReflexive u = inductionProposition (ψ , θ , ω) u
          κ
 
   ω : (u : ℝ) → isProp ((ε : ℚ) (π : 0 < ε) → u ∼[ ε , π ] u)
-  ω u = isPropΠ2 (squash u u)
+  ω u = isPropΠ2 (λ ε π → squash ε π u u)
 
 -- HoTT Theorem 11.3.9
 ℝ-isSet : isSet ℝ
 ℝ-isSet = reflPropRelImpliesIdentity→isSet
             (λ x y → (ε : ℚ) (φ : 0 < ε) → x ∼[ ε , φ ] y)
             closeReflexive
-            (λ x y → isPropΠ2 (squash x y))
+            (λ x y → isPropΠ2 (λ ε π → squash ε π x y))
             (λ {x} {y} → path x y)
 
 -- HoTT Lemma 11.3.10
@@ -395,7 +395,7 @@ limitSurjective = inductionProposition (φ , ψ , θ)
     ψ : CauchyApproximation (λ ε _ → rational q)
     ψ ε δ θ ω =
       let π : 0 < ε + δ
-          π = +0< {x = ε} {y = δ} θ ω
+          π = 0<+' {x = ε} {y = δ} θ ω
 
           π' : (q - q) < ε + δ
           π' = subst (λ ?x → ?x < ε + δ) (sym (+InvR q)) π
@@ -404,17 +404,17 @@ limitSurjective = inductionProposition (φ , ψ , θ)
           ρ = subst (λ ?x → - (ε + δ) < ?x)
                     (sym (+InvR q))
                     (<antitone- {x = 0} {y = ε + δ} π)
-      in rationalRational q q (ε + δ) (+0< {x = ε} {y = δ} θ ω) ρ π'
+      in rationalRational q q (ε + δ) (0<+' {x = ε} {y = δ} θ ω) ρ π'
 
     σ : (ε : ℚ) (τ : 0 < ε) →
         Close ε τ (limit (λ ε₁ _ → rational q) ψ) (rational q)
     σ ε τ =
       let
         υ : ¬ 2 ≡ 0
-        υ = toWitnessFalse {Q = discreteℚ 2 0} tt
+        υ = Bool.toWitnessFalse {Q = discreteℚ 2 0} tt
 
         υ' : 0 < 2 [ υ ]⁻¹
-        υ' = toWitness {Q = <Dec 0 (2 [ υ ]⁻¹)} tt
+        υ' = Bool.toWitness {Q = <Dec 0 (2 [ υ ]⁻¹)} tt
 
         α : 0 < ε / 2 [ υ ]
         α = subst (λ ?x → ?x < ε / 2 [ υ ])
@@ -517,14 +517,14 @@ closeSymmetric _ _ _ _ =
 
   χ : (u v : ℝ) (ε : ℚ) (φ : 0 < ε) (ψ : u ∼[ ε , φ ] v) →
       isProp (v ∼[ ε , φ ] u)
-  χ u v ε φ ψ = squash v u ε φ
+  χ u v ε φ ψ = squash ε φ v u
 
 closeSymmetric' :
   (u v : ℝ) (ε : ℚ) (φ : 0 < ε) → u ∼[ ε , φ ] v ≃ v ∼[ ε , φ ] u
 closeSymmetric' u v ε φ =
   propBiimpl→Equiv
-    (squash u v ε φ)
-    (squash v u ε φ)
+    (squash ε φ u v)
+    (squash ε φ v u)
     (closeSymmetric u v ε φ)
     (closeSymmetric v u ε φ)
 
@@ -540,7 +540,7 @@ CauchyApproximation'' :
   Type j
 CauchyApproximation'' A B f =
   (ε δ : ℚ) (ψ : 0 < ε) (θ : 0 < δ) →
-  B (f ε ψ) (f δ θ) (ε + δ) (+0< {x = ε} {y = δ} ψ θ)
+  B (f ε ψ) (f δ θ) (ε + δ) (0<+' {x = ε} {y = δ} ψ θ)
 
 -- HoTT 388 Enhanced principle of recursion
 Recursion :
@@ -620,7 +620,7 @@ recursion∼ α@(fRational , fLimit , φ , ψ , θ , ω , χ , π)
     (λ ε δ ν ξ → recursion∼ α (σ ε δ ν ξ))
     ε δ η τ υ ι κ (recursion∼ α μ)
 recursion∼ α@(fRational , fLimit , φ , ψ , θ , ω , χ , π)
-  (squash u v ε ρ ζ ζ' i) =
+  (squash ε ρ u v ζ ζ' i) =
   isProp→PathP (λ j → π (recursion α u) (recursion α v) ε ρ)
                (recursion∼ α ζ)
                (recursion∼ α ζ')
@@ -631,20 +631,20 @@ Lipschitzℚ : (f : ℚ → ℝ) (L : ℚ) → 0 < L → Type ℓ-zero
 Lipschitzℚ f L φ =
   (q r ε : ℚ) (ψ : 0 < ε) →
   ∣ q - r ∣ < ε →
-  f q ∼[ L · ε , ·0< {x = L} {y = ε} φ ψ ] f r
+  f q ∼[ L · ε , 0<· {x = L} {y = ε} φ ψ ] f r
 
 Lipschitzℝ : (f : ℝ → ℝ) (L : ℚ) → 0 < L → Type ℓ-zero
 Lipschitzℝ f L φ =
   (u v : ℝ)
   (ε : ℚ) (ψ : 0 < ε) →
   u ∼[ ε , ψ ] v →
-  f u ∼[ L · ε , ·0< {x = L} {y = ε} φ ψ ] f v
+  f u ∼[ L · ε , 0<· {x = L} {y = ε} φ ψ ] f v
 
 -- HoTT Lemma 11.3.16
 closeLimit : (u : ℝ) (y : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation y)
              (ε δ : ℚ) (ψ : 0 < ε) (ω : 0 < δ) →
              u ∼[ ε , ψ ] (y δ ω) →
-             u ∼[ ε + δ , +0< {x = ε} {y = δ} ψ ω ] (limit y φ)
+             u ∼[ ε + δ , 0<+' {x = ε} {y = δ} ψ ω ] (limit y φ)
 closeLimit = {!!}
 
 closeLimit' : (u : ℝ) (y : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation y)
@@ -666,7 +666,7 @@ closeLimit' u y φ ε δ ψ ω θ χ = σ'
   σ : Σ (0 < ε) (λ π → Close ε π u (limit y φ))
   σ = subst (λ ?x → Σ (0 < ?x) (λ π → Close ?x π u (limit y φ)))
             π
-            (+0< {x = ε - δ} {y = δ} θ ω ,
+            (0<+' {x = ε - δ} {y = δ} θ ω ,
              closeLimit u y φ (ε - δ) δ θ ω χ)
 
   σ' : Close ε ψ u (limit y φ)
@@ -882,3 +882,470 @@ closeLimit' u y φ ε δ ψ ω θ χ = σ'
 --   ρ : (u v : ℝ) (ε : ℚ) (σ : 0 < ε) → isProp (B u v ε σ)
 --   ρ u v ε σ = squash u v (L · ε) (·0< {x = L} {y = ε} φ σ)
 
+-- TODO: Why does this not exist in the cubical library?
+_↔_ : {i j : Level} → Type i → Type j → Type (ℓ-max i j)
+A ↔ B = (A → B) × (B → A)
+
+-- HoTT 11.3.21
+Rounded : {i : Level}
+          (B : (ε : ℚ) → 0 < ε → ℝ → ℝ → Type i) →
+          ((ε : ℚ) (φ : 0 < ε) (u v : ℝ) → isProp (B ε φ u v)) →
+          Type i
+Rounded B _ =
+  (u v : ℝ) (ε : ℚ) (φ : 0 < ε) →
+  B ε φ u v ↔ ∃ ℚ (λ θ → (0 < θ) × Σ (0 < (ε - θ)) (λ ψ → B (ε - θ) ψ u v))
+
+-- HoTT 11.3.22
+TriangleInequality₁ :
+  {i j : Level}
+  (B : (ε : ℚ) → 0 < ε → ℝ → ℝ → Type i)
+  (C : (ε : ℚ) → 0 < ε → ℝ → ℝ → Type j) →
+  ((ε : ℚ) (φ : 0 < ε) (u v : ℝ) → isProp (B ε φ u v)) →
+  ((ε : ℚ) (φ : 0 < ε) (u v : ℝ) → isProp (C ε φ u v)) →
+  Type (ℓ-max i j)
+TriangleInequality₁ B C _ _ =
+  (u v w : ℝ)
+  (ε δ : ℚ) (φ : 0 < ε) (ψ : 0 < δ) →
+  C ε φ u v → B δ ψ v w → C (ε + δ) (0<+' {x = ε} {y = δ} φ ψ) u w
+
+-- HoTT 11.3.23
+TriangleInequality₂ :
+  {i j : Level}
+  (B : (ε : ℚ) → 0 < ε → ℝ → ℝ → Type i)
+  (C : (ε : ℚ) → 0 < ε → ℝ → ℝ → Type j) →
+  ((ε : ℚ) (φ : 0 < ε) (u v : ℝ) → isProp (B ε φ u v)) →
+  ((ε : ℚ) (φ : 0 < ε) (u v : ℝ) → isProp (C ε φ u v)) →
+  Type (ℓ-max i j)
+TriangleInequality₂ B C _ _ =
+  (u v w : ℝ)
+  (ε δ : ℚ) (φ : 0 < ε) (ψ : 0 < δ) →
+  B ε φ u v → C δ ψ v w → C (ε + δ) (0<+' {x = ε} {y = δ} φ ψ) u w
+
+Close'RationalRational : (q r : ℚ) (ε : ℚ) → 0 < ε → Type ℓ-zero
+Close'RationalRational q r ε φ = ∣ q - r ∣ < ε
+
+close'RationalRationalProposition : 
+  (q r : ℚ) (ε : ℚ) (φ : 0 < ε)  → isProp (Close'RationalRational q r ε φ)
+close'RationalRationalProposition = {!!}
+
+      -- γ : (ε : ℚ) (φ : 0 < ε) →
+      --     Close'RationalRational q r ε φ ↔
+      --     ∃ ℚ (λ θ → (0 < θ) × Σ (0 < (ε - θ)) (Close'RationalRational q r (ε - θ)))
+      -- γ ε φ = {!!}
+      --   -- γ' , γ''
+      --   where
+      --   γ' : Close'RationalRational q r ε φ →
+      --        ∃ ℚ (λ θ → (0 < θ) ×
+      --                   Σ (0 < (ε - θ)) (Close'RationalRational q r (ε - θ)))
+      --   γ' ψ = ∣ (θ , ι , κ , μ) ∣₁
+      --     where
+      --     ζ : ¬ 2 ≡ 0
+      --     ζ = Bool.toWitnessFalse {Q = discreteℚ 2 0} tt
+
+      --     ζ' : 0 < 2
+      --     ζ' = Bool.toWitness {Q = <Dec 0 2} tt
+
+      --     θ = (ε - ∣ q - r ∣) / 2 [ ζ ] 
+
+      --     foo' : ∣ q - r ∣ < ε
+      --     foo' = {!!} -- <→∣∣< {x = q - r} {ε = ε} (snd ψ) (fst ψ)
+
+      --     foo : 0 < ε - ∣ q - r ∣
+      --     foo = <→0<- {x = ∣ q - r ∣} {y = ε} foo'
+
+      --     ι : 0 < θ
+      --     ι = 0</ {x = ε - ∣ q - r ∣} {y = 2} foo ζ'
+
+      --     bar : θ < ε
+      --     bar = subst (λ ?x → θ < ?x) (·IdR ε) bar''
+      --       where
+      --       baz : 2 [ ζ ]⁻¹ < 1
+      --       baz = Bool.toWitness {Q = <Dec (2 [ ζ ]⁻¹) 1} tt
+
+      --       baz' : 0 ≤ 2 [ ζ ]⁻¹
+      --       baz' = Bool.toWitness {Q = ≤Dec 0 (2 [ ζ ]⁻¹)} tt
+
+      --       bar''' : - ∣ q - r ∣ ≤ 0
+      --       bar''' = ≤antitone- {x = 0} {y = ∣ q - r ∣} (0≤∣∣ (q - r))
+
+      --       bar' : (ε - ∣ q - r ∣) ≤ ε
+      --       bar' = subst (_≤_ (ε - ∣ q - r ∣))
+      --                    (+IdR ε)
+      --                    (≤-o+ (- ∣ q - r ∣) 0 ε bar''')
+
+      --       bar'' : (ε - ∣ q - r ∣) · (2 [ ζ ]⁻¹) < ε · 1
+      --       bar'' = ≤→<→·<· {x = ε - ∣ q - r ∣} {y = 2 [ ζ ]⁻¹} {z = ε} {w = 1}
+      --                       bar' baz φ baz'
+
+      --     κ : 0 < ε - θ
+      --     κ = <→0<- {x = θ} {y = ε} bar 
+
+      --     μ : Close'RationalRational q r (ε - θ) κ
+      --     μ = {!!} -- (∣∣<→<₂ {x = q - r} {ε = ε - θ} knew) , (∣∣<→<₁ {x = q - r} {ε = ε - θ} knew)
+      --       where
+      --       bon : 0 < ε / 2 [ ζ ]
+      --       bon = 0</ {x = ε} {y = 2} φ ζ'
+
+      --       iver : ε - θ ≡ ε / 2 [ ζ ] + ∣ q - r ∣
+      --       iver = {!!}
+      --       -- ε - ((ε - ∣ q - r ∣) / 2 [ ζ ])
+      --       --          ≡⟨ ? ⟩
+      --       --        ε - (ε / 2 [ ζ ] + (- ∣ q - r ∣) / 2 [ ζ ])
+      --       --          ≡⟨ ? ⟩
+      --       --        ε (- (ε / 2 [ ζ ]) + - ((- ∣ q - r ∣) / 2 [ ζ ]))
+      --       --          ≡⟨ ? ⟩
+      --       --        ε (- (ε / 2 [ ζ ]) + ((- - ∣ q - r ∣) / 2 [ ζ ]))
+      --       --          ≡⟨ ? ⟩
+      --       --        ε (- (ε / 2 [ ζ ]) + ∣ q - r ∣ / 2 [ ζ ])
+      --       --          ≡⟨ ? ⟩
+      --       --        (ε - (ε / 2 [ ζ ]) + ∣ q - r ∣ / 2 [ ζ ]
+      --       --          ≡⟨ ? ⟩
+
+      --       -- TODO: No it needs to be ∣ q - r ∣ / 2 [ ] < ε - θ
+      --       -- ≡ ε - (ε - ∣ q - r ∣) / 2 [ ]
+      --       knew : ∣ q - r ∣ < ε - θ
+      --       knew = subst2 _<_
+      --                     (+IdL ∣ q - r ∣) (sym iver)
+      --                     (<-+o 0 (ε / 2 [ ζ ]) ∣ q - r ∣ bon)
+
+      --   γ'' = {!!}
+
+close'RationalRationalRounded :
+  (q r : ℚ) (ε : ℚ) (φ : 0 < ε) →
+  Close'RationalRational q r ε φ ↔
+  ∃ ℚ (λ θ → (0 < θ) ×
+           Σ (0 < (ε - θ))
+           (λ ψ → Close'RationalRational q r (ε - θ) ψ))
+close'RationalRationalRounded = {!!}
+
+Close'Σ : Σ ((ε : ℚ) → 0 < ε → ℝ → ℝ → Type ℓ-zero)
+            (λ Close' →
+            Σ ((ε : ℚ) (φ : 0 < ε) (u v : ℝ) → isProp (Close' ε φ u v))
+            (λ φ →
+            Rounded Close' φ ×
+            TriangleInequality₁ Close Close' squash φ ×
+            TriangleInequality₂ Close Close' squash φ))
+Close'Σ =
+  -- (fst $ (recursion {A = A} {B = B} bar) u) v ε φ
+  let foo = recursion {A = A} {B = B} bar
+  in (λ ε φ u v → (fst $ foo u) v ε φ) ,
+     ((λ ε φ u v → (fst $ snd $ foo u) v ε φ) ,
+      (λ u v ε φ → (fst $ snd $ snd $ foo u) v ε φ) ,
+      (λ u v w ε η ω θ →
+       let foo' = (fst $ snd $ snd $ snd $ foo u) v w η ε θ ω 
+       -- Oh my goodness
+       in flip foo') ,
+      -- This one has eight cases according to the last paragraph of the proof
+      -- Not included as as part of A'
+      (λ u v w ε η ω θ →
+        let foo' = (fst $ snd $ snd $ snd $ foo u) v w ε η ω θ
+            foo'' = (snd $ snd $ snd $ snd $ foo u) v w ε η ω θ
+        in {!!}))
+  where
+  A' : (ℝ → (ε : ℚ) → 0 < ε → Type ℓ-zero) → Type ℓ-zero
+  A' ◆ = ((u : ℝ) (ε : ℚ) (φ : 0 < ε) → isProp (◆ u ε φ)) ×
+         ((u : ℝ) (ε : ℚ) (ω : 0 < ε) →
+          (◆ u ε ω) ↔ ∃ ℚ (λ θ → (0 < θ) ×
+                                 Σ (0 < ε - θ)
+                                   (λ χ → ◆ u (ε - θ) χ))) ×
+         ((u v : ℝ) (ε η : ℚ) (ω : 0 < ε) (θ : 0 < η) →
+          Close ε ω u v →
+          ◆ u η θ → ◆ v (η + ε) (0<+' {x = η} {y = ε} θ ω)) ×
+         ((u v : ℝ) (ε η : ℚ) (ω : 0 < ε) (θ : 0 < η) →
+          Close ε ω u v →
+          ◆ v η θ → ◆ u (η + ε) (0<+' {x = η} {y = ε} θ ω))
+
+  A : Type (ℓ-suc ℓ-zero)
+  A = Σ (ℝ → (ε : ℚ) → 0 < ε → Type ℓ-zero) A'
+
+  B : A → A → (ε : ℚ) → 0 < ε → Type ℓ-zero
+  B ◆ ♥ ε φ = (u : ℝ) (η : ℚ) (ψ : 0 < η) →
+              ((fst ◆) u η ψ → (fst ♥) u (ε + η) (0<+' {x = ε} {y = η} φ ψ)) × 
+              ((fst ♥) u η ψ → (fst ◆) u (ε + η) (0<+' {x = ε} {y = η} φ ψ))
+
+  C' : ((ε : ℚ) → 0 < ε → Type ℓ-zero) → Type ℓ-zero
+  C' ▲ =
+    ((ε : ℚ) (φ : 0 < ε) → isProp (▲ ε φ)) ×
+    ((ε : ℚ) (φ : 0 < ε) → ▲ ε φ ↔ ∃ ℚ (λ θ → (0 < θ) ×
+                                              Σ (0 < ε - θ)
+                                                (λ χ → ▲ (ε - θ) χ)))
+
+  C : Type (ℓ-suc ℓ-zero)
+  C = Σ ((ε : ℚ) → 0 < ε → Type ℓ-zero) C'
+
+  D : C → C → (ε : ℚ) → 0 < ε → Type ℓ-zero
+  D ▲ □ ε φ = (η : ℚ) (ψ : 0 < η) →
+              ((fst ▲) η ψ → (fst □) (η + ε) (0<+' {x = η} {y = ε} ψ φ)) ×
+              ((fst □) η ψ → (fst ▲) (η + ε) (0<+' {x = η} {y = ε} ψ φ))
+
+  lightyear : (◆ : ℝ → (ε : ℚ) → 0 < ε → Type ℓ-zero) →
+      isProp (A' ◆)
+  -- Trick: hehe we need the first projection to prove the rest are
+  -- propositions, so just assume it's here. This lemma says we can do that
+  lightyear ◆ = isOfHLevelSucIfInhabited→isOfHLevelSuc 0
+          (λ a' → let β : (u : ℝ) (ε : ℚ) (φ : 0 < ε) → isProp (◆ u ε φ)
+                      β = fst a'
+                  in isProp×3 (isPropΠ3 (λ _ _ _ → isPropIsProp))
+                              (isPropΠ3 (λ u ε φ →
+                                isProp× (isProp→ isPropPropTrunc)
+                                        (isProp→ (β u ε φ))))
+                              (isPropΠ6 (λ u v ε η ω θ →
+                                isPropΠ2 (λ χ π →
+                                  β v (η + ε) (0<+' {x = η} {y = ε} θ ω))))
+                              (isPropΠ6 λ u v ε η ω θ →
+                                isPropΠ2 λ χ π →
+                                  β u (η + ε) (0<+' {x = η} {y = ε} θ ω)))
+
+  ψ : ℚ → A
+  ψ q =
+    let bar' = α , β , γ , ζ , ι , κ , μ , ν
+        buzz = recursion {A = C} {B = D} bar'
+        buzz' = recursion∼ {A = C} {B = D} bar'
+    in (λ u → fst $ buzz u) ,
+       ((λ u → fst $ snd $ buzz u) ,
+        (λ u → snd $ snd $ buzz u) ,
+        (λ u v ε θ φ ψ ω → fst $ buzz' ω θ ψ) ,
+        (λ u v ε θ φ ψ ω → snd $ buzz' ω θ ψ))
+    where
+    α : ℚ → C
+    -- HoTT 11.3.17
+    α r = Close'RationalRational q r , (close'RationalRationalProposition q r , close'RationalRationalRounded q r)
+      where
+      -- Close'RationalRational : (ε : ℚ) → 0 < ε → Type ℓ-zero
+      -- Close'RationalRational ε φ = (- ε < q - r) × (q - r < ε)
+
+      β : (ε : ℚ) (φ : 0 < ε) → isProp (Close'RationalRational q r ε φ)
+      β ε φ = {!!}
+      -- isProp× (isProp< (- ε) (q - r)) (isProp< (q - r) ε)
+
+      γ : (ε : ℚ) (φ : 0 < ε) →
+          Close'RationalRational q r ε φ ↔
+          ∃ ℚ (λ θ → (0 < θ) × Σ (0 < (ε - θ)) (Close'RationalRational q r (ε - θ)))
+      γ ε φ = {!!}
+        -- γ' , γ''
+        where
+        γ' : Close'RationalRational q r ε φ →
+             ∃ ℚ (λ θ → (0 < θ) ×
+                        Σ (0 < (ε - θ)) (Close'RationalRational q r (ε - θ)))
+        γ' ψ = ∣ (θ , ι , κ , μ) ∣₁
+          where
+          ζ : ¬ 2 ≡ 0
+          ζ = Bool.toWitnessFalse {Q = discreteℚ 2 0} tt
+
+          ζ' : 0 < 2
+          ζ' = Bool.toWitness {Q = <Dec 0 2} tt
+
+          θ = (ε - ∣ q - r ∣) / 2 [ ζ ] 
+
+          foo' : ∣ q - r ∣ < ε
+          foo' = {!!} -- <→∣∣< {x = q - r} {ε = ε} (snd ψ) (fst ψ)
+
+          foo : 0 < ε - ∣ q - r ∣
+          foo = <→0<- {x = ∣ q - r ∣} {y = ε} foo'
+
+          ι : 0 < θ
+          ι = 0</ {x = ε - ∣ q - r ∣} {y = 2} foo ζ'
+
+          bar : θ < ε
+          bar = subst (λ ?x → θ < ?x) (·IdR ε) bar''
+            where
+            baz : 2 [ ζ ]⁻¹ < 1
+            baz = Bool.toWitness {Q = <Dec (2 [ ζ ]⁻¹) 1} tt
+
+            baz' : 0 ≤ 2 [ ζ ]⁻¹
+            baz' = Bool.toWitness {Q = ≤Dec 0 (2 [ ζ ]⁻¹)} tt
+
+            bar''' : - ∣ q - r ∣ ≤ 0
+            bar''' = ≤antitone- {x = 0} {y = ∣ q - r ∣} (0≤∣∣ (q - r))
+
+            bar' : (ε - ∣ q - r ∣) ≤ ε
+            bar' = subst (_≤_ (ε - ∣ q - r ∣))
+                         (+IdR ε)
+                         (≤-o+ (- ∣ q - r ∣) 0 ε bar''')
+
+            bar'' : (ε - ∣ q - r ∣) · (2 [ ζ ]⁻¹) < ε · 1
+            bar'' = ≤→<→·<· {x = ε - ∣ q - r ∣} {y = 2 [ ζ ]⁻¹} {z = ε} {w = 1}
+                            bar' baz φ baz'
+
+          κ : 0 < ε - θ
+          κ = <→0<- {x = θ} {y = ε} bar 
+
+          μ : Close'RationalRational q r (ε - θ) κ
+          μ = {!!} -- (∣∣<→<₂ {x = q - r} {ε = ε - θ} knew) , (∣∣<→<₁ {x = q - r} {ε = ε - θ} knew)
+            where
+            bon : 0 < ε / 2 [ ζ ]
+            bon = 0</ {x = ε} {y = 2} φ ζ'
+
+            iver : ε - θ ≡ ε / 2 [ ζ ] + ∣ q - r ∣
+            iver = {!!}
+            -- ε - ((ε - ∣ q - r ∣) / 2 [ ζ ])
+            --          ≡⟨ ? ⟩
+            --        ε - (ε / 2 [ ζ ] + (- ∣ q - r ∣) / 2 [ ζ ])
+            --          ≡⟨ ? ⟩
+            --        ε (- (ε / 2 [ ζ ]) + - ((- ∣ q - r ∣) / 2 [ ζ ]))
+            --          ≡⟨ ? ⟩
+            --        ε (- (ε / 2 [ ζ ]) + ((- - ∣ q - r ∣) / 2 [ ζ ]))
+            --          ≡⟨ ? ⟩
+            --        ε (- (ε / 2 [ ζ ]) + ∣ q - r ∣ / 2 [ ζ ])
+            --          ≡⟨ ? ⟩
+            --        (ε - (ε / 2 [ ζ ]) + ∣ q - r ∣ / 2 [ ζ ]
+            --          ≡⟨ ? ⟩
+
+            -- TODO: No it needs to be ∣ q - r ∣ / 2 [ ] < ε - θ
+            -- ≡ ε - (ε - ∣ q - r ∣) / 2 [ ]
+            knew : ∣ q - r ∣ < ε - θ
+            knew = subst2 _<_
+                          (+IdL ∣ q - r ∣) (sym iver)
+                          (<-+o 0 (ε / 2 [ ζ ]) ∣ q - r ∣ bon)
+
+        γ'' = {!!}
+
+    β = {!!}
+
+    γ = {!!}
+
+    ζ = {!!}
+
+    ι = {!!}
+
+    κ = {!!}
+
+    μ = {!!}
+
+    ν = {!!}
+
+  ω : (f : (ε : ℚ) → 0 < ε → A) → CauchyApproximation'' A B f → A
+  ω f φ =
+    let bar' = α , β , γ , ζ , ι , κ , μ , ν
+        buzz = recursion {A = C} {B = D} bar'
+        buzz' = recursion∼ {A = C} {B = D} bar'
+    in (λ u → fst $ buzz u) ,
+       ((λ u → fst $ snd $ buzz u) ,
+        (λ u → snd $ snd $ buzz u) ,
+        (λ u v ε θ φ ψ ω → fst $ buzz' ω θ ψ) ,
+        (λ u v ε θ φ ψ ω → snd $ buzz' ω θ ψ))
+    where
+    α = {!!}
+
+    β = {!!}
+
+    γ = {!!}
+
+    ζ = {!!}
+
+    ι = {!!}
+
+    κ = {!!}
+
+    μ = {!!}
+
+    ν = {!!}
+
+  -- Seperatedness of B
+  θ : (◆ ♥ : A) → ((ε : ℚ) (φ : 0 < ε) → B ◆ ♥ ε φ) → ◆ ≡ ♥
+  θ ◆ ♥ χ =
+    Σ≡Prop lightyear
+           (funExt λ u → funExt (λ ε → funExt (λ φ → π u ε φ)))
+    where
+    π : (u : ℝ) (ε : ℚ) (φ : 0 < ε) → (fst ◆) u ε φ ≡ (fst ♥) u ε φ
+    π u ε φ = ua $ propBiimpl→Equiv ((fst $ snd ◆) u ε φ)
+                                    ((fst $ snd ♥) u ε φ)
+                                    σ τ
+      where
+      -- TODO: Pull out into lemma
+      ρ : (θ : ℚ) → θ + (ε - θ) ≡ ε
+      ρ θ = θ + (ε - θ)
+              ≡⟨ cong (_+_ θ) (+Comm ε (- θ)) ⟩
+            θ + (- θ + ε)
+              ≡⟨ +Assoc θ (- θ) ε ⟩
+            (θ + - θ) + ε
+              ≡⟨ cong (flip _+_ ε) (+InvR θ) ⟩
+            0 + ε
+              ≡⟨ +IdL ε ⟩
+            ε ∎
+
+      σ : (fst ◆) u ε φ → (fst ♥) u ε φ
+      σ τ = μ
+        where
+        ι : ∃ ℚ (λ θ → (0 < θ) × Σ (0 < (ε - θ)) (λ τ → (fst ◆) u (ε - θ) τ))
+        ι = (fst $ (fst $ snd $ snd ◆) u ε φ) τ
+
+        κ : (θ : ℚ) →
+              (0 < θ) × Σ (0 < ε - θ) (λ τ → (fst ◆) u (ε - θ) τ) →
+              (fst ♥) u ε φ
+        κ θ (τ , υ , γ) = ο
+          where
+          ν : (fst ♥) u (θ + (ε - θ)) (0<+' {x = θ} {y = ε - θ} τ υ)
+          ν = (fst $ χ θ τ u (ε - θ) υ) $ γ
+
+          ξ : Σ (0 < ε) (λ ι → (fst ♥) u ε ι)
+          ξ = subst (λ ?x → Σ (0 < ?x) (λ ι → (fst ♥) u ?x ι))
+                       (ρ θ)
+                       (0<+' {x = θ} {y = ε - θ} τ υ , ν)
+
+          ο : (fst ♥) u ε φ
+          ο = subst (λ ?x → (fst ♥) u ε ?x)
+                         (isProp< 0 ε (fst ξ) φ)
+                         (snd ξ)
+
+        μ : (fst ♥) u ε φ
+        μ = ∃-rec ((fst $ snd ♥) u ε φ) κ ι
+
+      τ : (fst ♥) u ε φ → (fst ◆) u ε φ
+      τ υ = μ
+        where
+        ι : ∃ ℚ (λ θ → (0 < θ) × Σ (0 < (ε - θ)) (λ τ → (fst ♥) u (ε - θ) τ))
+        ι = (fst $ (fst $ snd $ snd ♥) u ε φ) υ
+
+        κ : (θ : ℚ) →
+            (0 < θ) × Σ (0 < (ε - θ)) (λ υ → (fst ♥) u (ε - θ) υ) →
+            (fst ◆) u ε φ
+        κ θ (υ , γ , ζ) = ο
+          where
+          ν : (fst ◆) u (θ + (ε - θ)) (0<+' {x = θ} {y = ε - θ} υ γ)
+          ν = (snd $ χ θ υ u (ε - θ) γ) $ ζ
+
+          ξ : Σ (0 < ε) (λ ι → (fst ◆) u ε ι)
+          ξ = subst (λ ?x → Σ (0 < ?x) (λ ι → (fst ◆) u ?x ι))
+                       (ρ θ)
+                       (0<+' {x = θ} {y = ε - θ} υ γ , ν)
+
+          ο : (fst ◆) u ε φ
+          ο = subst (λ ?x → (fst ◆) u ε ?x)
+                         (isProp< 0 ε (fst ξ) φ)
+                         (snd ξ)
+
+        μ : (fst ◆) u ε φ
+        μ = ∃-rec ((fst $ snd ◆) u ε φ) κ ι
+
+  χ = {!!}
+
+  π = {!!}
+
+  ρ = {!!}
+
+  σ = {!!}
+
+  τ = {!!}
+
+  -- TODO: Name
+  bar = ψ , ω , θ , χ , π , ρ , σ , τ
+
+Close' : (ε : ℚ) → 0 < ε → ℝ → ℝ → Type ℓ-zero
+Close' = fst Close'Σ
+
+syntax Close' ε p x y = x ≈[ ε , p ] y
+
+closeProposition : (ε : ℚ) (φ : 0 < ε) (u v : ℝ) → isProp (Close' ε φ u v)
+closeProposition = fst $ snd $ Close'Σ
+
+closeRounded : Rounded Close' closeProposition
+closeRounded = fst $ snd $ snd $ Close'Σ
+
+closeTriangleInequality₁ :
+  TriangleInequality₁ Close Close' squash closeProposition
+closeTriangleInequality₁ = fst $ snd $ snd $ snd $ Close'Σ
+
+closeTriangleInequality₂ :
+  TriangleInequality₂ Close Close' squash closeProposition
+closeTriangleInequality₂ = snd $ snd $ snd $ snd $ Close'Σ

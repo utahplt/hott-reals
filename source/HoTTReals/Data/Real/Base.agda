@@ -335,7 +335,7 @@ closeReflexive u = inductionProposition (ψ , θ , ω) u
             ε / 3 [ σ ] + ε / 3 [ σ ]
               ≡⟨ sym (·DistR+ ε ε (3 [ σ ]⁻¹)) ⟩
             (ε + ε) · (3 [ σ ]⁻¹)
-              ≡⟨ cong (λ ?x → ?x · (3 [ σ ]⁻¹)) (2·≡self+ ε) ⟩
+              ≡⟨ cong (λ ?x → ?x · (3 [ σ ]⁻¹)) (self+≡2· ε) ⟩
             (2 · ε) · (3 [ σ ]⁻¹)
               ≡⟨ sym (·Assoc 2 ε (3 [ σ ]⁻¹)) ⟩
             2 · (ε · (3 [ σ ]⁻¹))
@@ -921,94 +921,83 @@ TriangleInequality₂ B C _ _ =
   (ε δ : ℚ) (φ : 0 < ε) (ψ : 0 < δ) →
   B ε φ u v → C δ ψ v w → C (ε + δ) (0<+' {x = ε} {y = δ} φ ψ) u w
 
+-- HoTT 11.3.17
 Close'RationalRational : (q r : ℚ) (ε : ℚ) → 0 < ε → Type ℓ-zero
 Close'RationalRational q r ε φ = ∣ q - r ∣ < ε
 
 close'RationalRationalProposition : 
   (q r : ℚ) (ε : ℚ) (φ : 0 < ε)  → isProp (Close'RationalRational q r ε φ)
-close'RationalRationalProposition = {!!}
+close'RationalRationalProposition q r ε φ = isProp< ∣ q - r ∣ ε
 
-      -- γ : (ε : ℚ) (φ : 0 < ε) →
-      --     Close'RationalRational q r ε φ ↔
-      --     ∃ ℚ (λ θ → (0 < θ) × Σ (0 < (ε - θ)) (Close'RationalRational q r (ε - θ)))
-      -- γ ε φ = {!!}
-      --   -- γ' , γ''
-      --   where
-      --   γ' : Close'RationalRational q r ε φ →
-      --        ∃ ℚ (λ θ → (0 < θ) ×
-      --                   Σ (0 < (ε - θ)) (Close'RationalRational q r (ε - θ)))
-      --   γ' ψ = ∣ (θ , ι , κ , μ) ∣₁
-      --     where
-      --     ζ : ¬ 2 ≡ 0
-      --     ζ = Bool.toWitnessFalse {Q = discreteℚ 2 0} tt
+close'RationalRationalOpen :
+  (q r : ℚ) (ε : ℚ) (φ : 0 < ε) →
+  Close'RationalRational q r ε φ →
+  ∃ ℚ (λ θ → (0 < θ) ×
+           Σ (0 < (ε - θ))
+           (λ ψ → Close'RationalRational q r (ε - θ) ψ))
+close'RationalRationalOpen q r ε φ ψ = ∣ (θ , χ' , τ , σ'') ∣₁
+  where
+  ω : ¬ 2 ≡ 0
+  ω = Bool.toWitnessFalse {Q = discreteℚ 2 0} tt
 
-      --     ζ' : 0 < 2
-      --     ζ' = Bool.toWitness {Q = <Dec 0 2} tt
+  ω' : 0 < 2 [ ω ]⁻¹
+  ω' = Bool.toWitness {Q = <Dec 0 (2 [ ω ]⁻¹)} tt
 
-      --     θ = (ε - ∣ q - r ∣) / 2 [ ζ ] 
+  ω'' : 0 < 2
+  ω'' = Bool.toWitness {Q = <Dec 0 2} tt
 
-      --     foo' : ∣ q - r ∣ < ε
-      --     foo' = {!!} -- <→∣∣< {x = q - r} {ε = ε} (snd ψ) (fst ψ)
+  θ : ℚ
+  θ = (ε - ∣ q - r ∣) / 2 [ ω ]
 
-      --     foo : 0 < ε - ∣ q - r ∣
-      --     foo = <→0<- {x = ∣ q - r ∣} {y = ε} foo'
+  χ : 0 < ε - ∣ q - r ∣
+  χ = <→0<- {x = ∣ q - r ∣} {y = ε} ψ
 
-      --     ι : 0 < θ
-      --     ι = 0</ {x = ε - ∣ q - r ∣} {y = 2} foo ζ'
+  χ' : 0 < θ
+  χ' = 0</ {x = ε - ∣ q - r ∣} {y = 2} χ ω''
 
-      --     bar : θ < ε
-      --     bar = subst (λ ?x → θ < ?x) (·IdR ε) bar''
-      --       where
-      --       baz : 2 [ ζ ]⁻¹ < 1
-      --       baz = Bool.toWitness {Q = <Dec (2 [ ζ ]⁻¹) 1} tt
+  π : 2 [ ω ]⁻¹ · ∣ q - r ∣ + 2 [ ω ]⁻¹ · ∣ q - r ∣ ≡ ∣ q - r ∣
+  π = 2⁻¹+≡self ∣ q - r ∣
 
-      --       baz' : 0 ≤ 2 [ ζ ]⁻¹
-      --       baz' = Bool.toWitness {Q = ≤Dec 0 (2 [ ζ ]⁻¹)} tt
+  ρ : ε - θ ≡ 2 [ ω ]⁻¹ · ε + 2 [ ω ]⁻¹ · ∣ q - r ∣
+  ρ = ε - ((ε - ∣ q - r ∣) / 2 [ ω ])
+        ≡⟨ cong (_-_ ε) (·DistR+ ε (- ∣ q - r ∣) (2 [ ω ]⁻¹)) ⟩
+      ε - (ε / 2 [ ω ] + (- ∣ q - r ∣) / 2 [ ω ])
+        ≡⟨ cong (_+_ ε) (negateAdd (ε / 2 [ ω ]) ((- ∣ q - r ∣) / 2 [ ω ])) ⟩
+      ε + (- (ε / 2 [ ω ]) + - ((- ∣ q - r ∣) / 2 [ ω ]))
+        ≡⟨ +Assoc ε (- (ε / 2 [ ω ])) (- ((- ∣ q - r ∣) / 2 [ ω ])) ⟩
+      (ε - (ε / 2 [ ω ])) + - ((- ∣ q - r ∣) / 2 [ ω ])
+        ≡⟨ cong (flip _+_ _) (self-self/2≡self/2 ε) ⟩
+      (ε / 2 [ ω ]) + - ((- ∣ q - r ∣) / 2 [ ω ])
+        ≡⟨ cong (_+_ (ε / 2 [ ω ])) (-·≡-· (- ∣ q - r ∣) (2 [ ω ]⁻¹)) ⟩
+      (ε / 2 [ ω ]) + (- - ∣ q - r ∣) / 2 [ ω ]
+        ≡⟨ cong (λ ?x → (ε / 2 [ ω ]) + (?x / 2 [ ω ])) (-Invol ∣ q - r ∣) ⟩
+      (ε / 2 [ ω ]) + (∣ q - r ∣) / 2 [ ω ]
+        ≡⟨ cong₂ _+_ (·Comm ε (2 [ ω ]⁻¹)) (·Comm ∣ q - r ∣ (2 [ ω ]⁻¹)) ⟩
+      2 [ ω ]⁻¹ · ε + 2 [ ω ]⁻¹ · ∣ q - r ∣ ∎
 
-      --       bar''' : - ∣ q - r ∣ ≤ 0
-      --       bar''' = ≤antitone- {x = 0} {y = ∣ q - r ∣} (0≤∣∣ (q - r))
+  σ : 2 [ ω ]⁻¹ · ∣ q - r ∣ < 2 [ ω ]⁻¹ · ε
+  σ = <-o· {x = 2 [ ω ]⁻¹} {y = ∣ q - r ∣} {z = ε} ω' ψ
+  
+  σ' : 2 [ ω ]⁻¹ · ∣ q - r ∣ + 2 [ ω ]⁻¹ · ∣ q - r ∣ <
+       2 [ ω ]⁻¹ · ε + 2 [ ω ]⁻¹ · ∣ q - r ∣
+  σ' = <-+o (2 [ ω ]⁻¹ · ∣ q - r ∣)
+            (2 [ ω ]⁻¹ · ε)
+            (2 [ ω ]⁻¹ · ∣ q - r ∣)
+            σ
 
-      --       bar' : (ε - ∣ q - r ∣) ≤ ε
-      --       bar' = subst (_≤_ (ε - ∣ q - r ∣))
-      --                    (+IdR ε)
-      --                    (≤-o+ (- ∣ q - r ∣) 0 ε bar''')
+  σ'' : ∣ q - r ∣ < ε - θ
+  σ'' = subst2 _<_ π (sym ρ) σ'
 
-      --       bar'' : (ε - ∣ q - r ∣) · (2 [ ζ ]⁻¹) < ε · 1
-      --       bar'' = ≤→<→·<· {x = ε - ∣ q - r ∣} {y = 2 [ ζ ]⁻¹} {z = ε} {w = 1}
-      --                       bar' baz φ baz'
+  τ : 0 < ε - θ
+  τ = isTrans≤< 0 ∣ q - r ∣ (ε - θ) (0≤∣∣ (q - r)) σ''
 
-      --     κ : 0 < ε - θ
-      --     κ = <→0<- {x = θ} {y = ε} bar 
-
-      --     μ : Close'RationalRational q r (ε - θ) κ
-      --     μ = {!!} -- (∣∣<→<₂ {x = q - r} {ε = ε - θ} knew) , (∣∣<→<₁ {x = q - r} {ε = ε - θ} knew)
-      --       where
-      --       bon : 0 < ε / 2 [ ζ ]
-      --       bon = 0</ {x = ε} {y = 2} φ ζ'
-
-      --       iver : ε - θ ≡ ε / 2 [ ζ ] + ∣ q - r ∣
-      --       iver = {!!}
-      --       -- ε - ((ε - ∣ q - r ∣) / 2 [ ζ ])
-      --       --          ≡⟨ ? ⟩
-      --       --        ε - (ε / 2 [ ζ ] + (- ∣ q - r ∣) / 2 [ ζ ])
-      --       --          ≡⟨ ? ⟩
-      --       --        ε (- (ε / 2 [ ζ ]) + - ((- ∣ q - r ∣) / 2 [ ζ ]))
-      --       --          ≡⟨ ? ⟩
-      --       --        ε (- (ε / 2 [ ζ ]) + ((- - ∣ q - r ∣) / 2 [ ζ ]))
-      --       --          ≡⟨ ? ⟩
-      --       --        ε (- (ε / 2 [ ζ ]) + ∣ q - r ∣ / 2 [ ζ ])
-      --       --          ≡⟨ ? ⟩
-      --       --        (ε - (ε / 2 [ ζ ]) + ∣ q - r ∣ / 2 [ ζ ]
-      --       --          ≡⟨ ? ⟩
-
-      --       -- TODO: No it needs to be ∣ q - r ∣ / 2 [ ] < ε - θ
-      --       -- ≡ ε - (ε - ∣ q - r ∣) / 2 [ ]
-      --       knew : ∣ q - r ∣ < ε - θ
-      --       knew = subst2 _<_
-      --                     (+IdL ∣ q - r ∣) (sym iver)
-      --                     (<-+o 0 (ε / 2 [ ζ ]) ∣ q - r ∣ bon)
-
-      --   γ'' = {!!}
+close'RationalRationalMonotone :
+  (q r : ℚ) (ε : ℚ) (φ : 0 < ε) →
+  ∃ ℚ (λ θ → (0 < θ) ×
+           Σ (0 < (ε - θ))
+           (λ ψ → Close'RationalRational q r (ε - θ) ψ)) →
+  Close'RationalRational q r ε φ
+close'RationalRationalMonotone q r ε φ ψ = {!!}
 
 close'RationalRationalRounded :
   (q r : ℚ) (ε : ℚ) (φ : 0 < ε) →
@@ -1016,7 +1005,9 @@ close'RationalRationalRounded :
   ∃ ℚ (λ θ → (0 < θ) ×
            Σ (0 < (ε - θ))
            (λ ψ → Close'RationalRational q r (ε - θ) ψ))
-close'RationalRationalRounded = {!!}
+close'RationalRationalRounded q r ε φ =
+  (close'RationalRationalOpen q r ε φ ,
+   close'RationalRationalMonotone q r ε φ)
 
 Close'Σ : Σ ((ε : ℚ) → 0 < ε → ℝ → ℝ → Type ℓ-zero)
             (λ Close' →
@@ -1108,97 +1099,9 @@ Close'Σ =
         (λ u v ε θ φ ψ ω → snd $ buzz' ω θ ψ))
     where
     α : ℚ → C
-    -- HoTT 11.3.17
-    α r = Close'RationalRational q r , (close'RationalRationalProposition q r , close'RationalRationalRounded q r)
-      where
-      -- Close'RationalRational : (ε : ℚ) → 0 < ε → Type ℓ-zero
-      -- Close'RationalRational ε φ = (- ε < q - r) × (q - r < ε)
-
-      β : (ε : ℚ) (φ : 0 < ε) → isProp (Close'RationalRational q r ε φ)
-      β ε φ = {!!}
-      -- isProp× (isProp< (- ε) (q - r)) (isProp< (q - r) ε)
-
-      γ : (ε : ℚ) (φ : 0 < ε) →
-          Close'RationalRational q r ε φ ↔
-          ∃ ℚ (λ θ → (0 < θ) × Σ (0 < (ε - θ)) (Close'RationalRational q r (ε - θ)))
-      γ ε φ = {!!}
-        -- γ' , γ''
-        where
-        γ' : Close'RationalRational q r ε φ →
-             ∃ ℚ (λ θ → (0 < θ) ×
-                        Σ (0 < (ε - θ)) (Close'RationalRational q r (ε - θ)))
-        γ' ψ = ∣ (θ , ι , κ , μ) ∣₁
-          where
-          ζ : ¬ 2 ≡ 0
-          ζ = Bool.toWitnessFalse {Q = discreteℚ 2 0} tt
-
-          ζ' : 0 < 2
-          ζ' = Bool.toWitness {Q = <Dec 0 2} tt
-
-          θ = (ε - ∣ q - r ∣) / 2 [ ζ ] 
-
-          foo' : ∣ q - r ∣ < ε
-          foo' = {!!} -- <→∣∣< {x = q - r} {ε = ε} (snd ψ) (fst ψ)
-
-          foo : 0 < ε - ∣ q - r ∣
-          foo = <→0<- {x = ∣ q - r ∣} {y = ε} foo'
-
-          ι : 0 < θ
-          ι = 0</ {x = ε - ∣ q - r ∣} {y = 2} foo ζ'
-
-          bar : θ < ε
-          bar = subst (λ ?x → θ < ?x) (·IdR ε) bar''
-            where
-            baz : 2 [ ζ ]⁻¹ < 1
-            baz = Bool.toWitness {Q = <Dec (2 [ ζ ]⁻¹) 1} tt
-
-            baz' : 0 ≤ 2 [ ζ ]⁻¹
-            baz' = Bool.toWitness {Q = ≤Dec 0 (2 [ ζ ]⁻¹)} tt
-
-            bar''' : - ∣ q - r ∣ ≤ 0
-            bar''' = ≤antitone- {x = 0} {y = ∣ q - r ∣} (0≤∣∣ (q - r))
-
-            bar' : (ε - ∣ q - r ∣) ≤ ε
-            bar' = subst (_≤_ (ε - ∣ q - r ∣))
-                         (+IdR ε)
-                         (≤-o+ (- ∣ q - r ∣) 0 ε bar''')
-
-            bar'' : (ε - ∣ q - r ∣) · (2 [ ζ ]⁻¹) < ε · 1
-            bar'' = ≤→<→·<· {x = ε - ∣ q - r ∣} {y = 2 [ ζ ]⁻¹} {z = ε} {w = 1}
-                            bar' baz φ baz'
-
-          κ : 0 < ε - θ
-          κ = <→0<- {x = θ} {y = ε} bar 
-
-          μ : Close'RationalRational q r (ε - θ) κ
-          μ = {!!} -- (∣∣<→<₂ {x = q - r} {ε = ε - θ} knew) , (∣∣<→<₁ {x = q - r} {ε = ε - θ} knew)
-            where
-            bon : 0 < ε / 2 [ ζ ]
-            bon = 0</ {x = ε} {y = 2} φ ζ'
-
-            iver : ε - θ ≡ ε / 2 [ ζ ] + ∣ q - r ∣
-            iver = {!!}
-            -- ε - ((ε - ∣ q - r ∣) / 2 [ ζ ])
-            --          ≡⟨ ? ⟩
-            --        ε - (ε / 2 [ ζ ] + (- ∣ q - r ∣) / 2 [ ζ ])
-            --          ≡⟨ ? ⟩
-            --        ε (- (ε / 2 [ ζ ]) + - ((- ∣ q - r ∣) / 2 [ ζ ]))
-            --          ≡⟨ ? ⟩
-            --        ε (- (ε / 2 [ ζ ]) + ((- - ∣ q - r ∣) / 2 [ ζ ]))
-            --          ≡⟨ ? ⟩
-            --        ε (- (ε / 2 [ ζ ]) + ∣ q - r ∣ / 2 [ ζ ])
-            --          ≡⟨ ? ⟩
-            --        (ε - (ε / 2 [ ζ ]) + ∣ q - r ∣ / 2 [ ζ ]
-            --          ≡⟨ ? ⟩
-
-            -- TODO: No it needs to be ∣ q - r ∣ / 2 [ ] < ε - θ
-            -- ≡ ε - (ε - ∣ q - r ∣) / 2 [ ]
-            knew : ∣ q - r ∣ < ε - θ
-            knew = subst2 _<_
-                          (+IdL ∣ q - r ∣) (sym iver)
-                          (<-+o 0 (ε / 2 [ ζ ]) ∣ q - r ∣ bon)
-
-        γ'' = {!!}
+    α r = Close'RationalRational q r ,
+          (close'RationalRationalProposition q r ,
+           close'RationalRationalRounded q r)
 
     β = {!!}
 

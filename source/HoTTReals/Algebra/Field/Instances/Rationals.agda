@@ -111,3 +111,6 @@ x / y [ p ] = x ℚ.· (y [ p ]⁻¹)
 
 ⁻¹-inverse : (x : ℚ) (p : ¬ x ≡ 0) → x ℚ.· (x [ p ]⁻¹) ≡ 1
 ⁻¹-inverse x p = snd $ hasInverseℚ x p
+
+⁻¹-inverse' : (x : ℚ) (p : ¬ x ≡ 0) → (x [ p ]⁻¹) ℚ.· x ≡ 1
+⁻¹-inverse' x p = ℚ.·Comm (x [ p ]⁻¹) x ∙ ⁻¹-inverse x p

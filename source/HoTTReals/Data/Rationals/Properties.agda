@@ -2,6 +2,7 @@ module HoTTReals.Data.Rationals.Properties where
 
 open import Cubical.Algebra.CommRing
 open import Cubical.Algebra.Field.Base
+open import Cubical.Data.Bool as Bool using ()
 open import Cubical.Data.Rationals as ℚ
 open import Cubical.Data.Sigma
 open import Cubical.Foundations.Function
@@ -10,13 +11,32 @@ open import Cubical.Relation.Nullary
 
 open import HoTTReals.Algebra.Field.Instances.Rationals as ℚ
 
-2·≡self+ : (x : ℚ) → x + x ≡ 2 · x
-2·≡self+ x =
+self+≡2· : (x : ℚ) → x + x ≡ 2 · x
+self+≡2· x =
   x + x
     ≡⟨ cong (λ ?x → ?x + ?x) (sym (·IdL x)) ⟩
   1 · x + 1 · x
     ≡⟨ sym (·DistR+ 1 1 x) ⟩
   2 · x ∎
+
+2⁻¹+≡self : (x : ℚ) →
+            let φ : ¬ 2 ≡ 0
+                φ = Bool.toWitnessFalse {Q = discreteℚ 2 0} tt
+            in 2 [ φ ]⁻¹ · x + 2 [ φ ]⁻¹ · x ≡ x
+2⁻¹+≡self x = 2 [ φ ]⁻¹ · x + 2 [ φ ]⁻¹ · x
+                ≡⟨ (sym $ ·DistL+ (2 [ φ ]⁻¹) x x) ⟩
+              2 [ φ ]⁻¹ · (x + x)
+                ≡⟨ cong (_·_ (2 [ φ ]⁻¹)) (self+≡2· x) ⟩
+              2 [ φ ]⁻¹ · (2 · x)
+                ≡⟨ ·Assoc (2 [ φ ]⁻¹) 2 x ⟩
+              (2 [ φ ]⁻¹ · 2) · x
+                ≡⟨ cong (flip _·_ x) (⁻¹-inverse' 2 φ) ⟩
+              1 · x
+                ≡⟨ ·IdL x ⟩
+              x ∎
+  where
+  φ : ¬ 2 ≡ 0
+  φ = Bool.toWitnessFalse {Q = discreteℚ 2 0} tt
 
 +≡0→≡- : {x y : ℚ} → x + y ≡ 0 → x ≡ - y
 +≡0→≡- {x} {y} p =
@@ -80,6 +100,40 @@ negateSubtract x y =
           (- y) · x
             ≡⟨ ·Comm (- y) x ⟩
           x · (- y) ∎
+
+self-2⁻¹·self≡2⁻¹·self :
+  (x : ℚ) →
+  let φ : ¬ 2 ≡ 0
+      φ = Bool.toWitnessFalse {Q = discreteℚ 2 0} tt
+  in x - (2 [ φ ]⁻¹ · x) ≡ 2 [ φ ]⁻¹ · x
+self-2⁻¹·self≡2⁻¹·self x = x - (2 [ φ ]⁻¹ · x)
+                           ≡⟨ cong (_+_ x) (-·≡-· (2 [ φ ]⁻¹) x) ⟩
+                         x + ((- (2 [ φ ]⁻¹)) · x)
+                           ≡⟨ cong (flip _+_ _) (sym $ ·IdL x) ⟩
+                         1 · x + (- (2 [ φ ]⁻¹)) · x
+                           ≡⟨ (sym $ ·DistR+ 1 (- (2 [ φ ]⁻¹)) x) ⟩
+                         (1 + (- (2 [ φ ]⁻¹))) · x
+                           ≡⟨ refl ⟩
+                         2 [ φ ]⁻¹ · x ∎
+  where
+  φ : ¬ 2 ≡ 0
+  φ = Bool.toWitnessFalse {Q = discreteℚ 2 0} tt
+
+self-self/2≡self/2 :
+  (x : ℚ) →
+  let φ : ¬ 2 ≡ 0
+      φ = Bool.toWitnessFalse {Q = discreteℚ 2 0} tt
+  in x - (x / 2 [ φ ]) ≡ x / 2 [ φ ]
+self-self/2≡self/2 x = x - (x / 2 [ φ ])
+                         ≡⟨ cong (_-_ x) (·Comm x (2 [ φ ]⁻¹)) ⟩
+                       x - (2 [ φ ]⁻¹ · x)
+                         ≡⟨ self-2⁻¹·self≡2⁻¹·self x ⟩
+                       2 [ φ ]⁻¹ · x
+                         ≡⟨ ·Comm (2 [ φ ]⁻¹) x ⟩
+                       x / 2 [ φ ] ∎
+  where
+  φ : ¬ 2 ≡ 0
+  φ = Bool.toWitnessFalse {Q = discreteℚ 2 0} tt
 
 ∣_∣ : ℚ → ℚ
 ∣ x ∣ = max x (- x)

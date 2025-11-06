@@ -921,94 +921,6 @@ TriangleInequality₂ B C _ _ =
   (ε δ : ℚ) (φ : 0 < ε) (ψ : 0 < δ) →
   B ε φ u v → C δ ψ v w → C (ε + δ) (0<+' {x = ε} {y = δ} φ ψ) u w
 
--- HoTT 11.3.17
-Close'RationalRational : (q r : ℚ) (ε : ℚ) → 0 < ε → Type ℓ-zero
-Close'RationalRational q r ε φ = ∣ q - r ∣ < ε
-
-close'RationalRationalProposition : 
-  (q r : ℚ) (ε : ℚ) (φ : 0 < ε)  → isProp (Close'RationalRational q r ε φ)
-close'RationalRationalProposition q r ε φ = isProp< ∣ q - r ∣ ε
-
-close'RationalRationalOpen :
-  (q r : ℚ) (ε : ℚ) (φ : 0 < ε) →
-  Close'RationalRational q r ε φ →
-  ∃ ℚ (λ θ → (0 < θ) ×
-           Σ (0 < (ε - θ))
-           (λ ψ → Close'RationalRational q r (ε - θ) ψ))
-close'RationalRationalOpen q r ε φ ψ = ∣ (θ , χ' , τ , σ'') ∣₁
-  where
-  ω : ¬ 2 ≡ 0
-  ω = Bool.toWitnessFalse {Q = discreteℚ 2 0} tt
-
-  ω' : 0 < 2 [ ω ]⁻¹
-  ω' = Bool.toWitness {Q = <Dec 0 (2 [ ω ]⁻¹)} tt
-
-  ω'' : 0 < 2
-  ω'' = Bool.toWitness {Q = <Dec 0 2} tt
-
-  θ : ℚ
-  θ = (ε - ∣ q - r ∣) / 2 [ ω ]
-
-  χ : 0 < ε - ∣ q - r ∣
-  χ = <→0<- {x = ∣ q - r ∣} {y = ε} ψ
-
-  χ' : 0 < θ
-  χ' = 0</ {x = ε - ∣ q - r ∣} {y = 2} χ ω''
-
-  π : 2 [ ω ]⁻¹ · ∣ q - r ∣ + 2 [ ω ]⁻¹ · ∣ q - r ∣ ≡ ∣ q - r ∣
-  π = 2⁻¹+≡self ∣ q - r ∣
-
-  ρ : ε - θ ≡ 2 [ ω ]⁻¹ · ε + 2 [ ω ]⁻¹ · ∣ q - r ∣
-  ρ = ε - ((ε - ∣ q - r ∣) / 2 [ ω ])
-        ≡⟨ cong (_-_ ε) (·DistR+ ε (- ∣ q - r ∣) (2 [ ω ]⁻¹)) ⟩
-      ε - (ε / 2 [ ω ] + (- ∣ q - r ∣) / 2 [ ω ])
-        ≡⟨ cong (_+_ ε) (negateAdd (ε / 2 [ ω ]) ((- ∣ q - r ∣) / 2 [ ω ])) ⟩
-      ε + (- (ε / 2 [ ω ]) + - ((- ∣ q - r ∣) / 2 [ ω ]))
-        ≡⟨ +Assoc ε (- (ε / 2 [ ω ])) (- ((- ∣ q - r ∣) / 2 [ ω ])) ⟩
-      (ε - (ε / 2 [ ω ])) + - ((- ∣ q - r ∣) / 2 [ ω ])
-        ≡⟨ cong (flip _+_ _) (self-self/2≡self/2 ε) ⟩
-      (ε / 2 [ ω ]) + - ((- ∣ q - r ∣) / 2 [ ω ])
-        ≡⟨ cong (_+_ (ε / 2 [ ω ])) (-·≡-· (- ∣ q - r ∣) (2 [ ω ]⁻¹)) ⟩
-      (ε / 2 [ ω ]) + (- - ∣ q - r ∣) / 2 [ ω ]
-        ≡⟨ cong (λ ?x → (ε / 2 [ ω ]) + (?x / 2 [ ω ])) (-Invol ∣ q - r ∣) ⟩
-      (ε / 2 [ ω ]) + (∣ q - r ∣) / 2 [ ω ]
-        ≡⟨ cong₂ _+_ (·Comm ε (2 [ ω ]⁻¹)) (·Comm ∣ q - r ∣ (2 [ ω ]⁻¹)) ⟩
-      2 [ ω ]⁻¹ · ε + 2 [ ω ]⁻¹ · ∣ q - r ∣ ∎
-
-  σ : 2 [ ω ]⁻¹ · ∣ q - r ∣ < 2 [ ω ]⁻¹ · ε
-  σ = <-o· {x = 2 [ ω ]⁻¹} {y = ∣ q - r ∣} {z = ε} ω' ψ
-  
-  σ' : 2 [ ω ]⁻¹ · ∣ q - r ∣ + 2 [ ω ]⁻¹ · ∣ q - r ∣ <
-       2 [ ω ]⁻¹ · ε + 2 [ ω ]⁻¹ · ∣ q - r ∣
-  σ' = <-+o (2 [ ω ]⁻¹ · ∣ q - r ∣)
-            (2 [ ω ]⁻¹ · ε)
-            (2 [ ω ]⁻¹ · ∣ q - r ∣)
-            σ
-
-  σ'' : ∣ q - r ∣ < ε - θ
-  σ'' = subst2 _<_ π (sym ρ) σ'
-
-  τ : 0 < ε - θ
-  τ = isTrans≤< 0 ∣ q - r ∣ (ε - θ) (0≤∣∣ (q - r)) σ''
-
-close'RationalRationalMonotone :
-  (q r : ℚ) (ε : ℚ) (φ : 0 < ε) →
-  ∃ ℚ (λ θ → (0 < θ) ×
-           Σ (0 < (ε - θ))
-           (λ ψ → Close'RationalRational q r (ε - θ) ψ)) →
-  Close'RationalRational q r ε φ
-close'RationalRationalMonotone q r ε φ ψ = {!!}
-
-close'RationalRationalRounded :
-  (q r : ℚ) (ε : ℚ) (φ : 0 < ε) →
-  Close'RationalRational q r ε φ ↔
-  ∃ ℚ (λ θ → (0 < θ) ×
-           Σ (0 < (ε - θ))
-           (λ ψ → Close'RationalRational q r (ε - θ) ψ))
-close'RationalRationalRounded q r ε φ =
-  (close'RationalRationalOpen q r ε φ ,
-   close'RationalRationalMonotone q r ε φ)
-
 Close'Σ : Σ ((ε : ℚ) → 0 < ε → ℝ → ℝ → Type ℓ-zero)
             (λ Close' →
             Σ ((ε : ℚ) (φ : 0 < ε) (u v : ℝ) → isProp (Close' ε φ u v))
@@ -1069,8 +981,8 @@ Close'Σ =
               ((fst ▲) η ψ → (fst □) (η + ε) (0<+' {x = η} {y = ε} ψ φ)) ×
               ((fst □) η ψ → (fst ▲) (η + ε) (0<+' {x = η} {y = ε} ψ φ))
 
-  lightyear : (◆ : ℝ → (ε : ℚ) → 0 < ε → Type ℓ-zero) →
-      isProp (A' ◆)
+  -- TODO: Name
+  lightyear : (◆ : ℝ → (ε : ℚ) → 0 < ε → Type ℓ-zero) → isProp (A' ◆)
   -- Trick: hehe we need the first projection to prove the rest are
   -- propositions, so just assume it's here. This lemma says we can do that
   lightyear ◆ = isOfHLevelSucIfInhabited→isOfHLevelSuc 0
@@ -1098,12 +1010,238 @@ Close'Σ =
         (λ u v ε θ φ ψ ω → fst $ buzz' ω θ ψ) ,
         (λ u v ε θ φ ψ ω → snd $ buzz' ω θ ψ))
     where
-    α : ℚ → C
-    α r = Close'RationalRational q r ,
-          (close'RationalRationalProposition q r ,
-           close'RationalRationalRounded q r)
+    -- HoTT 11.3.17
+    Close'RationalRational : (r : ℚ) (ε : ℚ) → 0 < ε → Type ℓ-zero
+    Close'RationalRational r ε φ = ∣ q - r ∣ < ε
 
-    β = {!!}
+    close'RationalRationalProposition : 
+      (r : ℚ) (ε : ℚ) (φ : 0 < ε)  → isProp (Close'RationalRational r ε φ)
+    close'RationalRationalProposition r ε φ = isProp< ∣ q - r ∣ ε
+
+    close'RationalRationalOpen :
+      (r : ℚ) (ε : ℚ) (φ : 0 < ε) →
+      Close'RationalRational r ε φ →
+      ∃ ℚ (λ θ → (0 < θ) ×
+               Σ (0 < (ε - θ))
+               (λ ψ → Close'RationalRational r (ε - θ) ψ))
+    close'RationalRationalOpen r ε φ ψ = ∣ (θ , χ' , τ , σ'') ∣₁
+      where
+      ω : ¬ 2 ≡ 0
+      ω = Bool.toWitnessFalse {Q = discreteℚ 2 0} tt
+    
+      ω' : 0 < 2 [ ω ]⁻¹
+      ω' = Bool.toWitness {Q = <Dec 0 (2 [ ω ]⁻¹)} tt
+    
+      ω'' : 0 < 2
+      ω'' = Bool.toWitness {Q = <Dec 0 2} tt
+    
+      θ : ℚ
+      θ = (ε - ∣ q - r ∣) / 2 [ ω ]
+    
+      χ : 0 < ε - ∣ q - r ∣
+      χ = <→0<- {x = ∣ q - r ∣} {y = ε} ψ
+    
+      χ' : 0 < θ
+      χ' = 0</ {x = ε - ∣ q - r ∣} {y = 2} χ ω''
+    
+      π : 2 [ ω ]⁻¹ · ∣ q - r ∣ + 2 [ ω ]⁻¹ · ∣ q - r ∣ ≡ ∣ q - r ∣
+      π = 2⁻¹+≡self ∣ q - r ∣
+    
+      ρ : ε - θ ≡ 2 [ ω ]⁻¹ · ε + 2 [ ω ]⁻¹ · ∣ q - r ∣
+      ρ =
+        ε - ((ε - ∣ q - r ∣) / 2 [ ω ])
+          ≡⟨ cong (_-_ ε) (·DistR+ ε (- ∣ q - r ∣) (2 [ ω ]⁻¹)) ⟩
+        ε - (ε / 2 [ ω ] + (- ∣ q - r ∣) / 2 [ ω ])
+          ≡⟨ cong (_+_ ε) (negateAdd (ε / 2 [ ω ]) ((- ∣ q - r ∣) / 2 [ ω ])) ⟩
+        ε + (- (ε / 2 [ ω ]) + - ((- ∣ q - r ∣) / 2 [ ω ]))
+          ≡⟨ +Assoc ε (- (ε / 2 [ ω ])) (- ((- ∣ q - r ∣) / 2 [ ω ])) ⟩
+        (ε - (ε / 2 [ ω ])) + - ((- ∣ q - r ∣) / 2 [ ω ])
+           ≡⟨ cong (flip _+_ _) (self-self/2≡self/2 ε) ⟩
+        (ε / 2 [ ω ]) + - ((- ∣ q - r ∣) / 2 [ ω ])
+           ≡⟨ cong (_+_ (ε / 2 [ ω ])) (-·≡-· (- ∣ q - r ∣) (2 [ ω ]⁻¹)) ⟩
+        (ε / 2 [ ω ]) + (- - ∣ q - r ∣) / 2 [ ω ]
+           ≡⟨ cong (λ ?x → (ε / 2 [ ω ]) + (?x / 2 [ ω ])) (-Invol ∣ q - r ∣) ⟩
+        (ε / 2 [ ω ]) + (∣ q - r ∣) / 2 [ ω ]
+           ≡⟨ cong₂ _+_ (·Comm ε (2 [ ω ]⁻¹)) (·Comm ∣ q - r ∣ (2 [ ω ]⁻¹)) ⟩
+        2 [ ω ]⁻¹ · ε + 2 [ ω ]⁻¹ · ∣ q - r ∣ ∎
+    
+      σ : 2 [ ω ]⁻¹ · ∣ q - r ∣ < 2 [ ω ]⁻¹ · ε
+      σ = <-o· {x = 2 [ ω ]⁻¹} {y = ∣ q - r ∣} {z = ε} ω' ψ
+      
+      σ' : 2 [ ω ]⁻¹ · ∣ q - r ∣ + 2 [ ω ]⁻¹ · ∣ q - r ∣ <
+         2 [ ω ]⁻¹ · ε + 2 [ ω ]⁻¹ · ∣ q - r ∣
+      σ' = <-+o (2 [ ω ]⁻¹ · ∣ q - r ∣)
+                   (2 [ ω ]⁻¹ · ε)
+                   (2 [ ω ]⁻¹ · ∣ q - r ∣)
+                   σ
+
+      σ'' : ∣ q - r ∣ < ε - θ
+      σ'' = subst2 _<_ π (sym ρ) σ'
+
+      τ : 0 < ε - θ
+      τ = isTrans≤< 0 ∣ q - r ∣ (ε - θ) (0≤∣∣ (q - r)) σ''
+
+    close'RationalRationalMonotone :
+      (r : ℚ) (ε : ℚ) (φ : 0 < ε) →
+      ∃ ℚ (λ θ → (0 < θ) ×
+               Σ (0 < (ε - θ))
+                 (Close'RationalRational r (ε - θ))) →
+      Close'RationalRational r ε φ
+    close'RationalRationalMonotone r ε φ ψ =
+      ∃-rec (close'RationalRationalProposition r ε φ) ω ψ
+      where
+      ω : (θ : ℚ) →
+          (0 < θ) × Σ (0 < (ε - θ)) (Close'RationalRational r (ε - θ)) → 
+          Close'RationalRational r ε φ
+      ω θ (χ , π , ρ) = isTrans< ∣ q - r ∣ (ε - θ) ε
+                             ρ σ
+        where
+        σ : ε - θ < ε
+        σ = subst (_<_ (ε - θ))
+                       (+IdR ε)
+                       (<-o+ (- θ) 0 ε (<antitone- {x = 0} {y = θ} χ))
+
+    close'RationalRationalRounded :
+      (r : ℚ) (ε : ℚ) (φ : 0 < ε) →
+      Close'RationalRational r ε φ ↔
+      ∃ ℚ (λ θ → (0 < θ) ×
+               Σ (0 < (ε - θ))
+               (λ ψ → Close'RationalRational r (ε - θ) ψ))
+    close'RationalRationalRounded r ε φ =
+      (close'RationalRationalOpen r ε φ ,
+      close'RationalRationalMonotone r ε φ)
+
+    α : ℚ → C
+    α r = Close'RationalRational r ,
+          (close'RationalRationalProposition r ,
+           close'RationalRationalRounded r)
+
+    Close'RationalLimit :
+      (f : (ε : ℚ) → 0 < ε → C)
+      (φ : CauchyApproximation'' C D f)
+      (ε : ℚ) → 0 < ε → Type ℓ-zero
+    Close'RationalLimit f φ ε ψ =
+      ∃ ℚ (λ δ → Σ (0 < δ)
+          (λ ω → Σ (0 < ε - δ)
+          -- I think the `q` is implicit in the construction of the output in
+          -- `C`
+          (λ χ → (fst $ f δ ω) (ε - δ) χ)))
+
+    close'RationalLimitProposition :
+      (f : (ε : ℚ) → 0 < ε → C)
+      (φ : CauchyApproximation'' C D f)
+      (ε : ℚ) (ψ : 0 < ε) →
+      isProp (Close'RationalLimit f φ ε ψ)
+    close'RationalLimitProposition f φ ε ψ = isPropPropTrunc
+
+    close'RationalLimitOpen :
+      (f : (ε : ℚ) → 0 < ε → C)
+      (φ : CauchyApproximation'' C D f)
+      (ε : ℚ)
+      (ψ : 0 < ε) →
+      Close'RationalLimit f φ ε ψ →
+      ∃ ℚ (λ θ → (0 < θ) × Σ (0 < (ε - θ)) (Close'RationalLimit f φ (ε - θ)))
+    close'RationalLimitOpen f φ ε ψ = ∃-rec isPropPropTrunc ω
+      where
+      ω : (δ : ℚ) →
+          Σ (0 < δ) (λ ω → Σ (0 < (ε - δ)) (fst (f δ ω) (ε - δ))) →
+          ∃ ℚ
+          (λ θ →
+          (0 < θ) ×
+          Σ (0 < (ε - θ))
+          (λ χ →
+          ∃ ℚ (λ η →
+          Σ (0 < η)
+          (λ π → Σ (0 < ((ε - θ) - η)) (fst (f η π) ((ε - θ) - η))))))
+      ω δ (χ , π , ρ) = ∃-rec isPropPropTrunc ω' σ
+        where
+          ω' : (θ : ℚ) →
+               (0 < θ) × Σ (0 < ((ε - δ) - θ)) (fst (f δ χ) ((ε - δ) - θ)) →
+               ∃ ℚ
+               (λ θ →
+               (0 < θ) ×
+               Σ (0 < (ε - θ))
+               (λ σ →
+               ∃ ℚ
+               (λ δ →
+               Σ (0 < δ)
+               (λ τ →
+               Σ (0 < ((ε - θ) - δ))
+               (fst (f δ τ) ((ε - θ) - δ))))))
+          ω' θ (σ , τ , υ) =
+            ∣ θ , (σ , ι' , ∣ δ , (χ , fst κ , snd κ) ∣₁) ∣₁
+            where
+            ζ : (ε - δ) - θ ≡ (ε - θ) - δ
+            ζ = addLeftSwap ε (- δ) (- θ)
+
+            ι : δ < (ε - θ)
+            ι = 0<-→< {x = δ} {y = ε - θ} (subst (_<_ 0) ζ τ)
+
+            ι' : 0 < (ε - θ)
+            ι' = isTrans< 0 δ (ε - θ) χ ι
+
+            κ : Σ (0 < (ε - θ) - δ) (fst (f δ χ) ((ε - θ) - δ))
+            κ = subst (λ ?x → Σ (0 < ?x) (fst (f δ χ) ?x)) ζ (τ , υ)
+
+          σ : ∃ ℚ (λ θ → (0 < θ) ×
+                       Σ (0 < ((ε - δ) - θ))
+                         (f δ χ .fst ((ε - δ) - θ)))
+          σ = (fst $ (snd $ snd $ f δ χ) (ε - δ) π) ρ
+
+    close'RationalLimitMonotone : 
+      (f : (ε : ℚ) → 0 < ε → C)
+      (φ : CauchyApproximation'' C D f)
+      (ε : ℚ)
+      (ψ : 0 < ε) →
+      ∃ ℚ (λ θ → (0 < θ) × Σ (0 < (ε - θ)) (Close'RationalLimit f φ (ε - θ))) →
+      Close'RationalLimit f φ ε ψ
+    close'RationalLimitMonotone f φ ε ψ ω =
+      ∃-rec
+        (close'RationalLimitProposition f φ ε ψ)
+        (λ θ (χ , π , ρ) →
+          -- let foo = snd ((snd $ snd $ f {!!} {!!}) {!ε - δ!} {!!}) {!ρ!}
+          -- in ∣ {!!} , ({!!} , {!!} , foo) ∣₁
+          --in
+          ∃-rec
+            (close'RationalLimitProposition f φ ε ψ)
+            (λ δ (σ , τ , υ) →
+              let ζ : (ε - θ) - δ ≡ (ε - δ) - θ 
+                  ζ = addLeftSwap ε (- θ) (- δ)
+
+                  ι : θ < ε - δ
+                  ι = 0<-→< {x = θ} {y = ε - δ} (subst (_<_ 0) ζ τ)
+
+                  ι' : 0 < ε - δ
+                  ι' = isTrans< 0 θ (ε - δ) χ ι
+
+                  κ : Σ (0 < (ε - δ) - θ) (fst (f δ σ) ((ε - δ) - θ))
+                  κ = subst (λ ?x → Σ (0 < ?x) (fst (f δ σ) ?x))
+                            ζ
+                            (τ , υ)
+
+                  μ : fst (f δ σ) (ε - δ) ι'
+                  μ = snd
+                    ((snd $ snd $ f δ σ)
+                    (ε - δ) ι')
+                    (∣ θ , (χ , fst κ , snd κ) ∣₁)
+              in ∣ δ , (σ , ι' , μ) ∣₁)
+            ρ)
+        ω
+
+    close'RationalLimitRounded : 
+      (f : (ε : ℚ) → 0 < ε → C)
+      (φ : CauchyApproximation'' C D f)
+      (ε : ℚ)
+      (ψ : 0 < ε) →
+      Close'RationalLimit f φ ε ψ ↔
+      ∃ ℚ (λ θ → (0 < θ) × Σ (0 < (ε - θ)) (Close'RationalLimit f φ (ε - θ)))
+    close'RationalLimitRounded f φ ε ψ =
+      (close'RationalLimitOpen f φ ε ψ) , (close'RationalLimitMonotone f φ ε ψ)
+
+    β : (f : (ε : ℚ) → 0 < ε → C) → CauchyApproximation'' C D f → C
+    β f φ = (Close'RationalLimit f φ) ,
+            (close'RationalLimitProposition f φ ,
+             close'RationalLimitRounded f φ)
 
     γ = {!!}
 
@@ -1117,20 +1255,50 @@ Close'Σ =
 
     ν = {!!}
 
+  -- TODO:
+  -- This subrecursion is possibly done incorrectly
+  -- The expected definitional equalities down below don't seem to hold
   ω : (f : (ε : ℚ) → 0 < ε → A) → CauchyApproximation'' A B f → A
   ω f φ =
-    let bar' = α , β , γ , ζ , ι , κ , μ , ν
-        buzz = recursion {A = C} {B = D} bar'
-        buzz' = recursion∼ {A = C} {B = D} bar'
-    in (λ u → fst $ buzz u) ,
-       ((λ u → fst $ snd $ buzz u) ,
-        (λ u → snd $ snd $ buzz u) ,
-        (λ u v ε θ φ ψ ω → fst $ buzz' ω θ ψ) ,
-        (λ u v ε θ φ ψ ω → snd $ buzz' ω θ ψ))
+    -- I think the problem is here
+    -- let bar' = α , β , γ , ζ , ι , κ , μ , ν
+    --     buzz = recursion {A = C} {B = D} bar'
+    --     buzz' = recursion∼ {A = C} {B = D} bar'
+    -- in (λ u → fst $ buzz u) ,
+    --    ((λ u → fst $ snd $ buzz u) ,
+    --     (λ u → snd $ snd $ buzz u) ,
+    --     (λ u v ε θ φ ψ ω → fst $ buzz' ω θ ψ) ,
+    --     (λ u v ε θ φ ψ ω → snd $ buzz' ω θ ψ))
+    let bar = α , β , γ , ζ , ι , κ , μ , ν
+        buzz = recursion {A = C} {B = D} bar
+        buzz' = recursion∼ {A = C} {B = D} bar
+    in (λ u → fst $ buzz u) , {!!}
     where
-    α = {!!}
+    Close'LimitRational :
+      (r : ℚ)
+      (ε : ℚ) → 0 < ε → Type ℓ-zero
+    Close'LimitRational r ε ψ =
+      ∃ ℚ (λ δ → Σ (0 < δ)
+          (λ ω → Σ (0 < ε - δ)
+          (λ χ → (fst $ f δ ω) (rational r) (ε - δ) χ)))
 
-    β = {!!}
+    α : ℚ → C
+    α r = (Close'LimitRational r) , {!!}
+
+    Close'LimitLimit :
+      (g : (ε : ℚ) → 0 < ε → C) (ψ : CauchyApproximation'' C D g)
+      (ε : ℚ) → 0 < ε → Type ℓ-zero
+    Close'LimitLimit g ψ ε ω =
+      ∃ (ℚ × ℚ)
+        (λ where (δ , η) → Σ (0 < δ)
+                    (λ χ → Σ (0 < η)
+                    (λ π → Σ (0 < ε - (δ + η))
+                    -- Same as rational limit case, I think the output in `C`
+                    -- implicitly references the `f` in scope
+                    (λ σ → (fst $ g η π) (ε - (δ + η)) σ))))
+
+    β : (g : (ε : ℚ) → 0 < ε → C) → CauchyApproximation'' C D g → C
+    β g ψ = (Close'LimitLimit g ψ) , {!!}
 
     γ = {!!}
 
@@ -1143,7 +1311,6 @@ Close'Σ =
     μ = {!!}
 
     ν = {!!}
-
   -- Seperatedness of B
   θ : (◆ ♥ : A) → ((ε : ℚ) (φ : 0 < ε) → B ◆ ♥ ε φ) → ◆ ≡ ♥
   θ ◆ ♥ χ =
@@ -1238,6 +1405,44 @@ Close' : (ε : ℚ) → 0 < ε → ℝ → ℝ → Type ℓ-zero
 Close' = fst Close'Σ
 
 syntax Close' ε p x y = x ≈[ ε , p ] y
+
+close'RationalRationalDefinition :
+  (q r : ℚ) (ε : ℚ) (φ : 0 < ε) →
+  (rational q ≈[ ε , φ ] rational r) ≡ (∣ q - r ∣ < ε)
+close'RationalRationalDefinition q r ε φ = refl
+
+close'RationalLimitDefinition :
+  (q : ℚ)
+  (y : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation y)
+  (ε : ℚ) (ψ : 0 < ε) →
+  (rational q ≈[ ε , ψ ] limit y φ) ≡
+  ∃ ℚ (λ δ → Σ (0 < δ) (λ ω →
+             Σ (0 < ε - δ)
+             (λ χ → rational q ≈[ ε - δ , χ ] y δ ω)))
+close'RationalLimitDefinition q x φ ε ψ = refl
+
+-- close'LimitRationalDefinition :
+--   (x : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation x)
+--   (r : ℚ)
+--   (ε : ℚ) (ψ : 0 < ε) →
+--   (limit x φ ≈[ ε , ψ ] rational r) ≡
+--   ∃ ℚ (λ δ → Σ (0 < δ) (λ ω →
+--              Σ (0 < ε - δ)
+--              (λ χ → x δ ω ≈[ ε - δ , χ ] rational r)))
+-- close'LimitRationalDefinition = {!refl!}
+
+close'LimitLimitDefinition :
+  (x : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation x)
+  (y : (ε : ℚ) → 0 < ε → ℝ) (ψ : CauchyApproximation y)
+  (ε : ℚ) (ω : 0 < ε) →
+  (limit x φ ≈[ ε , ω ] limit y ψ) ≡
+  ?
+  -- ∃ (ℚ × ℚ)
+  --   (λ where (δ , η) → Σ (0 < δ)
+  --               (λ χ → Σ (0 < η)
+  --               (λ π → Σ (0 < ε - (δ + η))
+  --               (λ σ → x δ χ ≈[ (ε - (δ + η)) , σ ] y η π))))
+close'LimitLimitDefinition = {!!}
 
 closeProposition : (ε : ℚ) (φ : 0 < ε) (u v : ℝ) → isProp (Close' ε φ u v)
 closeProposition = fst $ snd $ Close'Σ

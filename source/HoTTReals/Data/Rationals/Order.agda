@@ -249,6 +249,15 @@ open import HoTTReals.Data.Rationals.Properties
   r : x + (- x) < y + (- x)
   r = <-+o x y (- x) p
 
+0<-→< : {x y : ℚ} → 0 < y - x → x < y
+0<-→< {x} {y} p = subst2 _<_ q r (<-+o 0 (y - x) x p)
+  where
+  q : 0 + x ≡ x
+  q = +IdL x
+
+  r : (y - x) + x ≡ y
+  r = subtractAddRightCancel x y
+
 ≤max' : (x y : ℚ) → y ≤ max x y
 ≤max' x y = subst (λ ?x → y ≤ ?x) (maxComm y x) (≤max y x)
 
@@ -359,6 +368,18 @@ maxLeastUpperBound< {x} {y} {z} p q =
   subst2 (λ ?a ?b → ?a < ?b)
          (·Comm y x) (·Comm z x)
          (<-·o y z x p q)
+
++≤+ : {x y z w : ℚ} → x ≤ y → z ≤ w → x + z ≤ y + w
++≤+ {x} {y} {z} {w} p q =
+  isTrans≤ (x + z) (y + z) (y + w)
+           (≤-+o x y z p)
+           (≤-o+ z w y q)
+
++<+ : {x y z w : ℚ} → x < y → z < w → x + z < y + w
++<+ {x} {y} {z} {w} p q =
+  isTrans< (x + z) (y + z) (y + w)
+           (<-+o x y z p)
+           (<-o+ z w y q)
 
 ·≤· : {x y z w : ℚ} → x ≤ z → y ≤ w → 0 ≤ z → 0 ≤ y → x · y ≤ z · w
 ·≤· {x} {y} {z} {w} p q r s =

@@ -79,6 +79,24 @@ negateSubtract x y =
     ≡⟨ cong (_+_ $ - x) (-Invol y) ⟩
   - x + y ∎
 
+subtractAddRightCancel : (x y : ℚ) → (y - x) + x ≡ y
+subtractAddRightCancel x y = (y - x) + x
+                               ≡⟨ (sym $ +Assoc y (- x) x) ⟩
+                             y + ((- x) + x)
+                               ≡⟨ cong (_+_ y) (+InvL x) ⟩
+                             y + 0
+                               ≡⟨ +IdR y ⟩
+                             y ∎
+
+addLeftSwap : (x y z : ℚ) → (x + y) + z ≡ (x + z) + y
+addLeftSwap x y z = (x + y) + z
+                      ≡⟨ sym $ +Assoc x y z ⟩
+                    x + (y + z)
+                      ≡⟨ cong (_+_ x) (+Comm y z) ⟩
+                    x + (z + y)
+                      ≡⟨ +Assoc x z y ⟩
+                    (x + z) + y ∎
+
 -·≡-· : (x y : ℚ) → - (x · y) ≡ (- x) · y
 -·≡-· x y = sym (+≡0→≡- p)
   where

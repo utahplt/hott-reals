@@ -542,90 +542,6 @@ CauchyApproximation'' A B f =
   (ε δ : ℚ) (ψ : 0 < ε) (θ : 0 < δ) →
   B (f ε ψ) (f δ θ) (ε + δ) (0<+' {x = ε} {y = δ} ψ θ)
 
--- HoTT 388 Enhanced principle of recursion
-Recursion :
-  {i j : Level}
-  (A : Type i) →
-  ((a b : A) → (ε : ℚ) → 0 < ε → Type j) →
-  Type (ℓ-max i j)
-Recursion A B =
-  Σ (ℚ → A)
-  (λ fRational →
-  Σ ((f : (ε : ℚ) → 0 < ε → A) →
-     CauchyApproximation'' A B f →
-     A)
-  (λ fLimit →
-  ((a b : A) → ((ε : ℚ) (φ : 0 < ε) → B a b ε φ) → a ≡ b) ×
-  ((q r ε : ℚ) (φ : 0 < ε) →
-   - ε < q - r → q - r < ε →
-   B (fRational q) (fRational r) ε φ) ×
-  ((q ε δ : ℚ) (φ : 0 < ε) (ψ : 0 < δ) (θ : 0 < ε - δ) →
-   (f : (ε : ℚ) → 0 < ε → A) (ω : CauchyApproximation'' A B f) →
-   B (fRational q) (f δ ψ) (ε - δ) θ →
-   B (fRational q) (fLimit f ω) ε φ) ×
-  ((f : (ε : ℚ) → 0 < ε → A) (φ : CauchyApproximation'' A B f) →
-   (r ε δ : ℚ) (ψ : 0 < ε) (θ : 0 < δ) (ω : 0 < ε - δ) →
-   B (f δ θ) (fRational r) (ε - δ) ω →
-   B (fLimit f φ) (fRational r) ε ψ) ×
-  ((f g : (ε : ℚ) → 0 < ε → A)
-   (φ : CauchyApproximation'' A B f) →
-   (ψ : CauchyApproximation'' A B g) →
-   (ε δ η : ℚ) (θ : 0 < ε) (ω : 0 < δ) (χ : 0 < η) (π : 0 < ε - (δ + η)) →
-   B (f δ ω) (g η χ) (ε - (δ + η)) π →
-   B (fLimit f φ) (fLimit g ψ) ε θ) ×
-  ((a b : A) (ε : ℚ) (φ : 0 < ε) → isProp $ B a b ε φ)))
-
-recursion :
-  {i j : Level}
-  {A : Type i} →
-  {B : (a b : A) → (ε : ℚ) → 0 < ε → Type j} →
-  Recursion A B →
-  (ℝ → A)
-
-recursion∼ :
-  {i j : Level}
-  {A : Type i} →
-  {B : (a b : A) → (ε : ℚ) → 0 < ε → Type j} →
-  (α : Recursion A B) →
-  {u v : ℝ} {ε : ℚ} {p : 0 < ε} →
-  u ∼[ ε , p ] v →
-  B (recursion {A = A} {B = B} α u) (recursion {A = A} {B = B} α v) ε p
-
-recursion α@(fRational , fLimit , φ , ψ , θ , ω , χ , π) (rational x) =
-  fRational x
-recursion α@(fRational , fLimit , φ , ψ , θ , ω , χ , π) (limit x ρ) =
-  fLimit (λ ε φ → recursion α (x ε φ))
-         (λ ε δ φ ψ → recursion∼ α (ρ ε δ φ ψ))
-recursion α@(fRational , fLimit , φ , ψ , θ , ω , χ , π) (path u v ρ i) =
-  φ (recursion α u) (recursion α v) (λ ε φ → recursion∼ α (ρ ε φ)) i
-
-recursion∼ α@(fRational , fLimit , φ , ψ , θ , ω , χ , π)
-  (rationalRational q r ε ρ σ τ) = ψ q r ε ρ σ τ
-recursion∼ α@(fRational , fLimit , φ , ψ , θ , ω , χ , π)
-  (rationalLimit q ε δ ρ σ τ y υ ι) =
-  θ q ε δ ρ σ τ
-    (λ ε κ → recursion α (y ε κ))
-    (λ ε δ κ μ → recursion∼ α (υ ε δ κ μ))
-    (recursion∼ α ι)
-recursion∼ α@(fRational , fLimit , φ , ψ , θ , ω , χ , π)
-  (limitRational x ρ r ε δ σ τ υ ι) =
-  ω (λ ε κ → recursion α (x ε κ))
-    (λ ε δ κ μ → recursion∼ α (ρ ε δ κ μ))
-    r ε δ σ τ υ (recursion∼ α ι)
-recursion∼ α@(fRational , fLimit , φ , ψ , θ , ω , χ , π)
-  (limitLimit x y ρ σ ε δ η τ υ ι κ μ) =
-  χ (λ ε ν → recursion α (x ε ν))
-    (λ ε ν → recursion α (y ε ν))
-    (λ ε δ ν ξ → recursion∼ α (ρ ε δ ν ξ))
-    (λ ε δ ν ξ → recursion∼ α (σ ε δ ν ξ))
-    ε δ η τ υ ι κ (recursion∼ α μ)
-recursion∼ α@(fRational , fLimit , φ , ψ , θ , ω , χ , π)
-  (squash ε ρ u v ζ ζ' i) =
-  isProp→PathP (λ j → π (recursion α u) (recursion α v) ε ρ)
-               (recursion∼ α ζ)
-               (recursion∼ α ζ')
-               i
-
 -- HoTT Definition 11.3.14
 Lipschitzℚ : (f : ℚ → ℝ) (L : ℚ) → 0 < L → Type ℓ-zero
 Lipschitzℚ f L φ =
@@ -671,6 +587,118 @@ closeLimit' u y φ ε δ ψ ω θ χ = σ'
 
   σ' : Close ε ψ u (limit y φ)
   σ' = subst (λ π → Close ε π _ _) (isProp< 0 ε (fst σ) ψ) (snd σ)
+
+-- HoTT 388 Enhanced principle of recursion
+Recursion :
+  {i j : Level}
+  (A : Type i) →
+  ((a b : A) → (ε : ℚ) → 0 < ε → Type j) →
+  Type (ℓ-max i j)
+Recursion A B =
+  Σ (ℚ → A)
+  (λ fRational →
+  -- It turns out it is useful to have access to both the Cauchy
+  -- approximation and the corresponding values in `A` inductively assigned to
+  -- it.  I originally only had the values `f`, but needed when defining
+  -- alternative closeness `Close'`/`≈`. Specifally, I needed it in the second
+  -- subrecursion where the limit-limit case of `≈` is defined.
+  --
+  -- This is sort of like making sure that in a natural number induction that
+  -- the inductive step has access to both what the previous `n` was and which
+  -- value we have inductively assigned to it in the codomain. For natural
+  -- numbers this is sort of implicit in the fact that the current value is
+  -- `successor(n)`, but here we can't derive that information from `f`.
+  Σ ((x : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation x) →
+     (f : (ε : ℚ) → 0 < ε → A) →
+     CauchyApproximation'' A B f →
+     A)
+  (λ fLimit →
+  ((a b : A) → ((ε : ℚ) (φ : 0 < ε) → B a b ε φ) → a ≡ b) ×
+  ((q r : ℚ)
+   (ε : ℚ) (φ : 0 < ε) →
+   - ε < q - r → q - r < ε →
+   B (fRational q) (fRational r) ε φ) ×
+  ((q ε δ : ℚ) (φ : 0 < ε) (ψ : 0 < δ) (θ : 0 < ε - δ) →
+   (y : (ε : ℚ) → 0 < ε → ℝ) (ω : CauchyApproximation y) →
+   (g : (ε : ℚ) → 0 < ε → A) (χ : CauchyApproximation'' A B g) →
+   B (fRational q) (g δ ψ) (ε - δ) θ →
+   B (fRational q) (fLimit y ω g χ) ε φ) ×
+  ((x : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation x)
+   (f : (ε : ℚ) → 0 < ε → A) (ψ : CauchyApproximation'' A B f) →
+   (r ε δ : ℚ) (θ : 0 < ε) (ω : 0 < δ) (χ : 0 < ε - δ) →
+   B (f δ ω) (fRational r) (ε - δ) χ →
+   B (fLimit x φ f ψ) (fRational r) ε θ) ×
+  ((x y : (ε : ℚ) → 0 < ε → ℝ)
+   (f g : (ε : ℚ) → 0 < ε → A)
+   (φ : CauchyApproximation x)
+   (ψ : CauchyApproximation y)
+   (θ : CauchyApproximation'' A B f) →
+   (ω : CauchyApproximation'' A B g) →
+   (ε δ η : ℚ) (χ : 0 < ε) (π : 0 < δ) (ρ : 0 < η) (σ : 0 < ε - (δ + η)) →
+   B (f δ π) (g η ρ) (ε - (δ + η)) σ →
+   B (fLimit x φ f θ) (fLimit y ψ g ω) ε χ) ×
+  ((a b : A) (ε : ℚ) (φ : 0 < ε) → isProp $ B a b ε φ)))
+
+recursion :
+  {i j : Level}
+  {A : Type i} →
+  {B : (a b : A) → (ε : ℚ) → 0 < ε → Type j} →
+  Recursion A B →
+  (ℝ → A)
+
+recursion∼ :
+  {i j : Level}
+  {A : Type i} →
+  {B : (a b : A) → (ε : ℚ) → 0 < ε → Type j} →
+  (α : Recursion A B) →
+  {u v : ℝ} {ε : ℚ} {p : 0 < ε} →
+  u ∼[ ε , p ] v →
+  B (recursion {A = A} {B = B} α u) (recursion {A = A} {B = B} α v) ε p
+
+recursion α@(fRational , fLimit , φ , ψ , θ , ω , χ , π) (rational x) =
+  fRational x
+recursion α@(fRational , fLimit , φ , ψ , θ , ω , χ , π) (limit x ρ) =
+  fLimit
+    x ρ
+    (λ ε φ → recursion α (x ε φ))
+    (λ ε δ φ ψ → recursion∼ α (ρ ε δ φ ψ))
+recursion α@(fRational , fLimit , φ , ψ , θ , ω , χ , π) (path u v ρ i) =
+  φ (recursion α u) (recursion α v) (λ ε φ → recursion∼ α (ρ ε φ)) i
+
+recursion∼ α@(fRational , fLimit , φ , ψ , θ , ω , χ , π)
+  (rationalRational q r ε ρ σ τ) = ψ q r ε ρ σ τ
+recursion∼ α@(fRational , fLimit , φ , ψ , θ , ω , χ , π)
+  (rationalLimit q ε δ ρ σ τ y υ ι) =
+  θ q ε δ
+    ρ σ τ
+    y υ
+    (λ ε k → recursion α (y ε k))
+    (λ ε δ κ μ → recursion∼ α (υ ε δ κ μ))
+    (recursion∼ α ι)
+recursion∼ α@(fRational , fLimit , φ , ψ , θ , ω , χ , π)
+  (limitRational x ρ r ε δ σ τ υ ι) =
+  ω x ρ
+    (λ ε κ → recursion α (x ε κ))
+    (λ ε δ κ μ → recursion∼ α (ρ ε δ κ μ))
+    r ε δ
+    σ τ υ
+    (recursion∼ α ι)
+recursion∼ α@(fRational , fLimit , φ , ψ , θ , ω , χ , π)
+  (limitLimit x y ρ σ ε δ η τ υ ι κ μ) =
+  χ x y
+    (λ ε ν → recursion α (x ε ν)) (λ ε ν → recursion α (y ε ν))
+    ρ σ
+    (λ ε δ ν ζ → recursion∼ α (ρ ε δ ν ζ))
+    (λ ε δ ν ζ → recursion∼ α (σ ε δ ν ζ))
+    ε δ η
+    τ υ ι κ
+    (recursion∼ α μ)
+recursion∼ α@(fRational , fLimit , φ , ψ , θ , ω , χ , π)
+  (squash ε ρ u v ζ ζ' i) =
+  isProp→PathP (λ j → π (recursion α u) (recursion α v) ε ρ)
+               (recursion∼ α ζ)
+               (recursion∼ α ζ')
+               i
 
 -- HoTT Lemma 11.3.15
 -- liftLipschitz : (f : ℚ → ℝ)
@@ -929,8 +957,10 @@ Close'Σ : Σ ((ε : ℚ) → 0 < ε → ℝ → ℝ → Type ℓ-zero)
             TriangleInequality₁ Close Close' squash φ ×
             TriangleInequality₂ Close Close' squash φ))
 Close'Σ =
-  -- (fst $ (recursion {A = A} {B = B} bar) u) v ε φ
-  let foo = recursion {A = A} {B = B} bar
+  let
+    -- TODO: Name
+    bar = ψ , ω , θ , χ , π , ρ , σ , τ
+    foo = recursion {A = A} {B = B} bar
   in (λ ε φ u v → (fst $ foo u) v ε φ) ,
      ((λ ε φ u v → (fst $ snd $ foo u) v ε φ) ,
       (λ u v ε φ → (fst $ snd $ snd $ foo u) v ε φ) ,
@@ -981,36 +1011,34 @@ Close'Σ =
               ((fst ▲) η ψ → (fst □) (η + ε) (0<+' {x = η} {y = ε} ψ φ)) ×
               ((fst □) η ψ → (fst ▲) (η + ε) (0<+' {x = η} {y = ε} ψ φ))
 
-  -- TODO: Name
-  lightyear : (◆ : ℝ → (ε : ℚ) → 0 < ε → Type ℓ-zero) → isProp (A' ◆)
+  a'Proposition : (◆ : ℝ → (ε : ℚ) → 0 < ε → Type ℓ-zero) → isProp (A' ◆)
   -- Trick: hehe we need the first projection to prove the rest are
   -- propositions, so just assume it's here. This lemma says we can do that
-  lightyear ◆ = isOfHLevelSucIfInhabited→isOfHLevelSuc 0
-          (λ a' → let β : (u : ℝ) (ε : ℚ) (φ : 0 < ε) → isProp (◆ u ε φ)
-                      β = fst a'
-                  in isProp×3 (isPropΠ3 (λ _ _ _ → isPropIsProp))
-                              (isPropΠ3 (λ u ε φ →
-                                isProp× (isProp→ isPropPropTrunc)
-                                        (isProp→ (β u ε φ))))
-                              (isPropΠ6 (λ u v ε η ω θ →
-                                isPropΠ2 (λ χ π →
-                                  β v (η + ε) (0<+' {x = η} {y = ε} θ ω))))
-                              (isPropΠ6 λ u v ε η ω θ →
-                                isPropΠ2 λ χ π →
-                                  β u (η + ε) (0<+' {x = η} {y = ε} θ ω)))
+  a'Proposition ◆ = isOfHLevelSucIfInhabited→isOfHLevelSuc 0
+    (λ a' → let β : (u : ℝ) (ε : ℚ) (φ : 0 < ε) → isProp (◆ u ε φ)
+                β = fst a'
+            in isProp×3 (isPropΠ3 (λ _ _ _ → isPropIsProp))
+                        (isPropΠ3 (λ u ε φ →
+                          isProp× (isProp→ isPropPropTrunc)
+                                  (isProp→ (β u ε φ))))
+                        (isPropΠ6 (λ u v ε η ω θ →
+                          isPropΠ2 (λ χ π →
+                            β v (η + ε) (0<+' {x = η} {y = ε} θ ω))))
+                        (isPropΠ6 λ u v ε η ω θ →
+                          isPropΠ2 λ χ π →
+                            β u (η + ε) (0<+' {x = η} {y = ε} θ ω)))
 
   ψ : ℚ → A
   ψ q =
-    let bar' = α , β , γ , ζ , ι , κ , μ , ν
-        buzz = recursion {A = C} {B = D} bar'
-        buzz' = recursion∼ {A = C} {B = D} bar'
-    in (λ u → fst $ buzz u) ,
-       ((λ u → fst $ snd $ buzz u) ,
-        (λ u → snd $ snd $ buzz u) ,
-        (λ u v ε θ φ ψ ω → fst $ buzz' ω θ ψ) ,
-        (λ u v ε θ φ ψ ω → snd $ buzz' ω θ ψ))
+    let ξ = α , β , γ , ζ , ι , κ , μ , ν
+        ο = recursion {A = C} {B = D} ξ
+        ο' = recursion∼ {A = C} {B = D} ξ
+    in (λ u → fst $ ο u) ,
+       ((λ u → fst $ snd $ ο u) ,
+        (λ u → snd $ snd $ ο u) ,
+        (λ u v ε θ φ ψ ω → fst $ ο' ω θ ψ) ,
+        (λ u v ε θ φ ψ ω → snd $ ο' ω θ ψ))
     where
-    -- HoTT 11.3.17
     Close'RationalRational : (r : ℚ) (ε : ℚ) → 0 < ε → Type ℓ-zero
     Close'RationalRational r ε φ = ∣ q - r ∣ < ε
 
@@ -1117,33 +1145,39 @@ Close'Σ =
            close'RationalRationalRounded r)
 
     Close'RationalLimit :
+      (x : (ε : ℚ) → 0 < ε → ℝ)
+      (φ : CauchyApproximation x)
       (f : (ε : ℚ) → 0 < ε → C)
-      (φ : CauchyApproximation'' C D f)
+      (ψ : CauchyApproximation'' C D f)
       (ε : ℚ) → 0 < ε → Type ℓ-zero
-    Close'RationalLimit f φ ε ψ =
+    Close'RationalLimit x φ f ψ ε ω =
       ∃ ℚ (λ δ → Σ (0 < δ)
-          (λ ω → Σ (0 < ε - δ)
-          -- I think the `q` is implicit in the construction of the output in
-          -- `C`
-          (λ χ → (fst $ f δ ω) (ε - δ) χ)))
+          (λ χ → Σ (0 < ε - δ)
+          -- The `q` is implicit in the construction of the output in `C`
+          (λ π → (fst $ f δ χ) (ε - δ) π)))
 
     close'RationalLimitProposition :
+      (x : (ε : ℚ) → 0 < ε → ℝ)
+      (φ : CauchyApproximation x)
       (f : (ε : ℚ) → 0 < ε → C)
-      (φ : CauchyApproximation'' C D f)
-      (ε : ℚ) (ψ : 0 < ε) →
-      isProp (Close'RationalLimit f φ ε ψ)
-    close'RationalLimitProposition f φ ε ψ = isPropPropTrunc
+      (ψ : CauchyApproximation'' C D f)
+      (ε : ℚ) (ω : 0 < ε) →
+      isProp (Close'RationalLimit x φ f ψ ε ω)
+    close'RationalLimitProposition x φ f ψ ε ω = isPropPropTrunc
 
     close'RationalLimitOpen :
+      (x : (ε : ℚ) → 0 < ε → ℝ)
+      (φ : CauchyApproximation x)
       (f : (ε : ℚ) → 0 < ε → C)
-      (φ : CauchyApproximation'' C D f)
+      (ψ : CauchyApproximation'' C D f)
       (ε : ℚ)
-      (ψ : 0 < ε) →
-      Close'RationalLimit f φ ε ψ →
-      ∃ ℚ (λ θ → (0 < θ) × Σ (0 < (ε - θ)) (Close'RationalLimit f φ (ε - θ)))
-    close'RationalLimitOpen f φ ε ψ = ∃-rec isPropPropTrunc ω
+      (ω : 0 < ε) →
+      Close'RationalLimit x φ f ψ ε ω →
+      ∃ ℚ (λ θ → (0 < θ) ×
+          Σ (0 < (ε - θ)) (Close'RationalLimit x φ f ψ (ε - θ)))
+    close'RationalLimitOpen x φ f ψ ε ω = ∃-rec isPropPropTrunc χ
       where
-      ω : (δ : ℚ) →
+      χ : (δ : ℚ) →
           Σ (0 < δ) (λ ω → Σ (0 < (ε - δ)) (fst (f δ ω) (ε - δ))) →
           ∃ ℚ
           (λ θ →
@@ -1153,9 +1187,9 @@ Close'Σ =
           ∃ ℚ (λ η →
           Σ (0 < η)
           (λ π → Σ (0 < ((ε - θ) - η)) (fst (f η π) ((ε - θ) - η))))))
-      ω δ (χ , π , ρ) = ∃-rec isPropPropTrunc ω' σ
+      χ δ (χ , π , ρ) = ∃-rec isPropPropTrunc χ' σ
         where
-          ω' : (θ : ℚ) →
+          χ' : (θ : ℚ) →
                (0 < θ) × Σ (0 < ((ε - δ) - θ)) (fst (f δ χ) ((ε - δ) - θ)) →
                ∃ ℚ
                (λ θ →
@@ -1168,7 +1202,7 @@ Close'Σ =
                (λ τ →
                Σ (0 < ((ε - θ) - δ))
                (fst (f δ τ) ((ε - θ) - δ))))))
-          ω' θ (σ , τ , υ) =
+          χ' θ (σ , τ , υ) =
             ∣ θ , (σ , ι' , ∣ δ , (χ , fst κ , snd κ) ∣₁) ∣₁
             where
             ζ : (ε - δ) - θ ≡ (ε - θ) - δ
@@ -1189,21 +1223,21 @@ Close'Σ =
           σ = (fst $ (snd $ snd $ f δ χ) (ε - δ) π) ρ
 
     close'RationalLimitMonotone : 
+      (x : (ε : ℚ) → 0 < ε → ℝ)
+      (φ : CauchyApproximation x)
       (f : (ε : ℚ) → 0 < ε → C)
-      (φ : CauchyApproximation'' C D f)
+      (ψ : CauchyApproximation'' C D f)
       (ε : ℚ)
-      (ψ : 0 < ε) →
-      ∃ ℚ (λ θ → (0 < θ) × Σ (0 < (ε - θ)) (Close'RationalLimit f φ (ε - θ))) →
-      Close'RationalLimit f φ ε ψ
-    close'RationalLimitMonotone f φ ε ψ ω =
+      (ω : 0 < ε) →
+      ∃ ℚ (λ θ → (0 < θ) ×
+          Σ (0 < (ε - θ)) (Close'RationalLimit x φ f ψ (ε - θ))) →
+      Close'RationalLimit x φ f ψ ε ω
+    close'RationalLimitMonotone x φ f ψ ε ω χ =
       ∃-rec
-        (close'RationalLimitProposition f φ ε ψ)
+        (close'RationalLimitProposition x φ f ψ ε ω)
         (λ θ (χ , π , ρ) →
-          -- let foo = snd ((snd $ snd $ f {!!} {!!}) {!ε - δ!} {!!}) {!ρ!}
-          -- in ∣ {!!} , ({!!} , {!!} , foo) ∣₁
-          --in
           ∃-rec
-            (close'RationalLimitProposition f φ ε ψ)
+            (close'RationalLimitProposition x φ f ψ ε ω)
             (λ δ (σ , τ , υ) →
               let ζ : (ε - θ) - δ ≡ (ε - δ) - θ 
                   ζ = addLeftSwap ε (- θ) (- δ)
@@ -1226,22 +1260,30 @@ Close'Σ =
                     (∣ θ , (χ , fst κ , snd κ) ∣₁)
               in ∣ δ , (σ , ι' , μ) ∣₁)
             ρ)
-        ω
+        χ
 
     close'RationalLimitRounded : 
+      (x : (ε : ℚ) → 0 < ε → ℝ)
+      (φ : CauchyApproximation x)
       (f : (ε : ℚ) → 0 < ε → C)
-      (φ : CauchyApproximation'' C D f)
+      (ψ : CauchyApproximation'' C D f)
       (ε : ℚ)
-      (ψ : 0 < ε) →
-      Close'RationalLimit f φ ε ψ ↔
-      ∃ ℚ (λ θ → (0 < θ) × Σ (0 < (ε - θ)) (Close'RationalLimit f φ (ε - θ)))
-    close'RationalLimitRounded f φ ε ψ =
-      (close'RationalLimitOpen f φ ε ψ) , (close'RationalLimitMonotone f φ ε ψ)
+      (ω : 0 < ε) →
+      Close'RationalLimit x φ f ψ ε ω ↔
+      ∃ ℚ (λ θ → (0 < θ) ×
+          Σ (0 < (ε - θ)) (Close'RationalLimit x φ f ψ (ε - θ)))
+    close'RationalLimitRounded x φ f ψ ε ω =
+      (close'RationalLimitOpen x φ f ψ ε ω) ,
+      (close'RationalLimitMonotone x φ f ψ ε ω)
 
-    β : (f : (ε : ℚ) → 0 < ε → C) → CauchyApproximation'' C D f → C
-    β f φ = (Close'RationalLimit f φ) ,
-            (close'RationalLimitProposition f φ ,
-             close'RationalLimitRounded f φ)
+    β : (x : (ε : ℚ) → 0 < ε → ℝ)
+        (φ : CauchyApproximation x)
+        (f : (ε : ℚ) → 0 < ε → C)
+        (ψ : CauchyApproximation'' C D f) →
+        C
+    β x φ f ψ = (Close'RationalLimit x φ f ψ) ,
+                 (close'RationalLimitProposition x φ f ψ ,
+                 close'RationalLimitRounded x φ f ψ)
 
     γ = {!!}
 
@@ -1255,24 +1297,18 @@ Close'Σ =
 
     ν = {!!}
 
-  -- TODO:
-  -- This subrecursion is possibly done incorrectly
-  -- The expected definitional equalities down below don't seem to hold
-  ω : (f : (ε : ℚ) → 0 < ε → A) → CauchyApproximation'' A B f → A
-  ω f φ =
-    -- I think the problem is here
-    -- let bar' = α , β , γ , ζ , ι , κ , μ , ν
-    --     buzz = recursion {A = C} {B = D} bar'
-    --     buzz' = recursion∼ {A = C} {B = D} bar'
-    -- in (λ u → fst $ buzz u) ,
-    --    ((λ u → fst $ snd $ buzz u) ,
-    --     (λ u → snd $ snd $ buzz u) ,
-    --     (λ u v ε θ φ ψ ω → fst $ buzz' ω θ ψ) ,
-    --     (λ u v ε θ φ ψ ω → snd $ buzz' ω θ ψ))
-    let bar = α , β , γ , ζ , ι , κ , μ , ν
-        buzz = recursion {A = C} {B = D} bar
-        buzz' = recursion∼ {A = C} {B = D} bar
-    in (λ u → fst $ buzz u) , {!!}
+  ω : (x : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation x)
+      (f : (ε : ℚ) → 0 < ε → A) (ψ : CauchyApproximation'' A B f) →
+      A
+  ω x φ f ψ =
+    let ξ = α , β , γ , ζ , ι , κ , μ , ν
+        ο = recursion {A = C} {B = D} ξ
+        ο' = recursion∼ {A = C} {B = D} ξ
+    in (λ u → fst $ ο u) ,
+       ((λ u → fst $ snd $ ο u) ,
+        (λ u → snd $ snd $ ο u) ,
+        (λ u v ε θ φ ψ ω → fst $ ο' ω θ ψ) ,
+        (λ u v ε θ φ ψ ω → snd $ ο' ω θ ψ))
     where
     Close'LimitRational :
       (r : ℚ)
@@ -1282,23 +1318,93 @@ Close'Σ =
           (λ ω → Σ (0 < ε - δ)
           (λ χ → (fst $ f δ ω) (rational r) (ε - δ) χ)))
 
+    close'LimitRationalProposition :
+      (r : ℚ)
+      (ε : ℚ) (ψ : 0 < ε) →
+      isProp (Close'LimitRational r ε ψ)
+    close'LimitRationalProposition r ε ψ = isPropPropTrunc
+
+    close'LimitRationalOpen :
+      (r : ℚ)
+      (ε : ℚ)
+      (ω : 0 < ε) →
+      Close'LimitRational r ε ω →
+      ∃ ℚ (λ θ → (0 < θ) ×
+          Σ (0 < (ε - θ)) (Close'LimitRational r (ε - θ)))
+    close'LimitRationalOpen r ε ω χ = {!!}
+
+    close'LimitRationalMonotone : 
+      (r : ℚ)
+      (ε : ℚ)
+      (ω : 0 < ε) →
+      ∃ ℚ (λ θ → (0 < θ) ×
+          Σ (0 < (ε - θ)) (Close'LimitRational r (ε - θ))) →
+      Close'LimitRational r ε ω
+    close'LimitRationalMonotone r ε ω χ = {!!}
+
+    close'LimitRationalRounded :
+      (r : ℚ) →
+      (ε : ℚ) (ψ : 0 < ε) →
+      Close'LimitRational r ε ψ ↔
+      ∃ ℚ (λ θ → (0 < θ) × Σ (0 < (ε - θ)) (Close'LimitRational r (ε - θ)))
+    close'LimitRationalRounded r ε ψ =
+      close'LimitRationalOpen r ε ψ ,
+      close'LimitRationalMonotone r ε ψ
+
     α : ℚ → C
-    α r = (Close'LimitRational r) , {!!}
+    α r = Close'LimitRational r ,
+          (close'LimitRationalProposition r , close'LimitRationalRounded r)
 
     Close'LimitLimit :
-      (g : (ε : ℚ) → 0 < ε → C) (ψ : CauchyApproximation'' C D g)
+      (y : (ε : ℚ) → 0 < ε → ℝ) (ψ : CauchyApproximation y)
+      (g : (ε : ℚ) → 0 < ε → C) (ω : CauchyApproximation'' C D g)
       (ε : ℚ) → 0 < ε → Type ℓ-zero
-    Close'LimitLimit g ψ ε ω =
+    Close'LimitLimit y ψ g ω ε χ =
       ∃ (ℚ × ℚ)
         (λ where (δ , η) → Σ (0 < δ)
-                    (λ χ → Σ (0 < η)
-                    (λ π → Σ (0 < ε - (δ + η))
-                    -- Same as rational limit case, I think the output in `C`
-                    -- implicitly references the `f` in scope
-                    (λ σ → (fst $ g η π) (ε - (δ + η)) σ))))
+                    (λ π → Σ (0 < η)
+                    (λ σ → Σ (0 < ε - (δ + η))
+                    (λ τ → (fst $ f δ π) (y η σ) (ε - (δ + η)) τ))))
 
-    β : (g : (ε : ℚ) → 0 < ε → C) → CauchyApproximation'' C D g → C
-    β g ψ = (Close'LimitLimit g ψ) , {!!}
+    close'LimitLimitProposition :
+      (y : (ε : ℚ) → 0 < ε → ℝ) (ψ : CauchyApproximation y)
+      (g : (ε : ℚ) → 0 < ε → C) (ω : CauchyApproximation'' C D g)
+      (ε : ℚ) (χ : 0 < ε) →
+      isProp (Close'LimitLimit y ψ g ω ε χ)
+    close'LimitLimitProposition y ψ g ω ε χ = isPropPropTrunc
+
+    close'LimitLimitOpen :
+      (y : (ε : ℚ) → 0 < ε → ℝ) (ψ : CauchyApproximation y)
+      (g : (ε : ℚ) → 0 < ε → C) (ω : CauchyApproximation'' C D g)
+      (ε : ℚ) (χ : 0 < ε) →
+      Close'LimitLimit y ψ g ω ε χ →
+      ∃ ℚ (λ θ → (0 < θ) × Σ (0 < (ε - θ)) (Close'LimitLimit y ψ g ω (ε - θ)))
+    close'LimitLimitOpen y ψ g ω ε χ π = {!!}
+
+    close'LimitLimitMonotone :
+      (y : (ε : ℚ) → 0 < ε → ℝ) (ψ : CauchyApproximation y)
+      (g : (ε : ℚ) → 0 < ε → C) (ω : CauchyApproximation'' C D g)
+      (ε : ℚ) (χ : 0 < ε) →
+      ∃ ℚ (λ θ → (0 < θ) × Σ (0 < (ε - θ)) (Close'LimitLimit y ψ g ω (ε - θ))) →
+      Close'LimitLimit y ψ g ω ε χ
+    close'LimitLimitMonotone y ψ g ω ε χ π = {!!}
+
+    close'LimitLimitRounded :
+      (y : (ε : ℚ) → 0 < ε → ℝ) (ψ : CauchyApproximation y)
+      (g : (ε : ℚ) → 0 < ε → C) (ω : CauchyApproximation'' C D g)
+      (ε : ℚ) (χ : 0 < ε) →
+      Close'LimitLimit y ψ g ω ε χ ↔
+      ∃ ℚ (λ θ → (0 < θ) × Σ (0 < (ε - θ)) (Close'LimitLimit y ψ g ω (ε - θ)))
+    close'LimitLimitRounded y ψ g ω ε χ =
+      close'LimitLimitOpen y ψ g ω ε χ ,
+      close'LimitLimitMonotone y ψ g ω ε χ
+
+    β : (y : (ε : ℚ) → 0 < ε → ℝ) (ψ : CauchyApproximation y)
+        (g : (ε : ℚ) → 0 < ε → C) (ω : CauchyApproximation'' C D g) →
+        C
+    β y ψ g ω = Close'LimitLimit y ψ g ω ,
+                (close'LimitLimitProposition y ψ g ω ,
+                (close'LimitLimitRounded y ψ g ω))
 
     γ = {!!}
 
@@ -1311,10 +1417,11 @@ Close'Σ =
     μ = {!!}
 
     ν = {!!}
+
   -- Seperatedness of B
   θ : (◆ ♥ : A) → ((ε : ℚ) (φ : 0 < ε) → B ◆ ♥ ε φ) → ◆ ≡ ♥
   θ ◆ ♥ χ =
-    Σ≡Prop lightyear
+    Σ≡Prop a'Proposition
            (funExt λ u → funExt (λ ε → funExt (λ φ → π u ε φ)))
     where
     π : (u : ℝ) (ε : ℚ) (φ : 0 < ε) → (fst ◆) u ε φ ≡ (fst ♥) u ε φ
@@ -1398,9 +1505,6 @@ Close'Σ =
 
   τ = {!!}
 
-  -- TODO: Name
-  bar = ψ , ω , θ , χ , π , ρ , σ , τ
-
 Close' : (ε : ℚ) → 0 < ε → ℝ → ℝ → Type ℓ-zero
 Close' = fst Close'Σ
 
@@ -1421,28 +1525,27 @@ close'RationalLimitDefinition :
              (λ χ → rational q ≈[ ε - δ , χ ] y δ ω)))
 close'RationalLimitDefinition q x φ ε ψ = refl
 
--- close'LimitRationalDefinition :
---   (x : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation x)
---   (r : ℚ)
---   (ε : ℚ) (ψ : 0 < ε) →
---   (limit x φ ≈[ ε , ψ ] rational r) ≡
---   ∃ ℚ (λ δ → Σ (0 < δ) (λ ω →
---              Σ (0 < ε - δ)
---              (λ χ → x δ ω ≈[ ε - δ , χ ] rational r)))
--- close'LimitRationalDefinition = {!refl!}
+close'LimitRationalDefinition :
+  (x : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation x)
+  (r : ℚ)
+  (ε : ℚ) (ψ : 0 < ε) →
+  (limit x φ ≈[ ε , ψ ] rational r) ≡
+  (∃ ℚ (λ δ → Σ (0 < δ) (λ ω →
+             Σ (0 < ε - δ)
+             (λ χ → x δ ω ≈[ ε - δ , χ ] rational r))))
+close'LimitRationalDefinition x φ r ε ψ = refl
 
 close'LimitLimitDefinition :
   (x : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation x)
   (y : (ε : ℚ) → 0 < ε → ℝ) (ψ : CauchyApproximation y)
   (ε : ℚ) (ω : 0 < ε) →
   (limit x φ ≈[ ε , ω ] limit y ψ) ≡
-  ?
-  -- ∃ (ℚ × ℚ)
-  --   (λ where (δ , η) → Σ (0 < δ)
-  --               (λ χ → Σ (0 < η)
-  --               (λ π → Σ (0 < ε - (δ + η))
-  --               (λ σ → x δ χ ≈[ (ε - (δ + η)) , σ ] y η π))))
-close'LimitLimitDefinition = {!!}
+  (∃ (ℚ × ℚ)
+    (λ where (δ , η) → Σ (0 < δ)
+                (λ χ → Σ (0 < η)
+                (λ π → Σ (0 < ε - (δ + η))
+                (λ σ → x δ χ ≈[ (ε - (δ + η)) , σ ] y η π)))))
+close'LimitLimitDefinition x φ y ψ ε ω = refl
 
 closeProposition : (ε : ℚ) (φ : 0 < ε) (u v : ℝ) → isProp (Close' ε φ u v)
 closeProposition = fst $ snd $ Close'Σ

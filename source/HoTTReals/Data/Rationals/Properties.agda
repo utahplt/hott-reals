@@ -88,6 +88,18 @@ subtractAddRightCancel x y = (y - x) + x
                                ≡⟨ +IdR y ⟩
                              y ∎
 
+addLeftSubtractCancel : (x y : ℚ) → x + (y - x) ≡ y
+addLeftSubtractCancel x y =
+  x + (y - x)
+    ≡⟨ cong (_+_ x) (+Comm y (- x)) ⟩
+  x + ((- x) + y)
+    ≡⟨ +Assoc x (- x) y ⟩
+  (x + (- x)) + y
+    ≡⟨ cong (flip _+_ y) (+InvR x) ⟩
+  0 + y
+    ≡⟨ +IdL y ⟩
+  y ∎
+
 addLeftSwap : (x y z : ℚ) → (x + y) + z ≡ (x + z) + y
 addLeftSwap x y z = (x + y) + z
                       ≡⟨ sym $ +Assoc x y z ⟩

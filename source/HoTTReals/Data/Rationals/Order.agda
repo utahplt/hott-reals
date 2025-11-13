@@ -28,6 +28,12 @@ open import HoTTReals.Data.Rationals.Properties
   r : 0 + 0 < x + y
   r = <Monotone+ 0 x 0 y p q
 
+0≤+ : {x y : ℚ} → 0 ≤ x → 0 ≤ y → 0 ≤ x + y
+0≤+ {x} {y} p q = r
+  where
+  r : 0 + 0 ≤ x + y
+  r = ≤Monotone+ 0 x 0 y p q
+
 0<· : {x y : ℚ} → 0 < x → 0 < y → 0 < x · y
 0<· {x} {y} p q = subst (λ ?x → ?x < x · y) (·AnnihilL y) r
   where
@@ -323,6 +329,33 @@ maxLeastUpperBound< {x} {y} {z} p q =
   r' : ¬ max x y ≡ z
   r' s = PropositionalTruncation.rec Empty.isProp⊥ (r s) (isTotal≤ x y)
 
+∣∣≤→≤₁ : {x ε : ℚ} → ∣ x ∣ ≤ ε → x ≤ ε
+∣∣≤→≤₁ {x} {ε} p = isTrans≤ x ∣ x ∣ ε (≤max x (- x)) p
+
+∣∣≤→≤₂ : {x ε : ℚ} → ∣ x ∣ ≤ ε → - ε ≤ x
+∣∣≤→≤₂ {x} {ε} p = isTrans≤ (- ε) (- ∣ x ∣) x q r''
+  where
+  q : - ε ≤ - ∣ x ∣
+  q = ≤antitone- {x = ∣ x ∣} {y = ε} p
+
+  r : - x ≤ ∣ x ∣
+  r = ≤max' x (- x)
+
+  r' : - ∣ x ∣ ≤ - - x
+  r' = ≤antitone- {x = - x} {y = ∣ x ∣} r
+
+  r'' : - ∣ x ∣ ≤ x
+  r'' = subst (_≤_ (- ∣ x ∣)) (-Invol x) r'
+
+≤→∣∣≤ : {x ε : ℚ} → x ≤ ε → - ε ≤ x → ∣ x ∣ ≤ ε
+≤→∣∣≤ {x} {ε} p q = maxLeastUpperBound {x = x} {y = - x} {z = ε} p q'
+  where
+  r : - x ≤ - - ε
+  r = ≤antitone- {x = - ε} {y = x} q
+
+  q' : - x ≤ ε
+  q' = subst (_≤_ (- x)) (-Invol ε) r
+
 ∣∣<→<₁ : {x ε : ℚ} → ∣ x ∣ < ε → x < ε
 ∣∣<→<₁ {x} {ε} p = isTrans≤< x (∣ x ∣) ε (≤max x (- x)) p
 
@@ -356,6 +389,27 @@ maxLeastUpperBound< {x} {y} {z} p q =
   p : (0 ≤ x) ⊎ (x ≤ 0) → 0 ≤ ∣ x ∣
   p (inl q) = isTrans≤ 0 x (∣ x ∣) q (≤max x (- x))
   p (inr q) = isTrans≤ 0 (- x) (∣ x ∣) (≤antitone- {x = x} q) (≤max' x (- x))
+
+∣-∣≡∣∣ : (x : ℚ) → ∣ - x ∣ ≡ ∣ x ∣
+∣-∣≡∣∣ x =
+  ∣ - x ∣
+    ≡⟨ refl ⟩
+  max (- x) (- (- x))
+    ≡⟨ cong (max (- x)) (-Invol x) ⟩
+  max (- x) x
+    ≡⟨ maxComm (- x) x ⟩
+  max x (- x)
+    ≡⟨ refl ⟩
+  ∣ x ∣ ∎
+
+-∣∣≤self : (x : ℚ) → - ∣ x ∣ ≤ x
+-∣∣≤self x = subst (_≤_ (- ∣ x ∣)) (-Invol x) q
+  where
+  p : - x ≤ ∣ x ∣
+  p = ≤max' x (- x)
+
+  q : - ∣ x ∣ ≤ - - x
+  q = ≤antitone- {x = - x} {y = ∣ x ∣} p
 
 ≤-o· : {x y z : ℚ} → 0 ≤ x → y ≤ z → x · y ≤ x · z
 ≤-o· {x} {y} {z} p q =
@@ -398,3 +452,39 @@ maxLeastUpperBound< {x} {y} {z} p q =
   isTrans≤< (x · y) (z · y) (z · w)
             (≤-·o x z y s p)
             (<-o· {x = z} {y = y} {z = w} r q)
+
+magntidueTriangleInequality : (x y : ℚ) → ∣ x + y ∣ ≤ ∣ x ∣ + ∣ y ∣
+magntidueTriangleInequality x y = ≤→∣∣≤ {x = x + y} {ε = ∣ x ∣ + ∣ y ∣} p q
+  where
+  p : x + y ≤ ∣ x ∣ + ∣ y ∣
+  p = +≤+ {x = x} {y = ∣ x ∣} {z = y} {w = ∣ y ∣} (≤max x (- x)) (≤max y (- y))
+
+  q : (- (∣ x ∣ + ∣ y ∣)) ≤ x + y
+  q = subst (flip _≤_ (x + y))
+            (sym $ negateAdd ∣ x ∣ ∣ y ∣)
+            (+≤+ {x = - ∣ x ∣} {y = x} {z = - ∣ y ∣} {w = y}
+                 (-∣∣≤self x) (-∣∣≤self y))
+
+distanceCommutative : (x y : ℚ) → distance x y ≡ distance y x
+distanceCommutative x y =
+  distance x y
+    ≡⟨ sym $ ∣-∣≡∣∣ (x - y) ⟩
+  ∣ - (x - y) ∣
+    ≡⟨ cong ∣_∣ (negateSubtract' x y) ⟩
+  ∣ y - x ∣
+    ≡⟨ refl ⟩
+  distance y x ∎
+
+distanceTriangleInequality :
+  (x y z : ℚ) → distance x z ≤ distance x y + distance y z
+distanceTriangleInequality x y z =
+  subst (flip _≤_ (∣ x - y ∣ + ∣ y - z ∣))
+        (cong ∣_∣ p)
+        (magntidueTriangleInequality (x - y) (y - z))
+  where
+  p : (x - y) + (y - z) ≡ x - z
+  p = (x - y) + (y - z)
+        ≡⟨ +Assoc (x - y) y (- z) ⟩
+      ((x - y) + y) - z
+        ≡⟨ cong (flip _-_ z) (subtractAddRightCancel y x) ⟩
+      x - z ∎

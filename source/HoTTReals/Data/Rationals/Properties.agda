@@ -79,6 +79,9 @@ negateSubtract x y =
     ≡⟨ cong (_+_ $ - x) (-Invol y) ⟩
   - x + y ∎
 
+negateSubtract' : (x y : ℚ) → - (x - y) ≡ y - x
+negateSubtract' x y = negateSubtract x y ∙ +Comm (- x) y
+
 subtractAddRightCancel : (x y : ℚ) → (y - x) + x ≡ y
 subtractAddRightCancel x y = (y - x) + x
                                ≡⟨ (sym $ +Assoc y (- x) x) ⟩
@@ -249,13 +252,5 @@ inverseUnique {x} {y} {z} p q =
               ≡⟨ ·IdL y ⟩
             y ∎
 
--- y · (x / y [ p ])
---              ≡⟨ ? ⟩ -- cong (_·_ y) (·Comm x (y [ p ]⁻¹))
---            y · (y [ p ]⁻¹ · x)
---              ≡⟨ ·Assoc y (y [ p ]⁻¹) x ⟩
---            (y · y [ p ]⁻¹) · x
---              ≡⟨ cong (flip _·_ x) (⁻¹-inverse y p) ⟩
---            1 · x
---              ≡⟨ ·IdL x ⟩
---            x ∎
-
+distance : ℚ → ℚ → ℚ
+distance x y = ∣ x - y ∣

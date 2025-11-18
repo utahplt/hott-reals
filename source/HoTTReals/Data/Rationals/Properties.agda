@@ -82,6 +82,33 @@ negateSubtract x y =
 negateSubtract' : (x y : ℚ) → - (x - y) ≡ y - x
 negateSubtract' x y = negateSubtract x y ∙ +Comm (- x) y
 
+addLeftSwap : (x y z : ℚ) → (x + y) + z ≡ (x + z) + y
+addLeftSwap x y z = (x + y) + z
+                      ≡⟨ sym $ +Assoc x y z ⟩
+                    x + (y + z)
+                      ≡⟨ cong (_+_ x) (+Comm y z) ⟩
+                    x + (z + y)
+                      ≡⟨ +Assoc x z y ⟩
+                    (x + z) + y ∎
+
+addSubtractLeftCancel : (x y : ℚ) → (x + y) - x ≡ y
+addSubtractLeftCancel x y = (x + y) - x
+                              ≡⟨ addLeftSwap x y (- x) ⟩
+                            (x + (- x)) + y
+                              ≡⟨ cong (flip _+_ y) (+InvR x) ⟩
+                            0 + y
+                              ≡⟨ +IdL y ⟩
+                            y ∎
+
+addSubtractRightCancel : (x y : ℚ) → (x + y) - y ≡ x
+addSubtractRightCancel x y = (x + y) - y
+                               ≡⟨ (sym $ +Assoc x y (- y)) ⟩
+                             x + (y - y)
+                               ≡⟨ cong (_+_ x) (+InvR y) ⟩
+                             x + 0
+                               ≡⟨ +IdR x ⟩
+                             x ∎
+
 subtractAddRightCancel : (x y : ℚ) → (y - x) + x ≡ y
 subtractAddRightCancel x y = (y - x) + x
                                ≡⟨ (sym $ +Assoc y (- x) x) ⟩
@@ -102,15 +129,6 @@ addLeftSubtractCancel x y =
   0 + y
     ≡⟨ +IdL y ⟩
   y ∎
-
-addLeftSwap : (x y z : ℚ) → (x + y) + z ≡ (x + z) + y
-addLeftSwap x y z = (x + y) + z
-                      ≡⟨ sym $ +Assoc x y z ⟩
-                    x + (y + z)
-                      ≡⟨ cong (_+_ x) (+Comm y z) ⟩
-                    x + (z + y)
-                      ≡⟨ +Assoc x z y ⟩
-                    (x + z) + y ∎
 
 -·≡-· : (x y : ℚ) → - (x · y) ≡ (- x) · y
 -·≡-· x y = sym (+≡0→≡- p)

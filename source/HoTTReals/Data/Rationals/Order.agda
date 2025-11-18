@@ -411,6 +411,16 @@ maxLeastUpperBound< {x} {y} {z} p q =
   q : - ∣ x ∣ ≤ - - x
   q = ≤antitone- {x = - x} {y = ∣ x ∣} p
 
+subtract<→negate<subtract : (x y ε : ℚ) → x - y < ε → - ε < y - x
+subtract<→negate<subtract x y ε p =
+  subst (_<_ (- ε)) (negateSubtract' x y) (<antitone- {x = x - y} {y = ε} p)
+
+negate<subtract→subtract< : (x y ε : ℚ) → - ε < y - x → x - y < ε
+negate<subtract→subtract< x y ε p =
+  subst2 _<_ (negateSubtract' y x)
+             (-Invol ε)
+             (<antitone- {x = - ε} {y = y - x} p)
+
 ≤-o· : {x y z : ℚ} → 0 ≤ x → y ≤ z → x · y ≤ x · z
 ≤-o· {x} {y} {z} p q =
   subst2 (λ ?a ?b → ?a ≤ ?b)

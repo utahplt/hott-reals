@@ -247,6 +247,11 @@ Recursion A B =
   -- value we have inductively assigned to it in the codomain. For natural
   -- numbers this is sort of implicit in the fact that the current value is
   -- `successor(n)`, but here we can't derive that information from `f`.
+  --
+  -- Note, I also later forgot the corresponding inductive assumptions in the
+  -- rational-limit, limit-rational, and limit-limit cases which give induction
+  -- assumptions about `x` and `y` in the domain and not just `f` and `g` in the
+  -- codomain. Marked below with "here".
   Σ ((x : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation x) →
      (f : (ε : ℚ) → 0 < ε → A) →
      CauchyApproximation'' A B f →
@@ -260,11 +265,15 @@ Recursion A B =
   ((q ε δ : ℚ) (φ : 0 < ε) (ψ : 0 < δ) (θ : 0 < ε - δ) →
    (y : (ε : ℚ) → 0 < ε → ℝ) (ω : CauchyApproximation y) →
    (g : (ε : ℚ) → 0 < ε → A) (χ : CauchyApproximation'' A B g) →
+   -- Here (1)
+   (rational q) ∼[ ε - δ , θ ] (y δ ψ) →
    B (fRational q) (g δ ψ) (ε - δ) θ →
    B (fRational q) (fLimit y ω g χ) ε φ) ×
   ((x : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation x)
    (f : (ε : ℚ) → 0 < ε → A) (ψ : CauchyApproximation'' A B f) →
    (r ε δ : ℚ) (θ : 0 < ε) (ω : 0 < δ) (χ : 0 < ε - δ) →
+   -- Here (2)
+   (x δ ω) ∼[ ε - δ , χ ] (rational r) →
    B (f δ ω) (fRational r) (ε - δ) χ →
    B (fLimit x φ f ψ) (fRational r) ε θ) ×
   ((x y : (ε : ℚ) → 0 < ε → ℝ)
@@ -274,6 +283,8 @@ Recursion A B =
    (θ : CauchyApproximation'' A B f) →
    (ω : CauchyApproximation'' A B g) →
    (ε δ η : ℚ) (χ : 0 < ε) (π : 0 < δ) (ρ : 0 < η) (σ : 0 < ε - (δ + η)) →
+   -- Here (3)
+   (x δ π) ∼[ ε - (δ + η) , σ ] (y η ρ) →
    B (f δ π) (g η ρ) (ε - (δ + η)) σ →
    B (fLimit x φ f θ) (fLimit y ψ g ω) ε χ) ×
   ((a b : A) (ε : ℚ) (φ : 0 < ε) → isProp $ B a b ε φ)))
@@ -311,8 +322,9 @@ recursion∼ α@(fRational , fLimit , φ , ψ , θ , ω , χ , π)
   θ q ε δ
     ρ σ τ
     y υ
-    (λ ε k → recursion α (y ε k))
+    (λ ε κ → recursion α (y ε κ))
     (λ ε δ κ μ → recursion∼ α (υ ε δ κ μ))
+    ι
     (recursion∼ α ι)
 recursion∼ α@(fRational , fLimit , φ , ψ , θ , ω , χ , π)
   (limitRational x ρ r ε δ σ τ υ ι) =
@@ -321,17 +333,18 @@ recursion∼ α@(fRational , fLimit , φ , ψ , θ , ω , χ , π)
     (λ ε δ κ μ → recursion∼ α (ρ ε δ κ μ))
     r ε δ
     σ τ υ
-    (recursion∼ α ι)
+    ι (recursion∼ α ι)
 recursion∼ α@(fRational , fLimit , φ , ψ , θ , ω , χ , π)
   (limitLimit x y ρ σ ε δ η τ υ ι κ μ) =
   χ x y
-    (λ ε ν → recursion α (x ε ν)) (λ ε ν → recursion α (y ε ν))
+    (λ ε ν → recursion α (x ε ν))
+    (λ ε ν → recursion α (y ε ν))
     ρ σ
-    (λ ε δ ν ζ → recursion∼ α (ρ ε δ ν ζ))
-    (λ ε δ ν ζ → recursion∼ α (σ ε δ ν ζ))
+    (λ ε δ ν ξ → recursion∼ α (ρ ε δ ν ξ))
+    (λ ε δ ν ξ → recursion∼ α (σ ε δ ν ξ))
     ε δ η
-    τ υ ι κ
-    (recursion∼ α μ)
+    τ υ ι
+    κ μ (recursion∼ α μ)
 recursion∼ α@(fRational , fLimit , φ , ψ , θ , ω , χ , π)
   (squash ε ρ u v ζ ζ' i) =
   isProp→PathP (λ j → π (recursion α u) (recursion α v) ε ρ)

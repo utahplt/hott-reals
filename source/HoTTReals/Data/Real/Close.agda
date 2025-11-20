@@ -192,7 +192,7 @@ Close'Σ =
       -- This one has eight cases according to the last paragraph of the proof
       -- Not included as as part of A'
       (λ u v w ε η ω θ →
-        let foo' = (fst $ snd $ snd $ snd $ foo u) v w ε η ω θ
+        let foo' = (fst $ snd $ snd $ snd $ foo w) u v ε η ω θ
             foo'' = (snd $ snd $ snd $ snd $ foo u) v w ε η ω θ
         in {!!}))
   where
@@ -1501,12 +1501,97 @@ Close'Σ =
       τ'' : Close (ε - (η + δ)) (fst τ') (z η ρ) (y δ π)
       τ'' = closeSymmetric (y δ π) (z η ρ) (ε - (η + δ)) (fst τ') (snd τ')
 
-  χ = {!!}
+  χ' : (q r ε : ℚ) (φ : 0 < ε)
+       (ψ' : - ε < q - r) (ω : q - r < ε)
+       (w : ℝ) (η : ℚ) (π : 0 < η) →
+       fst (ψ q) w η π →
+       fst (ψ r) w (ε + η) (0<+' {x = ε} {y = η} φ π)
+  χ' q r ε φ ψ' ω = inductionProposition (ρ , σ , τ)
+    where
+    ρ : (s η : ℚ) (π : 0 < η) →
+        fst (ψ q) (rational s) η π →
+        fst (ψ r) (rational s) (ε + η) (0<+' {x = ε} {y = η} φ π)
+    ρ s η π ρ' = isTrans≤< ∣ r - s ∣ (∣ r - q ∣ + ∣ q - s ∣) (ε + η)
+                           (distanceTriangleInequality r q s)
+                           (+<+ {x = ∣ r - q ∣} {y = ε}
+                                {z = ∣ q - s ∣} {w = η}
+                                σ τ)
+      where
+      σ : ∣ r - q ∣ < ε
+      σ = subst (flip _<_ ε)
+                (distanceCommutative q r)
+                (<→∣∣< {x = q - r} {ε = ε} ω ψ')
 
+      τ : ∣ q - s ∣ < η
+      τ = ρ'
+
+    σ : (x : (ε : ℚ) → 0 < ε → ℝ) (π : CauchyApproximation x)
+        (ρ : (ε' : ℚ) (ψ' : 0 < ε') (η : ℚ) (ω : 0 < η) →
+             fst (ψ q) (x ε' ψ') η ω →
+             fst (ψ r) (x ε' ψ') (ε + η) (0<+' {x = ε} {y = η} φ ω))
+        (η : ℚ) (σ : 0 < η) →
+        fst (ψ q) (limit x π) η σ →
+        fst (ψ r) (limit x π) (ε + η) (0<+' {x = ε} {y = η} φ σ)
+    σ x π ρ η σ = ∃-rec isPropPropTrunc τ
+      where
+      τ : (θ : ℚ) →
+          Σ (0 < θ) (λ υ → Σ (0 < η - θ) (λ ι → fst (ψ q) (x θ υ) (η - θ) ι)) →
+          fst (ψ r) (limit x π) (ε + η) (0<+' {x = ε} {y = η} φ σ)
+      τ θ (υ , α , β) = ∣ θ , (υ , fst ζ , snd ζ) ∣₁
+        where
+        γ : fst (ψ r) (x θ υ) (ε + (η - θ))
+              (0<+' {x = ε} {y = η - θ} φ α)
+        γ = ρ θ υ (η - θ) α β 
+
+        ζ : Σ (0 < (ε + η) - θ) (fst (ψ r) (x θ υ) ((ε + η) - θ))
+        ζ = subst (λ ?x → Σ (0 < ?x) (fst (ψ r) (x θ υ) ?x))
+                  (+Assoc ε η (- θ))
+                  ((0<+' {x = ε} {y = η - θ} φ α) , γ)
+
+    τ : (u : ℝ) →
+        isProp ((η : ℚ) (π : 0 < η) →
+                fst (ψ q) u η π →
+                fst (ψ r) u (ε + η) (0<+' {x = ε} {y = η} φ π))
+    τ u = isPropΠ3 (λ η π ρ → (fst $ snd $ ψ r) u (ε + η)
+                                (0<+' {x = ε} {y = η} φ π))
+
+  χ : (q r ε : ℚ) (φ : 0 < ε) →
+      (- ε) < (q - r) → (q - r) < ε →
+      B (ψ q) (ψ r) ε φ
+  χ q r ε φ ψ ω w η π =
+    χ' q r ε φ ψ ω w η π ,
+    χ' r q ε φ ω' ψ' w η π
+    where
+    ω' : - ε < r - q
+    ω' = subtract<→negate<subtract q r ε ω
+
+    ψ' : r - q < ε
+    ψ' = negate<subtract→subtract< r q ε ψ
+
+  π : (q ε δ : ℚ) (φ : 0 < ε) (ψ' : 0 < δ) (θ : 0 < (ε - δ))
+      (y : (ε : ℚ) → 0 < ε → ℝ) (ω' : CauchyApproximation y)
+      (g : (ε : ℚ) → 0 < ε → A) (χ' : CauchyApproximation'' A B g) →
+      Close (ε - δ) θ (rational q) (y δ ψ') →
+      B (ψ q) (g δ ψ') (ε - δ) θ →
+      B (ψ q) (ω y ω' g χ') ε φ
   π = {!!}
 
+  ρ : (x : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation x)
+      (f : (ε : ℚ) → 0 < ε → A) (ψ' : CauchyApproximation'' A B f)
+      (r ε δ : ℚ) (θ : 0 < ε) (ω' : 0 < δ) (χ' : 0 < (ε - δ)) →
+      Close (ε - δ) χ' (x δ ω') (rational r) →
+      B (f δ ω') (ψ r) (ε - δ) χ' →
+      B (ω x φ f ψ') (ψ r) ε θ
   ρ = {!!}
 
+  σ : (x y : (ε : ℚ) → 0 < ε → ℝ) (f g : (ε : ℚ) → 0 < ε → A)
+      (φ : CauchyApproximation x) (ψ' : CauchyApproximation y)
+      (θ : CauchyApproximation'' A B f)
+      (ω' : CauchyApproximation'' A B g) (ε δ η : ℚ) (χ' : 0 < ε)
+      (π' : 0 < δ) (ρ' : 0 < η) (σ : 0 < (ε - (δ + η))) →
+      Close (ε - (δ + η)) σ (x δ π') (y η ρ') →
+      B (f δ π') (g η ρ') (ε - (δ + η)) σ →
+      B (ω x φ f θ) (ω y ψ' g ω') ε χ'
   σ = {!!}
 
 Close' : (ε : ℚ) → 0 < ε → ℝ → ℝ → Type ℓ-zero

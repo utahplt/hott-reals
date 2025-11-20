@@ -91,6 +91,15 @@ addLeftSwap x y z = (x + y) + z
                       ≡⟨ +Assoc x z y ⟩
                     (x + z) + y ∎
 
+addRightSwap : (x y z : ℚ) → x + (y + z) ≡ y + (x + z)
+addRightSwap x y z = x + (y + z)
+                       ≡⟨ +Assoc x y z ⟩
+                     (x + y) + z
+                       ≡⟨ cong (flip _+_ z) (+Comm x y) ⟩
+                     (y + x) + z
+                       ≡⟨ (sym $ +Assoc y x z) ⟩
+                     y + (x + z) ∎
+
 addSubtractLeftCancel : (x y : ℚ) → (x + y) - x ≡ y
 addSubtractLeftCancel x y = (x + y) - x
                               ≡⟨ addLeftSwap x y (- x) ⟩

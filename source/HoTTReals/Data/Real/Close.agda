@@ -692,7 +692,6 @@ Close'Σ =
       (r ε δ : ℚ) (φ : 0 < ε) (ψ : 0 < δ) (ω : 0 < ε - δ)
       (y : (ε : ℚ) → 0 < ε → ℝ) (χ : CauchyApproximation y)
       (g : (ε : ℚ) → 0 < ε → C) (π : CauchyApproximation'' C D g) →
-      -- D (α r) (g δ ψ) (ε - δ) ω →
       (θ : ℚ) (σ : 0 < θ) →
       ((η : ℚ) (τ : 0 < η) →
        fst (α r) η τ →
@@ -1572,8 +1571,6 @@ Close'Σ =
        (y : (ε : ℚ) → 0 < ε → ℝ) (ω' : CauchyApproximation y)
        (g : (ε : ℚ) → 0 < ε → A) (χ' : CauchyApproximation'' A B g)
        (π : Close (ε - δ) θ' (rational q) (y δ ψ'))
-       -- (ρ : B (ψ q) (g δ ψ') (ε - δ) θ')
-       -- TODO
        (ρ : (u : ℝ) (η : ℚ) (ρ : 0 < η) →
             fst (ψ q) u η ρ →   
             fst (g δ ψ') u ((ε - δ) + η)

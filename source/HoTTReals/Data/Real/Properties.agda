@@ -20,6 +20,7 @@ open import HoTTReals.Data.Real.Induction
 open import HoTTReals.Algebra.Field.Instances.Rationals as ℚ
 open import HoTTReals.Data.Rationals.Order as ℚ
 open import HoTTReals.Data.Rationals.Properties as ℚ
+open import HoTTReals.Logic
 
 -- HoTT Theorem 11.3.9
 ℝ-isSet : isSet ℝ
@@ -268,3 +269,28 @@ continuousExtensionUnique f g φ ψ ω =
   π : (u : ℝ) → isProp (f u ≡ g u)
   π u = ℝ-isSet (f u) (g u)
   
+lipschitz→continuous :
+  (f : ℝ → ℝ) (L : ℚ) (φ : 0 < L) → 
+  Lipschitzℝ f L φ →
+  Continuous f
+lipschitz→continuous f L φ ψ u ε ω =
+  ∣ ε / L [ L≠0 ] , (χ , (λ v π → ρ v $ ψ u v (ε / L [ L≠0 ]) χ π)) ∣₁
+  where
+  L≠0 : ¬ L ≡ 0
+  L≠0 = ≠-symmetric $ <→≠ φ
+
+  χ : 0 < (ε / L [ L≠0 ])
+  χ = 0</ {ε} {L} ω φ
+
+  ρ : (v : ℝ) →
+      Close (L · (ε / L [ L≠0 ])) (0<· {L} {ε / L [ L≠0 ]} φ χ) (f u) (f v) →
+      Close ε ω (f u) (f v)
+  ρ v σ = σ''
+    where
+    σ' : Σ (0 < ε) (λ τ → Close ε τ (f u) (f v))
+    σ' = subst (λ ?x → Σ (0 < ?x) (λ τ → Close ?x τ _ _))
+               (·/ ε L L≠0)
+               ((0<· {L} {ε / L [ L≠0 ]} φ χ) , σ)
+
+    σ'' : Close ε ω (f u) (f v)
+    σ'' = subst (λ ?x → Close ε ?x _ _) (isProp< 0 ε (fst σ') ω) (snd σ')

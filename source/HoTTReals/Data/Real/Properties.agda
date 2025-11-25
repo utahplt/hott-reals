@@ -153,118 +153,117 @@ continuousExtensionUnique f g φ ψ ω =
             Close (ε / 2 [ 2≠0 ]) (0</ {x = ε} {y = 2} σ 0<2)
                   (f (limit x π)) (f v)) →
             Close ε σ (f (limit x π)) (g (limit x π))
-      χ'' θ (τ , υ) η (ξ , ο) =
-        let
-          δ : ℚ
-          δ = (min θ η) / 2 [ 2≠0 ]
+      χ'' θ (τ , υ) η (ξ , ο) = ϕ''
+        where
+        δ : ℚ
+        δ = (min θ η) / 2 [ 2≠0 ]
 
-          bar : 0 < min θ η
-          bar = minGreatestLowerBound< {θ} {η} {0} τ ξ
+        α : 0 < min θ η
+        α = minGreatestLowerBound< {θ} {η} {0} τ ξ
 
-          α : 0 < δ
-          α = 0</ {x = min θ η} {y = 2} bar 0<2
+        α' : 0 < δ
+        α' = 0</ {x = min θ η} {y = 2} α 0<2
 
-          foo' : (min θ η) / 2 [ 2≠0 ] < min θ η
-          foo' =
-            subst
-              (_<_ ((min θ η) / 2 [ 2≠0 ]))
-              (·IdR (min θ η))
-              (≤→<→·<· {min θ η} {2 [ 2≠0 ]⁻¹} {min θ η} {1}
-                       (isRefl≤ (min θ η))
-                       (Bool.toWitness {Q = <Dec (2 [ 2≠0 ]⁻¹) 1} tt)
-                       bar
-                       (Bool.toWitness {Q = ≤Dec 0 (2 [ 2≠0 ]⁻¹)} tt)) 
+        β : (min θ η) / 2 [ 2≠0 ] < min θ η
+        β =
+          subst
+            (_<_ ((min θ η) / 2 [ 2≠0 ]))
+            (·IdR (min θ η))
+            (≤→<→·<· {min θ η} {2 [ 2≠0 ]⁻¹} {min θ η} {1}
+                     (isRefl≤ (min θ η))
+                     (Bool.toWitness {Q = <Dec (2 [ 2≠0 ]⁻¹) 1} tt)
+                     α
+                     (Bool.toWitness {Q = ≤Dec 0 (2 [ 2≠0 ]⁻¹)} tt)) 
 
-          foo : 0 < θ - δ 
-          foo = <→0<- {δ} {θ} (isTrans<≤ δ (min θ η) θ foo' (min≤ θ η))
+        γ : 0 < θ - δ 
+        γ = <→0<- {δ} {θ} (isTrans<≤ δ (min θ η) θ β (min≤ θ η))
 
-          baz : 0 < η - δ
-          baz = <→0<- {δ} {η} (isTrans<≤ δ (min θ η) η foo' (min≤' θ η))
+        γ' : 0 < η - δ
+        γ' = <→0<- {δ} {η} (isTrans<≤ δ (min θ η) η β (min≤' θ η))
 
-          buzz' : Close ((η - δ) + δ) (0<+' {η - δ} {δ} baz α)
-                        (limit x π) (x δ α)
-          buzz' =
-            closeSymmetric
-              (x δ α)
-              (limit x π)
-              ((η - δ) + δ) (0<+' {η - δ} {δ} baz α)
-              (closeLimit'' x π δ (η - δ) α baz)
+        ζ : Close ((η - δ) + δ) (0<+' {η - δ} {δ} γ' α')
+                  (limit x π) (x δ α')
+        ζ =
+          closeSymmetric
+            (x δ α')
+            (limit x π)
+            ((η - δ) + δ) (0<+' {η - δ} {δ} γ' α')
+            (closeLimit'' x π δ (η - δ) α' γ')
 
-          buzz : Σ (0 < η)
-                   (λ half → Close η half (limit x π) (x δ α))
-          buzz = subst (λ ?x → Σ (0 < ?x)
-                                 (λ half → Close ?x half (limit x π) (x δ α)))
-                       (subtractAddRightCancel δ η)
-                       ((0<+' {η - δ} {δ} baz α) , buzz')
+        ζ' : Σ (0 < η)
+               (λ ι → Close η ι (limit x π) (x δ α'))
+        ζ' = subst (λ ?x → Σ (0 < ?x)
+                               (λ ι → Close ?x ι (limit x π) (x δ α')))
+                     (subtractAddRightCancel δ η)
+                     ((0<+' {η - δ} {δ} γ' α') , ζ)
 
-          buzz'' : Close η ξ (limit x π) (x δ α)
-          buzz'' = subst (λ ?x → Close η ?x (limit x π) (x δ α))
-                         (isProp< 0 η (fst buzz) ξ)
-                         (snd buzz)
+        ζ'' : Close η ξ (limit x π) (x δ α')
+        ζ'' = subst (λ ?x → Close η ?x (limit x π) (x δ α'))
+                       (isProp< 0 η (fst ζ') ξ)
+                       (snd ζ')
 
-          β : Close (ε / 2 [ 2≠0 ]) (0</ {ε} {2} σ 0<2)
-                    (f (limit x π)) (f (x δ α))
-          β = ο (x δ α) buzz''
+        ι : Close (ε / 2 [ 2≠0 ]) (0</ {ε} {2} σ 0<2)
+                  (f (limit x π)) (f (x δ α'))
+        ι = ο (x δ α') ζ''
 
-          meal'' : Close ((θ - δ) + δ) (0<+' {θ - δ} {δ} foo α)
-                         (limit x π) (x δ α)
-          meal'' =
-            closeSymmetric
-              (x δ α) (limit x π) ((θ - δ) + δ) (0<+' {θ - δ} {δ} foo α)
-              (closeLimit'' x π δ (θ - δ) α foo)
+        κ : Close ((θ - δ) + δ) (0<+' {θ - δ} {δ} γ α')
+                  (limit x π) (x δ α')
+        κ =
+          closeSymmetric
+            (x δ α') (limit x π) ((θ - δ) + δ) (0<+' {θ - δ} {δ} γ α')
+            (closeLimit'' x π δ (θ - δ) α' γ)
 
-          meal' : Σ (0 < θ)
-                    (λ hash → Close θ hash (limit x π) (x δ α))
-          meal' = subst (λ ?x → Σ (0 < ?x)
-                                  (λ hash → Close ?x hash (limit x π) (x δ α)))
-                        (subtractAddRightCancel δ θ)
-                        ((0<+' {θ - δ} {δ} foo α) , meal'')
+        κ' : Σ (0 < θ)
+               (λ μ → Close θ μ (limit x π) (x δ α'))
+        κ' = subst (λ ?x → Σ (0 < ?x)
+                                (λ μ → Close ?x μ (limit x π) (x δ α')))
+                      (subtractAddRightCancel δ θ)
+                      ((0<+' {θ - δ} {δ} γ α') , κ)
 
-          meal : Close θ τ (limit x π) (x δ α)
-          meal = subst (λ ?x → Close θ ?x (limit x π) (x δ α))
-                       (isProp< 0 θ (fst meal') τ)
-                       (snd meal')
+        κ'' : Close θ τ (limit x π) (x δ α')
+        κ'' = subst (λ ?x → Close θ ?x (limit x π) (x δ α'))
+                     (isProp< 0 θ (fst κ') τ)
+                     (snd κ')
 
-          monster : Close (ε / 2 [ 2≠0 ]) (0</ {ε} {2} σ 0<2)
-                          (g (limit x π)) (g (x δ α))
-          monster = υ (x δ α) meal
+        μ : Close (ε / 2 [ 2≠0 ]) (0</ {ε} {2} σ 0<2)
+                  (g (limit x π)) (g (x δ α'))
+        μ = υ (x δ α') κ''
 
-          car : Close (ε / 2 [ 2≠0 ]) (0</ {ε} {2} σ 0<2)
-                      (f (x δ α)) (g (limit x π))
-          car = subst (λ ?x → Close (ε / 2 [ 2≠0 ]) (0</ {ε} {2} σ 0<2) ?x _)
-                      (sym $ ρ δ α)
-                      (closeSymmetric
-                        (g (limit x π)) (g (x δ α))
-                        (ε / 2 [ 2≠0 ]) (0</ {ε} {2} σ 0<2)
-                        monster)
+        ν : Close (ε / 2 [ 2≠0 ]) (0</ {ε} {2} σ 0<2)
+                    (f (x δ α')) (g (limit x π))
+        ν = subst (λ ?x → Close (ε / 2 [ 2≠0 ]) (0</ {ε} {2} σ 0<2) ?x _)
+                    (sym $ ρ δ α')
+                    (closeSymmetric
+                      (g (limit x π)) (g (x δ α'))
+                      (ε / 2 [ 2≠0 ]) (0</ {ε} {2} σ 0<2)
+                      μ)
 
-          curse : Close ((ε / 2 [ 2≠0 ]) + (ε / 2 [ 2≠0 ]))
-                        (0<+' {ε / 2 [ 2≠0 ]} {ε / 2 [ 2≠0 ]}
-                          (0</ {ε} {2} σ 0<2) (0</ {ε} {2} σ 0<2))
-                        (f (limit x π)) (g (limit x π))
-          curse =
-            closeTriangleInequality
-              (f (limit x π)) (f (x δ α)) (g (limit x π))
-              (ε / 2 [ 2≠0 ]) (ε / 2 [ 2≠0 ])
-              (0</ {ε} {2} σ 0<2) (0</ {ε} {2} σ 0<2)
-              β car
+        ϕ : Close ((ε / 2 [ 2≠0 ]) + (ε / 2 [ 2≠0 ]))
+                  (0<+' {ε / 2 [ 2≠0 ]} {ε / 2 [ 2≠0 ]}
+                    (0</ {ε} {2} σ 0<2) (0</ {ε} {2} σ 0<2))
+                  (f (limit x π)) (g (limit x π))
+        ϕ =
+          closeTriangleInequality
+            (f (limit x π)) (f (x δ α')) (g (limit x π))
+            (ε / 2 [ 2≠0 ]) (ε / 2 [ 2≠0 ])
+            (0</ {ε} {2} σ 0<2) (0</ {ε} {2} σ 0<2)
+            ι ν
 
-          curse' : Σ (0 < ε)
-                   (λ mask → Close ε mask (f (limit x π)) (g (limit x π)))
-          curse' =
-            subst (λ ?x → Σ (0 < ?x)
-                            (λ mask → Close ?x mask
-                                            (f (limit x π)) (g (limit x π))))
-                  (self/2≡self ε 2≠0)
-                  (((0<+' {ε / 2 [ 2≠0 ]} {ε / 2 [ 2≠0 ]}
-                          (0</ {ε} {2} σ 0<2) (0</ {ε} {2} σ 0<2))) ,
-                   curse)
+        ϕ' : Σ (0 < ε)
+             (λ mask → Close ε mask (f (limit x π)) (g (limit x π)))
+        ϕ' =
+          subst (λ ?x → Σ (0 < ?x)
+                          (λ mask → Close ?x mask
+                                          (f (limit x π)) (g (limit x π))))
+                (self/2≡self ε 2≠0)
+                (((0<+' {ε / 2 [ 2≠0 ]} {ε / 2 [ 2≠0 ]}
+                        (0</ {ε} {2} σ 0<2) (0</ {ε} {2} σ 0<2))) ,
+                 ϕ)
 
-          curse'' : Close ε σ (f (limit x π)) (g (limit x π))
-          curse'' = subst (λ ?x → Close ε ?x (f (limit x π)) (g (limit x π)))
-                          (isProp< 0 ε (fst curse') σ)
-                          (snd curse')
-        in curse''
+        ϕ'' : Close ε σ (f (limit x π)) (g (limit x π))
+        ϕ'' = subst (λ ?x → Close ε ?x (f (limit x π)) (g (limit x π)))
+                        (isProp< 0 ε (fst ϕ') σ)
+                        (snd ϕ')
 
   π : (u : ℝ) → isProp (f u ≡ g u)
   π u = ℝ-isSet (f u) (g u)

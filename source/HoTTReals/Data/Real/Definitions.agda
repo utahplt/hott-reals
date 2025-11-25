@@ -111,3 +111,8 @@ TriangleInequality B _ =
   (u v w : ℝ)
   (ε δ : ℚ) (φ : 0 < ε) (ψ : 0 < δ) →
   B ε φ u v → B δ ψ v w → B (ε + δ) (0<+' {x = ε} {y = δ} φ ψ) u w
+
+Continuous : (ℝ → ℝ) → Type
+Continuous f =
+  (u : ℝ) (ε : ℚ) (φ : 0 < ε) →
+  ∃ ℚ (λ δ → Σ (0 < δ) (λ ψ → (v : ℝ) → u ∼[ δ , ψ ] v → f u ∼[ ε , φ ] f v))

@@ -428,3 +428,9 @@ closeLimit' u y φ ε δ ψ ω θ χ = σ'
 
   σ' : Close ε ψ u (limit y φ)
   σ' = subst (λ π → Close ε π _ _) (isProp< 0 ε (fst σ) ψ) (snd σ)
+
+closeLimit'' : (y : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation y)
+               (δ η : ℚ) (ψ : 0 < δ) (ω : 0 < η) →
+               y δ ψ ∼[ η + δ , 0<+' {x = η} {y = δ} ω ψ ] limit y φ
+closeLimit'' y φ δ η ψ ω =
+  closeLimit (y δ ψ) y φ η δ ω ψ (closeReflexive (y δ ψ) η ω)

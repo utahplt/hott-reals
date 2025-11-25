@@ -192,6 +192,17 @@ self-2⁻¹·self≡2⁻¹·self x = x - (2 [ φ ]⁻¹ · x)
   φ : ¬ 2 ≡ 0
   φ = Bool.toWitnessFalse {Q = discreteℚ 2 0} tt
 
+self/2≡self : (x : ℚ) (φ : ¬ 2 ≡ 0) →
+              (x / 2 [ φ ]) + (x / 2 [ φ ]) ≡ x
+self/2≡self x φ =
+  (x / 2 [ φ ]) + (x / 2 [ φ ])
+    ≡⟨ cong (flip _+_ (x / 2 [ φ ])) (·Comm x (2 [ φ ]⁻¹)) ⟩
+  (2 [ φ ]⁻¹ · x) + (x / 2 [ φ ])
+    ≡⟨ cong (_+_ (2 [ φ ]⁻¹ · x)) (·Comm x (2 [ φ ]⁻¹)) ⟩
+  (2 [ φ ]⁻¹ · x) + (2 [ φ ]⁻¹ · x)
+    ≡⟨ 2⁻¹+≡self h ⟩
+  x ∎
+
 self-self/2≡self/2 :
   (x : ℚ) →
   let φ : ¬ 2 ≡ 0

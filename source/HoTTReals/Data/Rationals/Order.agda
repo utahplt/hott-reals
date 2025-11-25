@@ -284,7 +284,7 @@ open import HoTTReals.Data.Rationals.Properties
 
 maxLeastUpperBound : {x y z : ℚ} →
                      x ≤ z → y ≤ z → max x y ≤ z
-maxLeastUpperBound {x} {y} {z} p q = ≡max→≤₂ {x = max x y} {y = z} foo
+maxLeastUpperBound {x} {y} {z} p q = ≡max→≤₂ {x = max x y} {y = z} r
   where
   p' : max x z ≡ z
   p' = ≤→max x z p
@@ -292,14 +292,14 @@ maxLeastUpperBound {x} {y} {z} p q = ≡max→≤₂ {x = max x y} {y = z} foo
   q' : max y z ≡ z
   q' = ≤→max y z q
 
-  foo : max (max x y) z ≡ z
-  foo = max (max x y) z
-          ≡⟨ (sym $ maxAssoc x y z) ⟩
-        max x (max y z)
-          ≡⟨ cong (max x) q' ⟩
-        max x z
-          ≡⟨ p' ⟩
-        z ∎
+  r : max (max x y) z ≡ z
+  r = max (max x y) z
+        ≡⟨ (sym $ maxAssoc x y z) ⟩
+      max x (max y z)
+        ≡⟨ cong (max x) q' ⟩
+      max x z
+        ≡⟨ p' ⟩
+      z ∎
 
 maxLeastUpperBound< : {x y z : ℚ} →
                       x < z → y < z → max x y < z
@@ -327,6 +327,63 @@ maxLeastUpperBound< {x} {y} {z} p q =
     u = sym t' ∙ s
 
   r' : ¬ max x y ≡ z
+  r' s = PropositionalTruncation.rec Empty.isProp⊥ (r s) (isTotal≤ x y)
+
+min≤' : (x y : ℚ) → min x y ≤ y
+min≤' x y = subst (λ ?x → ?x ≤ y) (minComm y x) (min≤ y x)
+
+≤→min' : (x y : ℚ) → y ≤ x → min x y ≡ y
+≤→min' x y p = minComm x y ∙ ≤→min y x p
+
+≡min→≤₁ : {x y : ℚ} → min x y ≡ x → x ≤ y
+≡min→≤₁ {x} {y} p = subst (λ ?x → ?x ≤ y) p (min≤' x y) 
+
+≡min→≤₂ : {x y : ℚ} → min x y ≡ y → y ≤ x
+≡min→≤₂ {x} {y} p = subst (λ ?x → ?x ≤ x) p (min≤ x y)
+
+minGreatestLowerBound : {x y z : ℚ} →
+                        z ≤ x → z ≤ y → z ≤ min x y
+minGreatestLowerBound {x} {y} {z} p q = ≡min→≤₁ r
+  where
+  p' : min z x ≡ z
+  p' = ≤→min z x p
+
+  q' : min z y ≡ z
+  q' = ≤→min z y q
+
+  r : min z (min x y) ≡ z
+  r = min z (min x y)
+        ≡⟨ minAssoc z x y ⟩
+      min (min z x) y
+        ≡⟨ cong (flip min y) p' ⟩
+      min z y
+        ≡⟨ q' ⟩
+      z ∎
+
+minGreatestLowerBound< : {x y z : ℚ} →
+                         z < x → z < y → z < min x y
+minGreatestLowerBound< {x} {y} {z} p q =
+  ≤→≠→< {x = z} {y = min x y}
+        (minGreatestLowerBound {x} {y} {z} (<Weaken≤ z x p) (<Weaken≤ z y q))
+        r'
+  where
+  r : z ≡ min x y → (x ≤ y) ⊎ (y ≤ x) → ⊥
+  r s (inl t) = Empty.rec $ <→≠ p u
+    where
+    t' : min x y ≡ x
+    t' = ≤→min x y t
+
+    u : z ≡ x
+    u = s ∙ t'
+  r s (inr t) = Empty.rec $ <→≠ q u
+    where
+    t' : min x y ≡ y
+    t' = ≤→min' x y t
+
+    u : z ≡ y
+    u = s ∙ t'
+
+  r' : ¬ z ≡ min x y
   r' s = PropositionalTruncation.rec Empty.isProp⊥ (r s) (isTotal≤ x y)
 
 ∣∣≤→≤₁ : {x ε : ℚ} → ∣ x ∣ ≤ ε → x ≤ ε

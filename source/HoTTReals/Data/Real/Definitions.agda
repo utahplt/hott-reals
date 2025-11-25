@@ -49,14 +49,32 @@ Lipschitzℝ f L φ =
   u ∼[ ε , ψ ] v →
   f u ∼[ L · ε , 0<· {x = L} {y = ε} φ ψ ] f v
 
+Open : {i : Level}
+       (B : (ε : ℚ) → 0 < ε → ℝ → ℝ → Type i) →
+       ((ε : ℚ) (φ : 0 < ε) (u v : ℝ) → isProp (B ε φ u v)) →
+       Type i
+Open B _ =
+  (u v : ℝ) (ε : ℚ) (φ : 0 < ε) →
+  B ε φ u v →
+  ∃ ℚ (λ θ → (0 < θ) × Σ (0 < (ε - θ)) (λ ψ → B (ε - θ) ψ u v))
+
+Monotone : {i : Level}
+           (B : (ε : ℚ) → 0 < ε → ℝ → ℝ → Type i) →
+           ((ε : ℚ) (φ : 0 < ε) (u v : ℝ) → isProp (B ε φ u v)) →
+           Type i
+Monotone B _ =
+  (u v : ℝ) (ε : ℚ) (φ : 0 < ε) →
+  ∃ ℚ (λ θ → (0 < θ) × Σ (0 < (ε - θ)) (λ ψ → B (ε - θ) ψ u v)) →
+  B ε φ u v
+
 -- HoTT 11.3.21
 Rounded : {i : Level}
           (B : (ε : ℚ) → 0 < ε → ℝ → ℝ → Type i) →
           ((ε : ℚ) (φ : 0 < ε) (u v : ℝ) → isProp (B ε φ u v)) →
           Type i
-Rounded B _ =
-  (u v : ℝ) (ε : ℚ) (φ : 0 < ε) →
-  B ε φ u v ↔ ∃ ℚ (λ θ → (0 < θ) × Σ (0 < (ε - θ)) (λ ψ → B (ε - θ) ψ u v))
+Rounded B φ =
+  (u v : ℝ) (ε : ℚ) (ψ : 0 < ε) →
+  B ε ψ u v ↔ ∃ ℚ (λ θ → (0 < θ) × Σ (0 < (ε - θ)) (λ ψ → B (ε - θ) ψ u v))
 
 -- HoTT 11.3.22
 TriangleInequality₁ :
@@ -83,3 +101,13 @@ TriangleInequality₂ B C _ _ =
   (u v w : ℝ)
   (ε δ : ℚ) (φ : 0 < ε) (ψ : 0 < δ) →
   B ε φ u v → C δ ψ v w → C (ε + δ) (0<+' {x = ε} {y = δ} φ ψ) u w
+
+TriangleInequality :
+  {i : Level}
+  (B : (ε : ℚ) → 0 < ε → ℝ → ℝ → Type i) →
+  ((ε : ℚ) (φ : 0 < ε) (u v : ℝ) → isProp (B ε φ u v)) →
+  Type i
+TriangleInequality B _ =
+  (u v w : ℝ)
+  (ε δ : ℚ) (φ : 0 < ε) (ψ : 0 < δ) →
+  B ε φ u v → B δ ψ v w → B (ε + δ) (0<+' {x = ε} {y = δ} φ ψ) u w

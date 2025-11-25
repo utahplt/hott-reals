@@ -4,6 +4,7 @@ open import Cubical.Data.Rationals as ℚ
 open import Cubical.Data.Rationals.Order as ℚ
 open import Cubical.Data.Sigma
 open import Cubical.Foundations.Function
+open import Cubical.Foundations.HLevels
 open import Cubical.Foundations.Prelude
 
 open import HoTTReals.Data.Real.Base
@@ -180,6 +181,76 @@ inductionProposition α@(fRational , fLimit , φ) (path u v ψ i) =
                (inductionProposition α u)
                (inductionProposition α v)
                i
+
+InductionProposition₂ : {i : Level} → (ℝ → ℝ → Type i) → Type i
+InductionProposition₂ {_} A =
+  ((q r : ℚ) → A (rational q) (rational r)) ×
+  ((q : ℚ)
+   (y : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation y) →
+   ((ε : ℚ) (ψ : 0 < ε) → A (rational q) (y ε ψ)) →
+   A (rational q) (limit y φ)) ×
+  ((x : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation x) →
+   (r : ℚ) →
+   ((ε : ℚ) (ψ : 0 < ε) → A (x ε ψ) (rational r)) →
+   A (limit x φ) (rational r)) ×
+  ((x y : (ε : ℚ) → 0 < ε → ℝ)
+   (φ : CauchyApproximation x) (ψ : CauchyApproximation y) →
+   ((ε δ : ℚ) (ψ : 0 < ε) (ω : 0 < δ) → A (x ε ψ) (y δ ω)) →
+   A (limit x φ) (limit y ψ)) ×
+  ((u v : ℝ) → isProp $ A u v)
+
+inductionProposition₂ :
+  {i : Level} {A : ℝ → ℝ → Type i} →
+  InductionProposition₂ A →
+  (u v : ℝ) → A u v
+inductionProposition₂ {A = A} (α , β , γ , ζ , ι) =
+  inductionProposition
+    {A = λ u → (v : ℝ) → A u v}
+    (rationalCase , limitCase , proposition)
+  where
+  rationalCase :
+    (q : ℚ) (v : ℝ) → A (rational q) v
+  rationalCase q =
+    inductionProposition
+      {A = A (rational q)}
+      (rationalRationalCase , rationalLimitCase , rationalProposition)
+    where
+    rationalRationalCase :
+      (r : ℚ) → A (rational q) (rational r)
+    rationalRationalCase r = α q r
+
+    rationalLimitCase :
+      (x : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation x) →
+      ((ε : ℚ) (ψ : 0 < ε) → A (rational q) (x ε ψ)) →
+      A (rational q) (limit x φ)
+    rationalLimitCase x φ ψ = β q x φ ψ
+
+    rationalProposition : (v : ℝ) → isProp (A (rational q) v)
+    rationalProposition v = ι (rational q) v
+
+  limitCase : (x : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation x) →
+              ((ε : ℚ) (ψ : 0 < ε) (v : ℝ) → A (x ε ψ) v) →
+              (v : ℝ) → A (limit x φ) v
+  limitCase x φ ψ =
+    inductionProposition
+      {A = A (limit x φ)}
+      (limitRationalCase , limitLimitCase , limitProposition)
+    where
+    limitRationalCase :
+      (r : ℚ) → A (limit x φ) (rational r)
+    limitRationalCase r = γ x φ r (λ ε ω → ψ ε ω (rational r))
+
+    limitLimitCase :
+      (y : (ε : ℚ) → 0 < ε → ℝ) (ω : CauchyApproximation y) →
+      ((ε : ℚ) (χ : 0 < ε) → A (limit x φ) (y ε χ)) →
+      A (limit x φ) (limit y ω)
+    limitLimitCase y ω χ = ζ x y φ ω (λ ε δ ι κ → ψ ε ι (y δ κ))
+
+    limitProposition : (v : ℝ) → isProp (A (limit x φ) v)
+    limitProposition v = ι (limit x φ) v
+
+  proposition : (u : ℝ) → isProp ((v : ℝ) → A u v)
+  proposition u = isPropΠ (λ v → ι u v)
 
 Induction∼ :
   {i : Level} →

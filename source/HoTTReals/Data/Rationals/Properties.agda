@@ -82,6 +82,19 @@ negateSubtract x y =
 negateSubtract' : (x y : ℚ) → - (x - y) ≡ y - x
 negateSubtract' x y = negateSubtract x y ∙ +Comm (- x) y
 
+subtract≡negateNegateAdd : (x y : ℚ) →
+                           (x - y) ≡ - (y - x)
+subtract≡negateNegateAdd x y =
+  x - y
+    ≡⟨ (sym $ -Invol (x - y)) ⟩
+  - - (x - y)
+    ≡⟨ cong -_ (negateAdd x (- y)) ⟩
+  - (- x + - - y)
+    ≡⟨ cong (λ ?x → - (- x + ?x)) (-Invol y) ⟩
+  - (- x + y)
+    ≡⟨ cong -_ (+Comm (- x) y) ⟩
+  - (y - x) ∎
+
 addLeftSwap : (x y z : ℚ) → (x + y) + z ≡ (x + z) + y
 addLeftSwap x y z = (x + y) + z
                       ≡⟨ sym $ +Assoc x y z ⟩
@@ -194,6 +207,44 @@ self-self/2≡self/2 x = x - (x / 2 [ φ ])
   where
   φ : ¬ 2 ≡ 0
   φ = Bool.toWitnessFalse {Q = discreteℚ 2 0} tt
+
+self/3+self/3≡2/3self : (x : ℚ) →
+                        let p : ¬ 3 ≡ 0
+                            p = Bool.toWitnessFalse {Q = discreteℚ 3 0} tt
+                        in (x / 3 [ p ]) + (x / 3 [ p ]) ≡ (2 / 3 [ p ]) · x
+self/3+self/3≡2/3self x =
+  (x / 3 [ p ]) + (x / 3 [ p ])
+    ≡⟨ (sym $ ·DistL+ x (3 [ p ]⁻¹) (3 [ p ]⁻¹)) ⟩
+  x · (3 [ p ]⁻¹ + 3 [ p ]⁻¹)
+    ≡⟨ cong (_·_ x) (self+≡2· (3 [ p ]⁻¹)) ⟩
+  x · (2 / 3 [ p ])
+    ≡⟨ ·Comm x (2 / 3 [ p ]) ⟩
+  (2 / 3 [ p ]) · x ∎
+  where
+  p : ¬ 3 ≡ 0
+  p = Bool.toWitnessFalse {Q = discreteℚ 3 0} tt
+
+self-2/3self : (x : ℚ) →
+               let p : ¬ 3 ≡ 0
+                   p = Bool.toWitnessFalse {Q = discreteℚ 3 0} tt
+               in x - ((2 / 3 [ p ]) · x) ≡ (x / 3 [ p ])
+self-2/3self x =
+  x - ((2 / 3 [ p ]) · x)
+    ≡⟨ cong (_-_ x) (·Comm (2 / 3 [ p ]) x) ⟩
+  x - (x · (2 / 3 [ p ]))
+    ≡⟨ cong (flip _-_ (x · (2 / 3 [ p ]))) (sym $ ·IdR x) ⟩
+  (x · 1) - (x · (2 / 3 [ p ]))
+    ≡⟨ cong (_+_ (x · 1)) (-·≡·- x (2 / 3 [ p ])) ⟩
+  (x · 1) + (x · (- (2 / 3 [ p ])))
+    ≡⟨ sym $ ·DistL+ x 1 (- (2 / 3 [ p ])) ⟩
+  x · (1 - (2 / 3 [ p ]))
+    ≡⟨ refl ⟩
+  x · (1 / 3 [ p ])
+    ≡⟨ cong (_·_ x) (·IdL (3 [ p ]⁻¹)) ⟩
+  x / 3 [ p ] ∎
+  where
+  p : ¬ 3 ≡ 0
+  p = Bool.toWitnessFalse {Q = discreteℚ 3 0} tt
 
 ∣_∣ : ℚ → ℚ
 ∣ x ∣ = max x (- x)

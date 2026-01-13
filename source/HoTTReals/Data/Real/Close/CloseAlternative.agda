@@ -45,6 +45,9 @@ Close'Σ =
       --   let foo' = (fst $ snd $ snd $ snd $ foo w) u v ε η ω θ
       --       foo'' = (snd $ snd $ snd $ snd $ foo u) v w ε η ω θ
       --   in {!!}))
+
+      -- Update from later: I think it does, we just forgot to call recursion∼
+      -- afterwords
   where
   A' : (ℝ → (ε : ℚ) → 0 < ε → Type ℓ-zero) → Type ℓ-zero
   A' ◆ = ((u : ℝ) (ε : ℚ) (φ : 0 < ε) → isProp (◆ u ε φ)) ×

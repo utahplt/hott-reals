@@ -22,6 +22,20 @@ open import HoTTReals.Data.Rationals.Order as ℚ
 open import HoTTReals.Data.Rationals.Properties as ℚ
 open import HoTTReals.Logic
 
+Nonexpandingℚ₂ : (ℚ → ℚ → ℚ) → Type ℓ-zero
+Nonexpandingℚ₂ f =
+  ((q r s : ℚ) → distance (f q s) (f r s) ≤ distance q r) ×
+  ((q r s : ℚ) → distance (f q r) (f q s) ≤ distance r s)
+
+Nonexpandingℝ₂ : (ℝ → ℝ → ℝ) → Type ℓ-zero
+Nonexpandingℝ₂ f =
+  ((u v w : ℝ)
+   (ε : ℚ) (φ : 0 < ε) →
+   u ∼[ ε , φ ] v → f u w ∼[ ε , φ ] f v w) ×
+  ((u v w : ℝ)
+   (ε : ℚ) (φ : 0 < ε) →
+   v ∼[ ε , φ ] w → f u v ∼[ ε , φ ] f u w)
+
 liftNonexpanding₂Type : Type
 liftNonexpanding₂Type =
   Σ (ℝ → ℝ)
@@ -33,10 +47,9 @@ liftNonexpanding₂Relation (h , _) (g , _) ε φ = (u : ℝ) → h u ∼[ ε , 
 
 liftNonexpanding₂Recursion : 
   (f : ℚ → ℚ → ℚ) →
-  ((q r s : ℚ) → distance (f q s) (f r s) ≤ distance q r) →
-  ((q r s : ℚ) → distance (f q r) (f q s) ≤ distance r s) →
+  Nonexpandingℚ₂ f →
   Recursion liftNonexpanding₂Type liftNonexpanding₂Relation
-liftNonexpanding₂Recursion f φ ψ =
+liftNonexpanding₂Recursion f (φ , ψ) =
   -- Gotta go, gotta go, more pies to bake up
   rationalCase ,
   limitCase ,
@@ -236,12 +249,19 @@ liftNonexpanding₂Recursion f φ ψ =
                 (fst (rationalCase q) (limit x τ))
                 (fst (rationalCase r) (limit x τ))
       ο θ (α , β , γ) =
-        -- TODO: Do the other three cases first, then return to this one Try to
-        -- make the underscores explicit so we actually understand what's going
-        -- on
+        -- Sneaky! Figuring out what to put for the Cauchy approximations here
+        -- took *days*. Turns out we can consider the cauchy approximation given
+        -- by applying the functions lift(rational ∘ (f q)) and lift(rational ∘
+        -- (f q)) to the Cauchy approximation x at a particular ε. Not at all
+        -- obvious me thinks.
         limitLimit
-          _ _ _ _
-          ε θ'' θ'' ω η'' η'' {!!} {!!} -- (fst foo') (snd foo')
+          (liftLipschitzApproximation
+            (λ ε ζ → fst (rationalCase q) (x ε ζ)) 1 η')
+          (liftLipschitzApproximation
+            (λ ε ζ → fst (rationalCase r) (x ε ζ)) 1 η')
+          _
+          _
+          ε θ' θ' ω ζ'' ζ'' (fst κ') (snd κ')
         where
         ζ : ¬ 2 ≡ 0
         ζ = Bool.toWitnessFalse {Q = discreteℚ 2 0} tt 
@@ -268,14 +288,8 @@ liftNonexpanding₂Recursion f φ ψ =
         ι : θ' + θ' ≡ θ
         ι = self/2≡self θ ζ
 
-        ι' : θ'' + θ'' ≡ θ' + θ'
-        ι' = cong (λ ?x → ?x + ?x) (·IdR θ')
-
-        ι'' : θ'' + θ'' ≡ θ
-        ι'' = ι' ∙ ι
-
-        ι''' : ε - θ ≡ ε - (θ'' + θ'')
-        ι''' = cong (_-_ ε) (sym ι'')
+        ι' : ε - θ ≡ ε - (θ' + θ')
+        ι' = cong (_-_ ε) (sym ι)
 
         κ : Close (ε - θ) β
                   (fst (rationalCase q) (x θ'' η''))
@@ -284,89 +298,16 @@ liftNonexpanding₂Recursion f φ ψ =
               (∣∣<→<₂ {x = q - r} {ε = ε - θ} γ)
               (∣∣<→<₁ {x = q - r} {ε = ε - θ} γ)
 
-        foo : Σ (0 < ε - (θ'' + θ''))
-                (λ ξ →
-                  Close (ε - (θ'' + θ'')) ξ
-                        (fst (rationalCase q) (x θ'' η''))       
-                        (fst (rationalCase r) (x θ'' η'')))
-        foo = {!!}
-
-        foo' : Σ (0 < ε - (θ'' + θ''))
-                (λ ξ →
-                  Close (ε - (θ'' + θ'')) ξ
-                        {!fst (rationalCase q) ?!}       
-                        {!!})
-        foo' = {!!}
-        -- foo = subst (λ ?x → Σ (0 < ?x)
-        --                       (λ ξ → Close ?x ξ
-        --                         (fst (rationalCase q) (x θ'' η''))
-        --                         (fst (rationalCase r) (x θ'' η''))))
-        --             ι'''
-        --             (β , κ)
-
-      -- TODO:
-      -- Note, the underscores are the Cauchy approximations in the lipschitz
-      -- extension lemma which is not public, so we can't write it explicitly
-      --
-      -- The next two underscores are the proofs that these approximations are
-      -- indeed Cauchy
-      -- let
-      --   θ : ℚ
-      --   θ = {!!}
-
-      --   χ' : - (ε - θ) < q - r
-      --   χ' = {!!}
-
-      --   π' : q - r < ε - θ
-      --   π' = {!!}
-
-      --   foo : Close (ε - θ) {!!}
-      --               (fst (rationalCase q) (x (θ / 2 [ {!!} ]) {!!}))
-      --               (fst (rationalCase r) (x (θ / 2 [ {!!} ]) {!!}))
-      --   foo = υ (θ / 2 [ {!!} ]) {!!} (ε - θ) {!!}
-      --           χ'
-      --           π'
-
-      --   θ' = (θ / 2 [ {!!} ]) / 1 [ {!!} ]
-
-      --   baby' : θ / 2 [ {!!} ] ≡ (θ / 2 [ {!!} ]) / 1 [ {!!} ]
-      --   baby' = {!!}
-
-      --   baby : θ' + θ' ≡ θ
-      --   baby = subst (λ ?x → ?x + ?x ≡ θ) baby' (self/2≡self θ {!!})
-
-      --   -- TODO: Have to actually unify with Cauchy approximation definition
-      --   -- within the Lipschitz lemma, have to divide by 1 in the denominator of
-      --   -- θ / 2
-      --   --
-      --   -- Figure out what goes in hole instead of fst (rationalCase q) (x ?0
-      --   -- ?1), marked "here" below
-      --   -- foo' : Σ (0 < ε - ((θ / 2 [ {!!} ]) + (θ / 2 [ {!!} ])))
-      --   --          (λ ξ →
-      --   --            Close (ε - ((θ / 2 [ {!!} ]) + (θ / 2 [ {!!} ]))) ξ
-      --   --                  -- Here
-      --   --                  (fst (rationalCase q) (x (θ / 2 [ {!!} ]) {!!}))       
-      --   --                  (fst (rationalCase r) (x (θ / 2 [ {!!} ]) {!!})))
-      --   -- foo' = {!!}
-
-      --   -- Updated
-      --   foo' : Σ (0 < ε - (θ' + θ'))
-      --            (λ ξ →
-      --              Close (ε - (θ' + θ')) ξ
-      --                    (fst (rationalCase q) (x θ' {!!}))       
-      --                    (fst (rationalCase r) (x θ' {!!})))
-      --   foo' = {!!}
-
-
-      --   -- liftLipschitzApproximation = {!!}
-
-      --   bar : Close (ε - (θ' + θ')) {!!}
-      --               (fst (rationalCase q) (x θ' {!!}))
-      --               (fst (rationalCase r) (x θ' {!!}))
-      --               -- (liftLipschitzApproximation {!!} {!!})
-      --               -- (liftLipschitzApproximation {!!} {!!})
-      --   bar = {!!}
-      -- in limitLimit _ _ _ _ {!!} {!!} {!!} {!!} {!!} {!!} {!!} {!!}
+        κ' : Σ (0 < ε - (θ' + θ'))
+               (λ ξ →
+                 Close (ε - (θ' + θ')) ξ
+                       (fst (rationalCase q) (x θ'' η''))       
+                       (fst (rationalCase r) (x θ'' η'')))
+        κ' = subst (λ ?x → Σ (0 < ?x)
+                     (λ ξ → Close ?x ξ (fst (rationalCase q) (x θ'' η''))
+                                       (fst (rationalCase r) (x θ'' η''))))
+                   ι'
+                   (β , κ)
 
     τ : (w : ℝ) →
         isProp
@@ -376,51 +317,6 @@ liftNonexpanding₂Recursion f φ ψ =
     τ w = isPropΠ4
             (λ ε ω χ π →
               squash ε ω (fst (rationalCase q) w) (fst (rationalCase r) w))
-
-    -- P = (w : ℝ) (ε : ℚ) (ω : 0 < ε) →
-    --     - ε < q - r → q - r < ε →
-    --     Close ε ω (fst (rationalCase q) w) (fst (rationalCase r) w)
-    
-    -- inductionProposition (ρ , σ , τ)
-    -- where
-    -- ρ : (s : ℚ) →
-    --     Close ε ω (fst (rationalCase q) (rational s))
-    --               (fst (rationalCase r) (rational s))
-    -- ρ s = τ'
-    --   where
-    --   σ : ∣ f q s - f r s ∣ ≤ ∣ q - r ∣
-    --   σ = φ q r s
-
-    --   τ : ∣ f q s - f r s ∣ < ε
-    --   τ = isTrans≤<
-    --         ∣ f q s - f r s ∣ ∣ q - r ∣ ε
-    --         σ (<→∣∣< {x = q - r} {ε = ε} π χ)
-
-    --   τ' : Close ε ω (rational (f q s)) (rational (f r s))
-    --   τ' = rationalRational
-    --          (f q s) (f r s) ε ω
-    --          (∣∣<→<₂ {x = f q s - f r s} {ε = ε} τ)
-    --          (∣∣<→<₁ {x = f q s - f r s} {ε = ε} τ)
-
-    -- σ : (x : (ε : ℚ) → 0 < ε → ℝ) (τ : CauchyApproximation x) →
-    --     ((δ : ℚ) (υ : 0 < δ) →
-    --      Close ε ω
-    --        (fst (rationalCase q) (x δ υ))
-    --        (fst (rationalCase r) (x δ υ))) →
-    --     Close ε ω
-    --       (fst (rationalCase q) (limit x τ))
-    --       (fst (rationalCase r) (limit x τ))
-    -- σ x τ υ =
-    --   -- Note, the underscores are the Cauchy approximations in the lipschitz
-    --   -- extension lemma which is not public, so we can't write it explicitly
-    --   --
-    --   -- The next two underscores are the proofs that these approximations are
-    --   -- indeed Cauchy
-    --   limitLimit _ _ _ _ {!!} {!!} {!!} {!!} {!!} {!!} {!!} {!!}
-
-    -- τ : (u : ℝ) →
-    --     isProp (Close ε ω (fst (rationalCase q) u) (fst (rationalCase r) u))
-    -- τ u = squash ε ω (fst (rationalCase q) u) (fst (rationalCase r) u)
 
   rationalLimitCase :
     (q ε δ : ℚ) (ω : 0 < ε) (χ : 0 < δ) (π : 0 < ε - δ)
@@ -485,15 +381,31 @@ liftNonexpanding₂Recursion f φ ψ =
 
 liftNonexpanding₂ : 
   (f : ℚ → ℚ → ℚ) →
-  ((q r s : ℚ) → distance (f q s) (f r s) ≤ distance q r) →
-  ((q r s : ℚ) → distance (f q r) (f q s) ≤ distance r s) →
+  Nonexpandingℚ₂ f →
   (ℝ → ℝ → ℝ)
-liftNonexpanding₂ f φ ψ = fst ∘ (recursion $ liftNonexpanding₂Recursion f φ ψ)
+liftNonexpanding₂ f φ = fst ∘ (recursion $ liftNonexpanding₂Recursion f φ)
+
+liftNonexpanding₂NonExpanding : 
+  (f : ℚ → ℚ → ℚ)
+  (φ : Nonexpandingℚ₂ f) →
+  Nonexpandingℝ₂ $ liftNonexpanding₂ f φ
+liftNonexpanding₂NonExpanding f φ =
+  (λ u v w ε ψ ω → recursion∼ (liftNonexpanding₂Recursion f φ) ω w) ,
+  (λ u v w ε ψ →
+    let
+      ω : (ε : ℚ) (χ : 0 < ε) (v w : ℝ) →
+          Close ε χ v w →
+          Close ε χ (liftNonexpanding₂ f φ u v) (liftNonexpanding₂ f φ u w)
+      ω = snd $ (recursion $ liftNonexpanding₂Recursion f φ) u
+
+      χ : Close ε ψ v w →
+          Close ε ψ (liftNonexpanding₂ f φ u v) (liftNonexpanding₂ f φ u w)
+      χ = ω ε ψ v w
+    in χ)
 
 liftNonexpanding₂≡rational : 
-  (f : ℚ → ℚ → ℚ) →
-  (φ : (q r s : ℚ) → distance (f q s) (f r s) ≤ distance q r) →
-  (ψ : (q r s : ℚ) → distance (f q r) (f q s) ≤ distance r s) →
+  (f : ℚ → ℚ → ℚ)
+  (φ : Nonexpandingℚ₂ f)
   (q r : ℚ) →
-  ((liftNonexpanding₂ f φ ψ) (rational q) (rational r) ≡ rational (f q r))
-liftNonexpanding₂≡rational f φ ψ q r = {!!}
+  ((liftNonexpanding₂ f φ) (rational q) (rational r) ≡ rational (f q r))
+liftNonexpanding₂≡rational f φ q r = refl

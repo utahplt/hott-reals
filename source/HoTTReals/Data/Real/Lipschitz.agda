@@ -163,9 +163,9 @@ liftLipschitzRecursion f L φ ψ =
 
   rationalLimitCase :
     (q ε δ : ℚ) (ω : 0 < ε) (χ : 0 < δ) (π : 0 < (ε - δ))
-    (y : (ε₁ : ℚ) → 0 < ε₁ → ℝ)
+    (y : (ε : ℚ) → 0 < ε → ℝ)
     (ρ : CauchyApproximation y)
-    (g : (ε₁ : ℚ) → 0 < ε₁ → ℝ)
+    (g : (ε : ℚ) → 0 < ε → ℝ)
     (σ : CauchyApproximation'' ℝ (LiftLipschitzRelation L φ) g) →
     Close (ε - δ) π (rational q) (y δ χ) →
     Close (L · (ε - δ)) (0<· {x = L} {y = ε - δ} φ π)
@@ -335,3 +335,26 @@ liftLipschitzRecursion f L φ ψ =
                 (liftLipschitzApproximation g L φ (L · η)
                   (0<· {x = L} {y = η} φ υ))
       κ = subst2 (Close _ _) ζ ι (snd γ)
+
+liftLipschitz :
+  (f : ℚ → ℝ)
+  (L : ℚ) (φ : 0 < L) →
+  Lipschitzℚ f L φ →
+  (ℝ → ℝ)
+liftLipschitz f L φ ψ = recursion (liftLipschitzRecursion f L φ ψ)
+
+liftLipschitzLipschitz :
+  (f : ℚ → ℝ)
+  (L : ℚ) (φ : 0 < L)
+  (ψ : Lipschitzℚ f L φ) →
+  Lipschitzℝ (liftLipschitz f L φ ψ) L φ
+liftLipschitzLipschitz f L φ ψ =
+  λ u v ε ω → recursion∼ (liftLipschitzRecursion f L φ ψ)
+
+liftLipschitz≡rational :
+  (f : ℚ → ℝ)
+  (L : ℚ) (φ : 0 < L)
+  (ψ : Lipschitzℚ f L φ)
+  (q : ℚ) →
+  liftLipschitz f L φ ψ (rational q) ≡ f q
+liftLipschitz≡rational f L φ ψ q = refl

@@ -1,5 +1,6 @@
 module HoTTReals.Data.Rationals.Order where
 
+import Cubical.Data.Bool as Bool
 open import Cubical.Data.Empty as Empty using (⊥)
 open import Cubical.Data.Int.Base as ℤ using (ℤ)
 open import Cubical.Data.Int.Order as ℤ using ()
@@ -15,6 +16,7 @@ open import Cubical.Foundations.HLevels
 open import Cubical.Foundations.Prelude
 open import Cubical.HITs.PropositionalTruncation as PropositionalTruncation
 open import Cubical.HITs.SetQuotients as SetQuotients using ()
+open import Cubical.Relation.Binary.Order
 open import Cubical.Relation.Nullary
 
 open import HoTTReals.Algebra.Field.Instances.Rationals as ℚ
@@ -555,3 +557,78 @@ distanceTriangleInequality x y z =
       ((x - y) + y) - z
         ≡⟨ cong (flip _-_ z) (subtractAddRightCancel y x) ⟩
       x - z ∎
+
+∣∣<-open :
+  (x : ℚ) (ε : ℚ) (φ : 0 < ε) →
+  ∣ x ∣ < ε →
+  ∃ ℚ (λ θ → (0 < θ) ×
+           Σ (0 < ε - θ)
+           (λ ψ → ∣ x ∣ < ε - θ))
+∣∣<-open x ε φ ψ = ∣ θ , χ' , τ , σ'' ∣₁
+  where
+  ω : ¬ 2 ≡ 0
+  ω = Bool.toWitnessFalse {Q = discreteℚ 2 0} tt
+  
+  ω' : 0 < 2 [ ω ]⁻¹
+  ω' = Bool.toWitness {Q = <Dec 0 (2 [ ω ]⁻¹)} tt
+  
+  ω'' : 0 < 2
+  ω'' = Bool.toWitness {Q = <Dec 0 2} tt
+  
+  θ : ℚ
+  θ = (ε - ∣ x ∣) / 2 [ ω ]
+  
+  χ : 0 < ε - ∣ x ∣
+  χ = <→0<- {x = ∣ x ∣} {y = ε} ψ
+  
+  χ' : 0 < θ
+  χ' = 0</ {x = ε - ∣ x ∣} {y = 2} χ ω''
+  
+  π : 2 [ ω ]⁻¹ · ∣ x ∣ + 2 [ ω ]⁻¹ · ∣ x ∣ ≡ ∣ x ∣
+  π = 2⁻¹+≡self ∣ x ∣
+  
+  ρ : ε - θ ≡ 2 [ ω ]⁻¹ · ε + 2 [ ω ]⁻¹ · ∣ x ∣
+  ρ =
+    ε - ((ε - ∣ x ∣) / 2 [ ω ])
+      ≡⟨ cong (_-_ ε) (·DistR+ ε (- ∣ x ∣) (2 [ ω ]⁻¹)) ⟩
+    ε - (ε / 2 [ ω ] + (- ∣ x ∣) / 2 [ ω ])
+      ≡⟨ cong (_+_ ε) (negateAdd (ε / 2 [ ω ]) ((- ∣ x ∣) / 2 [ ω ])) ⟩
+    ε + (- (ε / 2 [ ω ]) + - ((- ∣ x ∣) / 2 [ ω ]))
+      ≡⟨ +Assoc ε (- (ε / 2 [ ω ])) (- ((- ∣ x ∣) / 2 [ ω ])) ⟩
+    (ε - (ε / 2 [ ω ])) + - ((- ∣ x ∣) / 2 [ ω ])
+       ≡⟨ cong (flip _+_ _) (self-self/2≡self/2 ε) ⟩
+    (ε / 2 [ ω ]) + - ((- ∣ x ∣) / 2 [ ω ])
+       ≡⟨ cong (_+_ (ε / 2 [ ω ])) (-·≡-· (- ∣ x ∣) (2 [ ω ]⁻¹)) ⟩
+    (ε / 2 [ ω ]) + (- - ∣ x ∣) / 2 [ ω ]
+       ≡⟨ cong (λ ?x → (ε / 2 [ ω ]) + (?x / 2 [ ω ])) (-Invol ∣ x ∣) ⟩
+    (ε / 2 [ ω ]) + (∣ x ∣) / 2 [ ω ]
+       ≡⟨ cong₂ _+_ (·Comm ε (2 [ ω ]⁻¹)) (·Comm ∣ x ∣ (2 [ ω ]⁻¹)) ⟩
+    2 [ ω ]⁻¹ · ε + 2 [ ω ]⁻¹ · ∣ x ∣ ∎
+  
+  σ : 2 [ ω ]⁻¹ · ∣ x ∣ < 2 [ ω ]⁻¹ · ε
+  σ = <-o· {x = 2 [ ω ]⁻¹} {y = ∣ x ∣} {z = ε} ω' ψ
+    
+  σ' : 2 [ ω ]⁻¹ · ∣ x ∣ + 2 [ ω ]⁻¹ · ∣ x ∣ <
+     2 [ ω ]⁻¹ · ε + 2 [ ω ]⁻¹ · ∣ x ∣
+  σ' = <-+o (2 [ ω ]⁻¹ · ∣ x ∣)
+               (2 [ ω ]⁻¹ · ε)
+               (2 [ ω ]⁻¹ · ∣ x ∣)
+               σ
+                   
+  σ'' : ∣ x ∣ < ε - θ
+  σ'' = subst2 _<_ π (sym ρ) σ'
+                               
+  τ : 0 < ε - θ
+  τ = isTrans≤< 0 ∣ x ∣ (ε - θ) (0≤∣∣ (x)) σ''
+
+ℚ-isPoset : IsPoset _≤_
+ℚ-isPoset = isposet isSetℚ isProp≤ isRefl≤ isTrans≤ isAntisym≤
+
+ℚ-posetStructure : PosetStr ℓ-zero ℚ
+ℚ-posetStructure = posetstr _≤_ ℚ-isPoset
+
+ℚ-isQuoset : IsQuoset _<_
+ℚ-isQuoset = isquoset isSetℚ isProp< isIrrefl< isTrans< isAsym<
+
+ℚ-quosetStructure : QuosetStr ℓ-zero ℚ
+ℚ-quosetStructure = quosetstr _<_ ℚ-isQuoset

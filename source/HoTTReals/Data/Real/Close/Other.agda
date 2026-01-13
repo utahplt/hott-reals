@@ -434,3 +434,29 @@ closeLimit'' : (y : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation y)
                y δ ψ ∼[ η + δ , 0<+' {x = η} {y = δ} ω ψ ] limit y φ
 closeLimit'' y φ δ η ψ ω =
   closeLimit (y δ ψ) y φ η δ ω ψ (closeReflexive (y δ ψ) η ω)
+
+limitClose : (u : ℝ) (y : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation y)
+             (ε δ : ℚ) (ψ : 0 < ε) (ω : 0 < δ) →
+             (y δ ω) ∼[ ε , ψ ] u →
+             (limit y φ) ∼[ ε + δ , 0<+' {x = ε} {y = δ} ψ ω ] u
+limitClose u y φ ε δ ψ ω χ =
+  closeSymmetric u (limit y φ) (ε + δ) (0<+' {x = ε} {y = δ} ψ ω) π
+  where
+  π : u ∼[ ε + δ , 0<+' {x = ε} {y = δ} ψ ω ] (limit y φ)
+  π = closeLimit u y φ ε δ ψ ω (closeSymmetric (y δ ω) u ε ψ χ)
+
+limitClose' : (u : ℝ) (y : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation y)
+              (ε δ : ℚ) (ψ : 0 < ε) (ω : 0 < δ) (θ : 0 < ε - δ) →
+              (y δ ω) ∼[ ε - δ , θ ] u →
+              (limit y φ) ∼[ ε , ψ ] u
+limitClose' u y φ ε δ ψ ω θ χ =
+  closeSymmetric u (limit y φ) ε ψ π
+  where
+  π : u ∼[ ε , ψ ] (limit y φ)
+  π = closeLimit' u y φ ε δ ψ ω θ (closeSymmetric (y δ ω) u (ε - δ) θ χ)
+
+limitClose'' : (y : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation y)
+               (δ η : ℚ) (ψ : 0 < δ) (ω : 0 < η) →
+               limit y φ ∼[ η + δ , 0<+' {x = η} {y = δ} ω ψ ] y δ ψ
+limitClose'' y φ δ η ψ ω =
+  limitClose (y δ ψ) y φ η δ ω ψ (closeReflexive (y δ ψ) η ω)

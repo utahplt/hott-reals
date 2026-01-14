@@ -49,6 +49,20 @@ Lipschitzℝ f L φ =
   u ∼[ ε , ψ ] v →
   f u ∼[ L · ε , 0<· {x = L} {y = ε} φ ψ ] f v
 
+Nonexpandingℚ₂ : (ℚ → ℚ → ℚ) → Type ℓ-zero
+Nonexpandingℚ₂ f =
+  ((q r s : ℚ) → distance (f q s) (f r s) ≤ distance q r) ×
+  ((q r s : ℚ) → distance (f q r) (f q s) ≤ distance r s)
+
+Nonexpandingℝ₂ : (ℝ → ℝ → ℝ) → Type ℓ-zero
+Nonexpandingℝ₂ f =
+  ((u v w : ℝ)
+   (ε : ℚ) (φ : 0 < ε) →
+   u ∼[ ε , φ ] v → f u w ∼[ ε , φ ] f v w) ×
+  ((u v w : ℝ)
+   (ε : ℚ) (φ : 0 < ε) →
+   v ∼[ ε , φ ] w → f u v ∼[ ε , φ ] f u w)
+
 Open : {i : Level}
        (B : (ε : ℚ) → 0 < ε → ℝ → ℝ → Type i) →
        ((ε : ℚ) (φ : 0 < ε) (u v : ℝ) → isProp (B ε φ u v)) →
@@ -112,13 +126,10 @@ TriangleInequality B _ =
   (ε δ : ℚ) (φ : 0 < ε) (ψ : 0 < δ) →
   B ε φ u v → B δ ψ v w → B (ε + δ) (0<+' {x = ε} {y = δ} φ ψ) u w
 
--- TODO: Nothing conceptual unfinished, just haven't typed it in
--- ContinuousAt : (ℝ → ℝ) → ℝ → Type
--- ContinuousAt f u = 
---   (ε : ℚ) (φ : 0 < ε) →
---   ∃ ℚ (λ δ → Σ (0 < δ) (λ ψ → (v : ℝ) → u ∼[ δ , ψ ] v → f u ∼[ ε , φ ] f v))
+ContinuousAt : (ℝ → ℝ) → ℝ → Type
+ContinuousAt f u = 
+  (ε : ℚ) (φ : 0 < ε) →
+  ∃ ℚ (λ δ → Σ (0 < δ) (λ ψ → (v : ℝ) → u ∼[ δ , ψ ] v → f u ∼[ ε , φ ] f v))
 
 Continuous : (ℝ → ℝ) → Type
-Continuous f =
-  (u : ℝ) (ε : ℚ) (φ : 0 < ε) →
-  ∃ ℚ (λ δ → Σ (0 < δ) (λ ψ → (v : ℝ) → u ∼[ δ , ψ ] v → f u ∼[ ε , φ ] f v))
+Continuous f = (u : ℝ) → ContinuousAt f u

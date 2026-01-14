@@ -617,9 +617,46 @@ distanceTriangleInequality x y z =
                    
   σ'' : ∣ x ∣ < ε - θ
   σ'' = subst2 _<_ π (sym ρ) σ'
-                               
+
   τ : 0 < ε - θ
   τ = isTrans≤< 0 ∣ x ∣ (ε - θ) (0≤∣∣ (x)) σ''
+
+-distance : (x y : ℚ) → distance (- x) (- y) ≡ distance x y
+-distance x y =
+  ∣ (- x) - (- y) ∣
+    ≡⟨ cong ∣_∣ (sym $ negateAdd x (- y)) ⟩
+  ∣ - (x - y) ∣
+    ≡⟨ ∣-∣≡∣∣ (x - y) ⟩
+  ∣ x - y ∣ ∎
+
++distanceᵣ : (x y z : ℚ) →
+             distance (x + z) (y + z) ≡ distance x y
++distanceᵣ x y z = cong ∣_∣ φ
+  where
+  φ = (x + z) - (y + z)
+        ≡⟨ cong (_+_ (x + z)) (negateAdd y z) ⟩
+      (x + z) + (- y + - z)
+        ≡⟨ sym $ +Assoc x z (- y + - z) ⟩
+      x + (z + (- y + - z))
+        ≡⟨ cong (_+_ x) (+Assoc z (- y) (- z)) ⟩
+      x + ((z + - y) + - z)
+        ≡⟨ cong (λ ?x → (x + (?x + - z))) (+Comm z (- y)) ⟩
+      x + ((- y + z) + - z)
+        ≡⟨ (cong (_+_ x) $ sym (+Assoc (- y) z (- z))) ⟩
+      x + (- y + (z + - z))
+        ≡⟨ cong (λ ?x → x + (- y + ?x)) (+InvR z) ⟩
+      x + (- y + 0)
+        ≡⟨ cong (_+_ x) (+IdR $ - y) ⟩
+      x + - y ∎
+
++distanceₗ : (x y z : ℚ) →
+             distance (x + y) (x + z) ≡ distance y z
++distanceₗ x y z =
+  distance (x + y) (x + z)
+    ≡⟨ cong₂ distance (+Comm x y) (+Comm x z) ⟩
+  distance (y + x) (z + x)
+    ≡⟨ +distanceᵣ y z x ⟩
+  distance y z ∎
 
 ℚ-isPoset : IsPoset _≤_
 ℚ-isPoset = isposet isSetℚ isProp≤ isRefl≤ isTrans≤ isAntisym≤
@@ -632,3 +669,9 @@ distanceTriangleInequality x y z =
 
 ℚ-quosetStructure : QuosetStr ℓ-zero ℚ
 ℚ-quosetStructure = quosetstr _<_ ℚ-isQuoset
+
+0<1 : 0 < 1
+0<1 = Bool.toWitness {Q = <Dec 0 1} tt
+
+0<2 : 0 < 2
+0<2 = Bool.toWitness {Q = <Dec 0 2} tt

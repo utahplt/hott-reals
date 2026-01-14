@@ -22,20 +22,6 @@ open import HoTTReals.Data.Rationals.Order as ℚ
 open import HoTTReals.Data.Rationals.Properties as ℚ
 open import HoTTReals.Logic
 
-Nonexpandingℚ₂ : (ℚ → ℚ → ℚ) → Type ℓ-zero
-Nonexpandingℚ₂ f =
-  ((q r s : ℚ) → distance (f q s) (f r s) ≤ distance q r) ×
-  ((q r s : ℚ) → distance (f q r) (f q s) ≤ distance r s)
-
-Nonexpandingℝ₂ : (ℝ → ℝ → ℝ) → Type ℓ-zero
-Nonexpandingℝ₂ f =
-  ((u v w : ℝ)
-   (ε : ℚ) (φ : 0 < ε) →
-   u ∼[ ε , φ ] v → f u w ∼[ ε , φ ] f v w) ×
-  ((u v w : ℝ)
-   (ε : ℚ) (φ : 0 < ε) →
-   v ∼[ ε , φ ] w → f u v ∼[ ε , φ ] f u w)
-
 liftNonexpanding₂Type : Type
 liftNonexpanding₂Type =
   Σ (ℝ → ℝ)

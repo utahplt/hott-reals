@@ -1,14 +1,16 @@
 module HoTTReals.Data.Real.Properties where
 
 import Cubical.Data.Bool as Bool
-open import Cubical.Data.Rationals as ℚ
+open import Cubical.Data.Rationals as ℚ hiding (_∼_)
 open import Cubical.Data.Rationals.Order as ℚ
+open import Cubical.Data.Sigma
 open import Cubical.Foundations.Equiv
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.HLevels
 open import Cubical.Foundations.Prelude
 open import Cubical.Functions.Surjection
 open import Cubical.HITs.PropositionalTruncation
+open import Cubical.Homotopy.Base
 open import Cubical.Relation.Binary
 open import Cubical.Relation.Nullary
 
@@ -110,8 +112,8 @@ continuousProposition f = isPropΠ3 (λ _ _ _ → isPropPropTrunc)
 
 continuousExtensionUnique :
   (f g : ℝ → ℝ) (φ : Continuous f) (ψ : Continuous g) →
-  ((q : ℚ) → f (rational q) ≡ g (rational q)) →
-  ((u : ℝ) → f u ≡ g u)
+  ((f ∘ rational) ∼ (g ∘ rational)) →
+  f ∼ g
 continuousExtensionUnique f g φ ψ ω =
   inductionProposition (θ , χ , π)
   where
@@ -125,9 +127,6 @@ continuousExtensionUnique f g φ ψ ω =
     where
     2≠0 : ¬ 2 ≡ 0
     2≠0 = Bool.toWitnessFalse {Q = discreteℚ 2 0} tt
-
-    0<2 : 0 < 2
-    0<2 = Bool.toWitness {Q = <Dec 0 2} tt
 
     χ' : (ε : ℚ) (ρ : 0 < ε) → Close ε ρ (f (limit x π)) (g (limit x π))
     χ' ε σ =
@@ -268,6 +267,54 @@ continuousExtensionUnique f g φ ψ ω =
 
   π : (u : ℝ) → isProp (f u ≡ g u)
   π u = ℝ-isSet (f u) (g u)
+
+continuousExtensionUnique₂ : 
+  (f g : ℝ → ℝ → ℝ) →
+  ((u : ℝ) → Continuous $ f u) → ((u : ℝ) → Continuous $ g u) →
+  ((v : ℝ) → Continuous $ flip f v) → ((v : ℝ) → Continuous $ flip g v) →
+  ((q r : ℚ) → f (rational q) (rational r) ≡ g (rational q) (rational r)) →
+  ((u v : ℝ) → f u v ≡ g u v)
+continuousExtensionUnique₂ f g φ ψ ω χ π u =
+  ρ σ
+  where
+  ρ : ((q : ℚ) → f u (rational q) ≡ g u (rational q)) →
+      (v : ℝ) → f u v ≡ g u v
+  ρ = continuousExtensionUnique (f u) (g u) (φ u) (ψ u)
+
+  σ : (q : ℚ) → f u (rational q) ≡ g u (rational q)
+  σ q = continuousExtensionUnique
+          (flip f $ rational q) (flip g $ rational q)
+          (ω $ rational q) (χ $ rational q)
+          (flip π q)
+          u
+
+continuousExtensionUnique₃ : 
+  (f g : ℝ → ℝ → ℝ → ℝ) →
+  ((u v : ℝ) → Continuous (λ w → f u v w)) →
+  ((u w : ℝ) → Continuous (λ v → f u v w)) →
+  ((v w : ℝ) → Continuous (λ u → f u v w)) →
+  ((u v : ℝ) → Continuous (λ w → g u v w)) →
+  ((u w : ℝ) → Continuous (λ v → g u v w)) →
+  ((v w : ℝ) → Continuous (λ u → g u v w)) →
+  ((q r s : ℚ) →
+   f (rational q) (rational r) (rational s) ≡
+   g (rational q) (rational r) (rational s)) →
+  ((u v w : ℝ) → f u v w ≡ g u v w)
+continuousExtensionUnique₃ f g φ ψ ω χ π ρ σ u v =
+  τ υ
+  where
+  τ : ((s : ℚ) → f u v (rational s) ≡ g u v (rational s)) →
+      (w : ℝ) → f u v w ≡ g u v w
+  τ = continuousExtensionUnique (f u v) (g u v) (φ u v) (χ u v)
+
+  υ : (s : ℚ) → f u v (rational s) ≡ g u v (rational s)
+  υ s = continuousExtensionUnique₂
+          (λ u v → f u v $ rational s) (λ u v → g u v $ rational s)
+          (flip ψ $ rational s)
+          (flip π $ rational s)
+          (flip ω $ rational s)
+          (flip ρ $ rational s)
+          (λ q r → σ q r s) u v
   
 lipschitz→continuous :
   (f : ℝ → ℝ) (L : ℚ) (φ : 0 < L) → 
@@ -294,3 +341,140 @@ lipschitz→continuous f L φ ψ u ε ω =
 
     σ'' : Close ε ω (f u) (f v)
     σ'' = subst (λ ?x → Close ε ?x _ _) (isProp< 0 ε (fst σ') ω) (snd σ')
+
+nonexpanding₂→lipschitz₂ : 
+  (f : ℝ → ℝ → ℝ) →
+  (φ : Nonexpandingℝ₂ f) →
+  (u : ℝ) → Lipschitzℝ (f u) 1 0<1 
+nonexpanding₂→lipschitz₂ f φ u v w ε ψ ω =
+  ρ
+  where
+  χ : Close ε ψ (f u v) (f u w)
+  χ = snd φ u v w ε ψ ω
+
+  π : Σ (0 < 1 · ε) (λ ρ → Close (1 · ε) ρ (f u v) (f u w))
+  π = subst (λ ?x → Σ (0 < ?x) (λ ρ → Close ?x ρ _ _)) (sym $ ·IdL ε) (ψ , χ)
+
+  ρ : Close (1 · ε) (0<· {x = 1} {y = ε} 0<1 ψ) (f u v) (f u w)
+  ρ = subst (λ ?x → Close (1 · ε) ?x (f u v) (f u w))
+            (isProp< 0 (1 · ε) (fst π) (0<· {x = 1} {y = ε} 0<1 ψ))
+            (snd π)
+
+nonexpanding₂→lipschitz₁ : 
+  (f : ℝ → ℝ → ℝ) →
+  (φ : Nonexpandingℝ₂ f) →
+  (w : ℝ) → Lipschitzℝ (flip f w) 1 0<1 
+nonexpanding₂→lipschitz₁ f φ w u v ε ψ ω =
+  ρ
+  where
+  χ : Close ε ψ (f u w) (f v w)
+  χ = fst φ u v w ε ψ ω
+
+  π : Σ (0 < 1 · ε) (λ ρ → Close (1 · ε) ρ (f u w) (f v w))
+  π = subst (λ ?x → Σ (0 < ?x) (λ ρ → Close ?x ρ _ _)) (sym $ ·IdL ε) (ψ , χ)
+
+  ρ : Close (1 · ε) (0<· {x = 1} {y = ε} 0<1 ψ) (f u w) (f v w)
+  ρ = subst (λ ?x → Close (1 · ε) ?x (f u w) (f v w))
+            (isProp< 0 (1 · ε) (fst π) (0<· {x = 1} {y = ε} 0<1 ψ))
+            (snd π)
+
+continuousAtCompose :
+  (f g : ℝ → ℝ)
+  (u : ℝ) →
+  ContinuousAt f u →
+  ContinuousAt g (f u) →
+  ContinuousAt (g ∘ f) u
+continuousAtCompose f g u φ ψ ε ω =
+  ∃-rec
+    isPropPropTrunc
+    (λ η π →
+      ∃-rec
+        isPropPropTrunc
+        (λ δ ρ → χ η π δ ρ)
+        (φ η (fst π)))
+    (ψ ε ω)
+  where
+  χ : (η : ℚ)
+      (π : Σ (0 < η)
+             (λ ρ → (v : ℝ) → Close η ρ (f u) v → Close ε ω (g (f u)) (g v)))
+      (δ : ℚ) →
+      Σ (0 < δ) (λ σ → (v : ℝ) → Close δ σ u v → Close η (fst π) (f u) (f v)) →
+      ∃ ℚ
+        (λ δ →
+          Σ (0 < δ)
+            (λ υ →
+              (v : ℝ) → Close δ υ u v → Close ε ω ((g ∘ f) u) ((g ∘ f) v)))
+  χ η (π , ρ) δ (σ , τ) = ∣ δ , σ , χ' ∣₁
+    where
+    χ' : (v : ℝ) → Close δ σ u v → Close ε ω ((g ∘ f) u) ((g ∘ f) v)
+    χ' v = ρ (f v) ∘ τ v
+
+continuousCompose :
+  (f g : ℝ → ℝ) →
+  Continuous f → Continuous g → Continuous (g ∘ f)
+continuousCompose f g φ ψ u = continuousAtCompose f g u (φ u) (ψ $ f u)
+
+identityContinuous : Continuous $ idfun ℝ
+identityContinuous u ε φ = ∣ ε , φ , (λ v → idfun _) ∣₁
+
+constantContinuous : (u : ℝ) → Continuous $ const u
+constantContinuous u v ε φ = ∣ 1 , 0<1 , ψ ∣₁
+  where
+  ψ : (w : ℝ) → Close 1 0<1 v w → Close ε φ (const u v) (const u w)
+  ψ w ω = closeReflexive u ε φ
+
+continuousExtensionLaw₁ :
+  (f g : ℝ → ℝ)
+  (f' g' : ℚ.ℚ → ℚ.ℚ) →
+  (f ∘ rational) ∼ (rational ∘ f') →
+  (g ∘ rational) ∼ (rational ∘ g') →
+  f' ∼ g' →
+  Continuous f →
+  Continuous g →
+  f ∼ g
+continuousExtensionLaw₁ f g f' g' H K L φ ψ =
+  continuousExtensionUnique f g φ ψ M
+  where
+  M : (f ∘ rational) ∼ (g ∘ rational)
+  M q = H q ∙ cong rational (L q) ∙ sym (K q)
+
+continuousExtensionLaw₂ :
+  (f g : ℝ → ℝ → ℝ)
+  (f' g' : ℚ.ℚ → ℚ.ℚ → ℚ.ℚ) →
+  ((q r : ℚ.ℚ) → f (rational q) (rational r) ≡ rational (f' q r)) →
+  ((q r : ℚ.ℚ) → g (rational q) (rational r) ≡ rational (g' q r)) →
+  ((q r : ℚ.ℚ) → f' q r ≡ g' q r) →
+  ((u : ℝ) → Continuous $ f u) →
+  ((v : ℝ) → Continuous $ flip f v) →
+  ((u : ℝ) → Continuous $ g u) →
+  ((v : ℝ) → Continuous $ flip g v) →
+  ((u v : ℝ) → f u v ≡ g u v)
+continuousExtensionLaw₂ f g f' g' H K L φ ψ ω χ =
+  continuousExtensionUnique₂ f g φ ω ψ χ M
+  where
+  M : (q r : ℚ) →
+      f (rational q) (rational r) ≡ g (rational q) (rational r)
+  M q r = H q r ∙ cong rational (L q r) ∙ (sym $ K q r)
+
+continuousExtensionLaw₃ :
+  (f g : ℝ → ℝ → ℝ → ℝ)
+  (f' g' : ℚ.ℚ → ℚ.ℚ → ℚ.ℚ → ℚ.ℚ) →
+  ((q r s : ℚ.ℚ) →
+    f (rational q) (rational r) (rational s) ≡ rational (f' q r s)) →
+  ((q r s : ℚ.ℚ) →
+    g (rational q) (rational r) (rational s) ≡ rational (g' q r s)) →
+  ((q r s : ℚ.ℚ) → f' q r s ≡ g' q r s) →
+  ((u v : ℝ) → Continuous (λ w → f u v w)) →
+  ((u w : ℝ) → Continuous (λ v → f u v w)) →
+  ((v w : ℝ) → Continuous (λ u → f u v w)) →
+  ((u v : ℝ) → Continuous (λ w → g u v w)) →
+  ((u w : ℝ) → Continuous (λ v → g u v w)) →
+  ((v w : ℝ) → Continuous (λ u → g u v w)) →
+  ((u v w : ℝ) → f u v w ≡ g u v w)
+continuousExtensionLaw₃ f g f' g' H K L φ ψ ω χ π ρ =
+  continuousExtensionUnique₃ f g φ ψ ω χ π ρ M
+  where
+  M : (q r s : ℚ) →
+      f (rational q) (rational r) (rational s) ≡
+      g (rational q) (rational r) (rational s)
+  M q r s = H q r s ∙ cong rational (L q r s) ∙ (sym $ K q r s)

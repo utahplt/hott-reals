@@ -8,6 +8,9 @@ open import Cubical.Foundations.Function
 open import Cubical.Foundations.Prelude
 open import Cubical.Homotopy.Base
 open import Cubical.Algebra.AbGroup.Base
+open import Cubical.Relation.Binary
+
+open BinaryRelation
 
 open import HoTTReals.Data.Real.Base
 open import HoTTReals.Data.Real.Close
@@ -316,3 +319,206 @@ isAbelianGroupℝ =
 
 ℝ+ : AbGroup ℓ-zero
 ℝ+ = ℝ , (abgroupstr 0 _+_ -_ isAbelianGroupℝ)
+
+maxNonexpandingℚ₂ : Nonexpandingℚ₂ ℚ.max
+maxNonexpandingℚ₂ = φ , ψ
+  where
+  φ : (q r s : ℚ.ℚ) → distance (ℚ.max q s) (ℚ.max r s) ℚ.≤ distance q r
+  φ = maxNonexpandingˡ
+
+  ψ : (q r s : ℚ.ℚ) → distance (ℚ.max q r) (ℚ.max q s) ℚ.≤ distance r s
+  ψ = maxNonexpandingʳ
+
+max : ℝ → ℝ → ℝ
+max = liftNonexpanding₂ ℚ.max maxNonexpandingℚ₂
+
+maxNonexpandingℝ₂ : Nonexpandingℝ₂ max
+maxNonexpandingℝ₂ = liftNonexpanding₂NonExpanding ℚ.max maxNonexpandingℚ₂
+
+maxLipschitz₁ : (v : ℝ) → Lipschitzℝ (flip max v) 1 0<1
+maxLipschitz₁ = nonexpanding₂→lipschitz₁ max maxNonexpandingℝ₂
+
+maxLipschitz₂ : (u : ℝ) → Lipschitzℝ (max u) 1 0<1
+maxLipschitz₂ = nonexpanding₂→lipschitz₂ max maxNonexpandingℝ₂
+
+maxContinuous₁ : (v : ℝ) → Continuous (flip max v)
+maxContinuous₁ v = lipschitz→continuous (flip max v) 1 0<1 (maxLipschitz₁ v)
+
+maxContinuous₂ : (u : ℝ) → Continuous (max u)
+maxContinuous₂ u = lipschitz→continuous (max u) 1 0<1 (maxLipschitz₂ u)
+
+-- Same deal as x + (- x), see comment above
+maxMaxLipschitz : Lipschitzℝ (λ u → max u u) 2 0<2
+maxMaxLipschitz u v ε φ ψ = π''
+  where
+  ω : Close ε φ (max u u) (max u v)
+  ω = snd maxNonexpandingℝ₂ u u v ε φ ψ
+
+  χ : Close ε φ (max u v) (max v v)
+  χ = fst maxNonexpandingℝ₂ u v v ε φ ψ
+
+  π : Close (ε ℚ.+ ε) (0<+' {x = ε} {y = ε} φ φ) (max u u) (max v v)
+  π = closeTriangleInequality (max u u) (max u v) (max v v)
+                              ε ε φ φ ω χ
+
+  π' : Σ (0 ℚ.< 2 ℚ.· ε) (λ ξ → Close (2 ℚ.· ε) ξ (max u u) (max v v))
+  π' = subst (λ ?x → Σ (0 ℚ.< ?x) (λ ξ → Close ?x ξ _ _))
+             (self+≡2· ε)
+             ((0<+' {x = ε} {y = ε} φ φ) , π)
+
+  π'' : Close (2 ℚ.· ε) (0<· {x = 2} {y = ε} 0<2 φ) (max u u) (max v v)
+  π'' = subst (λ ?x → Close (2 ℚ.· ε) ?x (max u u) (max v v))
+              (ℚ.isProp< 0 (2 ℚ.· ε)
+                         (fst π') (0<· {x = 2} {y = ε} 0<2 φ))
+              (snd π')
+
+maxAssociative : (x y z : ℝ) → max (max x y) z ≡ max x (max y z)
+maxAssociative =
+  continuousExtensionLaw₃
+    associateℝₗ associateℝᵣ associateℚₗ associateℚᵣ
+    ψ ω χ π ρ σ τ υ ξ
+  where
+  associateℝₗ : ℝ → ℝ → ℝ → ℝ
+  associateℝₗ x y z = max (max x y) z
+
+  associateℝᵣ : ℝ → ℝ → ℝ → ℝ
+  associateℝᵣ x y z = max x (max y z)
+
+  associateℚₗ : ℚ.ℚ → ℚ.ℚ → ℚ.ℚ → ℚ.ℚ
+  associateℚₗ q r s = ℚ.max (ℚ.max q r) s
+
+  associateℚᵣ : ℚ.ℚ → ℚ.ℚ → ℚ.ℚ → ℚ.ℚ
+  associateℚᵣ q r s = ℚ.max q (ℚ.max r s)
+
+  φ : (q r : ℚ.ℚ) →
+      liftNonexpanding₂ ℚ.max maxNonexpandingℚ₂ (rational q) (rational r) ≡
+      rational (ℚ.max q r)
+  φ = liftNonexpanding₂≡rational ℚ.max maxNonexpandingℚ₂ 
+
+  ψ : (q r s : ℚ.ℚ) →
+      associateℝₗ (rational q) (rational r) (rational s) ≡
+      rational (associateℚₗ q r s)
+  ψ q r s =
+    max (max (rational q) (rational r)) (rational s)
+      ≡⟨ cong (flip max $ rational s) (φ q r) ⟩
+    max (rational (ℚ.max q r)) (rational s)
+      ≡⟨ φ (ℚ.max q r) s ⟩
+    rational (ℚ.max (ℚ.max q r) s) ∎
+
+  ω : (q r s : ℚ.ℚ) →
+      associateℝᵣ (rational q) (rational r) (rational s) ≡
+      rational (associateℚᵣ q r s)
+  ω q r s =
+    max (rational q) (max (rational r) (rational s))
+      ≡⟨ cong (max $ rational q) (φ r s) ⟩
+    max (rational q) (rational (ℚ.max r s))
+      ≡⟨ φ q (ℚ.max r s) ⟩
+    rational (ℚ.max q (ℚ.max r s)) ∎
+
+  χ : (q r s : ℚ.ℚ) → associateℚₗ q r s ≡ associateℚᵣ q r s
+  χ q r s = sym $ ℚ.maxAssoc q r s
+
+  π : (x y : ℝ) → Continuous (associateℝₗ x y)
+  π x y = maxContinuous₂ (max x y)
+
+  ρ : (x z : ℝ) → Continuous (λ y → associateℝₗ x y z)
+  ρ x z = continuousCompose (max x) (flip max z)
+                            (maxContinuous₂ x) (maxContinuous₁ z)
+
+  σ : (y z : ℝ) → Continuous (λ x → associateℝₗ x y z)
+  σ y z = continuousCompose (flip max y) (flip max z)
+                            (maxContinuous₁ y) (maxContinuous₁ z)
+
+  τ : (x y : ℝ) → Continuous (associateℝᵣ x y)
+  τ x y = continuousCompose (max y) (max x)
+                            (maxContinuous₂ y) (maxContinuous₂ x)
+
+  υ : (x z : ℝ) → Continuous (λ y → associateℝᵣ x y z)
+  υ x z = continuousCompose (flip max z) (max x)
+                            (maxContinuous₁ z) (maxContinuous₂ x)
+
+  ξ : (y z : ℝ) → Continuous (λ x → associateℝᵣ x y z)
+  ξ y z = maxContinuous₁ (max y z)
+
+maxCommutative : (x y : ℝ) → max x y ≡ max y x
+maxCommutative =
+  continuousExtensionLaw₂
+    max
+    (flip max)
+    ℚ.max
+    (flip ℚ.max)
+    φ (flip φ) ψ ω χ χ ω
+  where
+  φ : (q r : ℚ.ℚ) →
+      liftNonexpanding₂ ℚ.max maxNonexpandingℚ₂ (rational q) (rational r) ≡
+      rational (ℚ.max q r)
+  φ = liftNonexpanding₂≡rational ℚ.max maxNonexpandingℚ₂ 
+
+  ψ : (x y : ℚ.ℚ) → ℚ.max x y ≡ ℚ.max y x
+  ψ = ℚ.maxComm
+
+  ω : (u : ℝ) → Continuous (max u)
+  ω = maxContinuous₂
+
+  χ : (v : ℝ) → Continuous $ flip max v
+  χ = maxContinuous₁
+
+maxIdempotent : (x : ℝ) → max x x ≡ x
+maxIdempotent =
+  continuousExtensionLaw₁
+    (λ x → max x x) (idfun ℝ)
+    (λ q → ℚ.max q q) (idfun ℚ.ℚ)
+    ψ ω χ π ρ
+  where
+  φ : (q r : ℚ.ℚ) →
+      liftNonexpanding₂ ℚ.max maxNonexpandingℚ₂ (rational q) (rational r) ≡
+      rational (ℚ.max q r)
+  φ = liftNonexpanding₂≡rational ℚ.max maxNonexpandingℚ₂ 
+
+  ψ : ((λ x → max x x) ∘ rational) ∼ (rational ∘ (λ q → ℚ.max q q))
+  ψ q = φ q q
+
+  ω : (idfun ℝ ∘ rational) ∼ (rational ∘ idfun ℚ.ℚ)
+  ω q = refl
+
+  χ : (λ q → ℚ.max q q) ∼ idfun ℚ.ℚ
+  χ = ℚ.maxIdem
+
+  π : Continuous (λ x → max x x)
+  π = lipschitz→continuous (λ x → max x x) 2 0<2 maxMaxLipschitz
+  
+  ρ : Continuous (idfun ℝ)
+  ρ = identityContinuous
+
+_≤_ : ℝ → ℝ → Type ℓ-zero
+_≤_ x y = max x y ≡ y
+
+infix 4 _≤_ 
+
+≤-isProp : (x y : ℝ) → isProp $ x ≤ y
+≤-isProp x y = ℝ-isSet (max x y) y
+
+≤-reflexive : isRefl _≤_
+≤-reflexive = maxIdempotent
+
+≤-antisymmetric : isAntisym _≤_
+≤-antisymmetric x y φ ψ =
+  x
+    ≡⟨ sym ψ ⟩
+  max y x
+    ≡⟨ maxCommutative y x ⟩
+  max x y
+    ≡⟨ φ ⟩
+  y ∎
+
+≤-transitive : isTrans _≤_
+≤-transitive x y z φ ψ =
+  max x z
+    ≡⟨ cong (max x) (sym ψ) ⟩
+  max x (max y z)
+    ≡⟨ sym $ maxAssociative x y z ⟩
+  max (max x y) z
+    ≡⟨ cong (flip max z) φ ⟩
+  max y z
+    ≡⟨ ψ ⟩
+  z ∎

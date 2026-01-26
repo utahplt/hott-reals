@@ -125,9 +125,6 @@ continuousExtensionUnique f g φ ψ ω =
       f (limit x π) ≡ g (limit x π)
   χ x π ρ = path (f (limit x π)) (g (limit x π)) χ'
     where
-    2≠0 : ¬ 2 ≡ 0
-    2≠0 = Bool.toWitnessFalse {Q = discreteℚ 2 0} tt
-
     χ' : (ε : ℚ) (ρ : 0 < ε) → Close ε ρ (f (limit x π)) (g (limit x π))
     χ' ε σ =
       ∃-rec

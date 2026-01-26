@@ -23,6 +23,18 @@ open import HoTTReals.Algebra.Field.Instances.Rationals as ℚ
 open import HoTTReals.Logic
 open import HoTTReals.Data.Rationals.Properties
 
+≤-o· : {x y z : ℚ} → 0 ≤ x → y ≤ z → x · y ≤ x · z
+≤-o· {x} {y} {z} p q =
+  subst2 (λ ?a ?b → ?a ≤ ?b)
+         (·Comm y x) (·Comm z x)
+         (≤-·o y z x p q)
+
+<-o· : {x y z : ℚ} → 0 < x → y < z → x · y < x · z
+<-o· {x} {y} {z} p q =
+  subst2 (λ ?a ?b → ?a < ?b)
+         (·Comm y x) (·Comm z x)
+         (<-·o y z x p q)
+
 0<+' : {x y : ℚ} → 0 < x → 0 < y → 0 < x + y
 0<+' {x} {y} p q = r
  -- Don't need `subst` because the path is refl
@@ -266,6 +278,57 @@ open import HoTTReals.Data.Rationals.Properties
   r : (y - x) + x ≡ y
   r = subtractAddRightCancel x y
 
+≤→0≤- : {x y : ℚ} → x ≤ y → 0 ≤ y - x
+≤→0≤- {x} {y} p =
+  subst (flip _≤_ $ (y - x)) r q
+  where
+  q : x - x ≤ y - x
+  q = ≤-+o x y (- x) p
+
+  r : x - x ≡ 0
+  r = +InvR x
+
+≤→-≤0 : {x y : ℚ} → x ≤ y → x - y ≤ 0
+≤→-≤0 {x} {y} p =
+  subst (_≤_ $ x - y) r q
+  where
+  q : x - y ≤ y - y
+  q = ≤-+o x y (- y) p
+
+  r : y - y ≡ 0
+  r = +InvR y
+
+0≤-→≤ : {x y : ℚ} → 0 ≤ y - x → x ≤ y
+0≤-→≤ {x} {y} p =
+  subst2 _≤_ r s q
+  where
+  q : 0 + x ≤ (y - x) + x
+  q = ≤-+o 0 (y - x) x p
+
+  r : 0 + x ≡ x
+  r = +IdL x
+
+  s : (y - x) + x ≡ y
+  s = subtractAddRightCancel x y
+
+≤+→-≤ : {x y z : ℚ} → x ≤ y + z → x - z ≤ y
+≤+→-≤ {x} {y} {z} φ = ψ'
+  where
+  ψ : x - z ≤ (y + z) - z
+  ψ = ≤-+o x (y + z) (- z) φ
+
+  ψ' : x - z ≤ y
+  ψ' = subst (_≤_ $ x - z) (addSubtractRightCancel y z) ψ
+
++≤→≤- : {x y z : ℚ} → x + y ≤ z → x ≤ z - y
++≤→≤- {x} {y} {z} φ = ψ'
+  where
+  ψ : (x + y) - y ≤ z - y
+  ψ = ≤-+o (x + y) z (- y) φ
+
+  ψ' : x ≤ z - y
+  ψ' = subst (flip _≤_ $ z - y) (addSubtractRightCancel x y) ψ
+
 ≤max' : (x y : ℚ) → y ≤ max x y
 ≤max' x y = subst (λ ?x → y ≤ ?x) (maxComm y x) (≤max y x)
 
@@ -461,6 +524,69 @@ minGreatestLowerBound< {x} {y} {z} p q =
     ≡⟨ refl ⟩
   ∣ x ∣ ∎
 
+0≤→∣∣≡self : (x : ℚ) → 0 ≤ x → ∣ x ∣ ≡ x
+0≤→∣∣≡self x φ = ≤→max' ψ
+  where
+  ψ : - x ≤ x
+  ψ = isTrans≤ (- x) 0 x (≤antitone- {x = 0} {y = x} φ) φ
+
+0≤-→∣∣≡negateSelf : (x : ℚ) → 0 ≤ - x → ∣ x ∣ ≡ - x
+0≤-→∣∣≡negateSelf x φ = ≤→max x (- x) ψ
+  where
+  ψ : x ≤ - x
+  ψ = isTrans≤ x 0 (- x)
+        (isTrans≤ x (- - x) 0
+          (≡Weaken≤ x (- - x) (sym $ -Invol x))
+          (≤antitone- {x = 0} {y = - x} φ))
+        φ
+
+≤0→∣∣≡negateSelf : (x : ℚ) → x ≤ 0 → ∣ x ∣ ≡ - x
+≤0→∣∣≡negateSelf x φ = ≤→max x (- x) ψ
+  where
+  ψ : x ≤ - x
+  ψ = isTrans≤ x 0 (- x) φ (≤antitone- {x = x} {y = 0} φ)
+
+maxMultiplyLeftNonnegative :
+  (a x y : ℚ) →
+  0 ≤ a →
+  max (a · x) (a · y) ≡ a · max x y
+maxMultiplyLeftNonnegative a x y φ =
+  PropositionalTruncation.rec (isSetℚ _ _) ψ' (isTotal≤ x y)
+  where
+  ψ' : (x ≤ y) ⊎ (y ≤ x) → max (a · x) (a · y) ≡ a · max x y
+  ψ' (inl ω) = ρ
+    where
+    χ : max (a · x) (a · y) ≡ a · y
+    χ = ≤→max (a · x) (a · y) (≤-o· {x = a} {y = x} {z = y} φ ω)
+
+    π : max x y ≡ y
+    π = ≤→max x y ω
+
+    ρ : max (a · x) (a · y) ≡ a · max x y
+    ρ = χ ∙ cong (_·_ a) (sym π)
+  ψ' (inr ω) = ρ
+    where
+    χ : max (a · x) (a · y) ≡ a · x
+    χ = ≤→max' (≤-o· {x = a} {y = y} {z = x} φ ω)
+
+    π : max x y ≡ x
+    π = ≤→max' ω
+
+    ρ : max (a · x) (a · y) ≡ a · max x y
+    ρ = χ ∙ cong (_·_ a) (sym π)
+
+maxMultiplyRightNonnegative :
+  (a x y : ℚ) →
+  0 ≤ a →
+  max (x · a) (y · a) ≡ a · max x y
+maxMultiplyRightNonnegative a x y φ = ψ ∙ ω
+  where
+  ψ : max (x · a) (y · a) ≡ max (a · x) (a · y)
+  ψ = cong₂ max (·Comm x a) (·Comm y a)
+
+  ω : max (a · x) (a · y) ≡ a · max x y
+  ω = maxMultiplyLeftNonnegative a x y φ
+
 -∣∣≤self : (x : ℚ) → - ∣ x ∣ ≤ x
 -∣∣≤self x = subst (_≤_ (- ∣ x ∣)) (-Invol x) q
   where
@@ -480,17 +606,15 @@ negate<subtract→subtract< x y ε p =
              (-Invol ε)
              (<antitone- {x = - ε} {y = y - x} p)
 
-≤-o· : {x y z : ℚ} → 0 ≤ x → y ≤ z → x · y ≤ x · z
-≤-o· {x} {y} {z} p q =
-  subst2 (λ ?a ?b → ?a ≤ ?b)
-         (·Comm y x) (·Comm z x)
-         (≤-·o y z x p q)
+subtract≤→negate≤subtract : (x y ε : ℚ) → x - y ≤ ε → - ε ≤ y - x
+subtract≤→negate≤subtract x y ε p =
+  subst (_≤_ (- ε)) (negateSubtract' x y) (≤antitone- {x = x - y} {y = ε} p)
 
-<-o· : {x y z : ℚ} → 0 < x → y < z → x · y < x · z
-<-o· {x} {y} {z} p q =
-  subst2 (λ ?a ?b → ?a < ?b)
-         (·Comm y x) (·Comm z x)
-         (<-·o y z x p q)
+negate≤subtract→subtract≤ : (x y ε : ℚ) → - ε ≤ y - x → x - y ≤ ε
+negate≤subtract→subtract≤ x y ε p =
+  subst2 _≤_ (negateSubtract' y x)
+             (-Invol ε)
+             (≤antitone- {x = - ε} {y = y - x} p)
 
 +≤+ : {x y z w : ℚ} → x ≤ y → z ≤ w → x + z ≤ y + w
 +≤+ {x} {y} {z} {w} p q =
@@ -522,8 +646,125 @@ negate<subtract→subtract< x y ε p =
             (≤-·o x z y s p)
             (<-o· {x = z} {y = y} {z = w} r q)
 
-magntidueTriangleInequality : (x y : ℚ) → ∣ x + y ∣ ≤ ∣ x ∣ + ∣ y ∣
-magntidueTriangleInequality x y = ≤→∣∣≤ {x = x + y} {ε = ∣ x ∣ + ∣ y ∣} p q
+0≤→0≤· : (x y : ℚ) → 0 ≤ x → 0 ≤ y → 0 ≤ x · y
+0≤→0≤· x y φ ψ = ·≤· {x = 0} {y = 0} {z = x} {w = y} φ ψ φ (isRefl≤ 0)
+
+≤0→0≤· : (x y : ℚ) → x ≤ 0 → y ≤ 0 → 0 ≤ x · y
+≤0→0≤· x y φ ψ = ω'
+  where
+  ω : 0 ≤ (- x) · (- y)
+  ω = 0≤→0≤· (- x) (- y)
+    (≤antitone- {x = x} {y = 0} φ) (≤antitone- {x = y} {y = 0} ψ)
+
+  χ : (- x) · (- y) ≡ x · y
+  χ = -·-≡· x y
+
+  ω' : 0 ≤ x · y
+  ω' = subst (_≤_ 0) χ ω
+
+magnitudeMultiply≡multiplyMagnitude :
+  (x y : ℚ) →
+  ∣ x · y ∣ ≡ ∣ x ∣ · ∣ y ∣
+magnitudeMultiply≡multiplyMagnitude x y =
+  rec2 (isSetℚ _ _) φ (isTotal≤ 0 x) (isTotal≤ 0 y)
+  where
+  φ : (0 ≤ x) ⊎ (x ≤ 0) → (0 ≤ y) ⊎ (y ≤ 0) → ∣ x · y ∣ ≡ ∣ x ∣ · ∣ y ∣
+  φ (inl ψ) (inl ω) = τ
+    where
+    χ : 0 ≤ x · y
+    χ = 0≤→0≤· x y ψ ω
+
+    π : ∣ x · y ∣ ≡ x · y
+    π = 0≤→∣∣≡self (x · y) χ
+
+    ρ : ∣ x ∣ ≡ x
+    ρ = 0≤→∣∣≡self x ψ
+
+    σ : ∣ y ∣ ≡ y
+    σ = 0≤→∣∣≡self y ω
+
+    τ : ∣ x · y ∣ ≡ ∣ x ∣ · ∣ y ∣
+    τ = π ∙ cong₂ _·_ (sym ρ) (sym σ)
+  φ (inl ψ) (inr ω') = υ
+    where
+    χ : - (x · y) ≡ x · (- y)
+    χ = -·≡·- x y
+
+    π : 0 ≤ x · (- y)
+    π = 0≤→0≤· x (- y) ψ (≤antitone- {x = y} {y = 0} ω')
+
+    π' : 0 ≤ - (x · y)
+    π' = isTrans≤ 0 (x · (- y)) (- (x · y))
+                  π (≡Weaken≤ (x · (- y)) (- (x · y)) (sym χ))
+
+    ρ : ∣ x · y ∣ ≡ - (x · y)
+    ρ = 0≤-→∣∣≡negateSelf (x · y) π'
+
+    σ : ∣ x ∣ ≡ x
+    σ = 0≤→∣∣≡self x ψ
+
+    τ : ∣ y ∣ ≡ - y
+    τ = ≤0→∣∣≡negateSelf y ω'
+
+    υ : ∣ x · y ∣ ≡ ∣ x ∣ · ∣ y ∣
+    υ = ∣ x · y ∣
+          ≡⟨ ρ ⟩
+        - (x · y)
+          ≡⟨ χ ⟩
+        x · (- y)
+          ≡⟨ cong₂ _·_ (sym σ) (sym τ) ⟩
+        ∣ x ∣ · ∣ y ∣ ∎
+  φ (inr ψ') (inl ω) = υ
+    where
+    χ : - (x · y) ≡ (- x) · y
+    χ = -·≡-· x y
+
+    π : 0 ≤ (- x) · y
+    π = 0≤→0≤· (- x) y (≤antitone- {x = x} {y = 0} ψ') ω
+
+    π' : 0 ≤ - (x · y)
+    π' = isTrans≤ 0 ((- x) · y) (- (x · y))
+                  π (≡Weaken≤ ((- x) · y) (- (x · y)) (sym χ))
+
+    ρ : ∣ x · y ∣ ≡ - (x · y)
+    ρ = 0≤-→∣∣≡negateSelf (x · y) π'
+
+    σ : ∣ x ∣ ≡ - x
+    σ = ≤0→∣∣≡negateSelf x ψ'
+
+    τ : ∣ y ∣ ≡ y
+    τ = 0≤→∣∣≡self y ω
+
+    υ : ∣ x · y ∣ ≡ ∣ x ∣ · ∣ y ∣
+    υ = ∣ x · y ∣
+          ≡⟨ ρ ⟩
+        - (x · y)
+          ≡⟨ χ ⟩
+        (- x) · y
+          ≡⟨ cong₂ _·_ (sym σ) (sym τ) ⟩
+        ∣ x ∣ · ∣ y ∣ ∎
+  φ (inr ψ') (inr ω') = υ
+    where
+    χ : 0 ≤ x · y
+    χ = ≤0→0≤· x y ψ' ω'
+
+    π : ∣ x · y ∣ ≡ x · y
+    π = 0≤→∣∣≡self (x · y) χ
+
+    ρ : ∣ x ∣ ≡ - x
+    ρ = ≤0→∣∣≡negateSelf x ψ'
+
+    σ : ∣ y ∣ ≡ - y
+    σ = ≤0→∣∣≡negateSelf y ω'
+
+    τ : (- x) · (- y) ≡ x · y
+    τ = -·-≡· x y
+
+    υ : ∣ x · y ∣ ≡ ∣ x ∣ · ∣ y ∣
+    υ = π ∙ sym τ ∙ cong₂ _·_ (sym ρ) (sym σ)
+
+magnitudeTriangleInequality : (x y : ℚ) → ∣ x + y ∣ ≤ ∣ x ∣ + ∣ y ∣
+magnitudeTriangleInequality x y = ≤→∣∣≤ {x = x + y} {ε = ∣ x ∣ + ∣ y ∣} p q
   where
   p : x + y ≤ ∣ x ∣ + ∣ y ∣
   p = +≤+ {x = x} {y = ∣ x ∣} {z = y} {w = ∣ y ∣} (≤max x (- x)) (≤max y (- y))
@@ -549,7 +790,7 @@ distanceTriangleInequality :
 distanceTriangleInequality x y z =
   subst (flip _≤_ (∣ x - y ∣ + ∣ y - z ∣))
         (cong ∣_∣ p)
-        (magntidueTriangleInequality (x - y) (y - z))
+        (magnitudeTriangleInequality (x - y) (y - z))
   where
   p : (x - y) + (y - z) ≡ x - z
   p = (x - y) + (y - z)
@@ -557,6 +798,39 @@ distanceTriangleInequality x y z =
       ((x - y) + y) - z
         ≡⟨ cong (flip _-_ z) (subtractAddRightCancel y x) ⟩
       x - z ∎
+
+magnitudeReverseTriangleInequality :
+  (x y : ℚ) → 
+  ∣ ∣ x ∣ - ∣ y ∣ ∣ ≤ ∣ x - y ∣
+magnitudeReverseTriangleInequality x y =
+  ≤→∣∣≤ {x = ∣ x ∣ - ∣ y ∣} {ε = ∣ x - y ∣} ω σ
+  where
+  φ : ∣ x ∣ ≡ ∣ (x - y) + y ∣
+  φ = cong ∣_∣ (sym $ subtractAddRightCancel y x)
+
+  ψ : ∣ (x - y) + y ∣ ≤ ∣ x - y ∣ + ∣ y ∣
+  ψ = magnitudeTriangleInequality (x - y) y
+
+  ψ' : ∣ x ∣ ≤ ∣ x - y ∣ + ∣ y ∣
+  ψ' = subst (flip _≤_ $ ∣ x - y ∣ + ∣ y ∣) (sym φ) ψ
+
+  ω : ∣ x ∣ - ∣ y ∣ ≤ ∣ x - y ∣
+  ω = ≤+→-≤ {x = ∣ x ∣} {y = ∣ x - y ∣} {z = ∣ y ∣} ψ'
+
+  χ : ∣ y ∣ ≡ ∣ (y - x) + x ∣
+  χ = cong ∣_∣ (sym $ subtractAddRightCancel x y)
+
+  π : ∣ (y - x) + x ∣ ≤ ∣ y - x ∣ + ∣ x ∣
+  π = magnitudeTriangleInequality (y - x) x
+
+  π' : ∣ y ∣ ≤ ∣ x - y ∣ + ∣ x ∣
+  π' = subst2 (λ ?x ?y → ?x ≤ ?y + ∣ x ∣) (sym χ) (distanceCommutative y x) π
+
+  ρ : ∣ y ∣ - ∣ x ∣ ≤ ∣ x - y ∣
+  ρ = ≤+→-≤ {x = ∣ y ∣} {y = ∣ x - y ∣} {z = ∣ x ∣} π'
+
+  σ : - ∣ x - y ∣ ≤ ∣ x ∣ - ∣ y ∣
+  σ = subtract≤→negate≤subtract (∣ y ∣) (∣ x ∣) (∣ x - y ∣) ρ
 
 ∣∣<-open :
   (x : ℚ) (ε : ℚ) (φ : 0 < ε) →
@@ -658,6 +932,43 @@ distanceTriangleInequality x y z =
     ≡⟨ +distanceᵣ y z x ⟩
   distance y z ∎
 
+≤→distance≡LeftSubtractRight :
+  (x y : ℚ) →
+  y ≤ x → distance x y ≡ x - y
+≤→distance≡LeftSubtractRight x y φ = χ
+  where
+  ψ : 0 ≤ x - y
+  ψ = ≤→0≤- {x = y} {y = x} φ
+
+  ψ' : - (x - y) ≤ 0
+  ψ' = ≤antitone- {x = 0} {y = x - y} ψ
+
+  ω : - (x - y) ≤ x - y
+  ω = isTrans≤ (- (x - y)) 0 (x - y) ψ' ψ
+
+  χ : distance x y ≡ x - y
+  χ = ≤→max' ω
+
+≤→distance≡RightSubtractLeft :
+  (x y : ℚ) →
+  x ≤ y → distance x y ≡ y - x
+≤→distance≡RightSubtractLeft x y φ = χ ∙ π
+  where
+  ψ : x - y ≤ 0
+  ψ = (≤→-≤0 {x = x} {y = y} φ)
+
+  ψ' : 0 ≤ - (x - y)
+  ψ' = ≤antitone- {x = x - y} {y = 0} ψ
+
+  ω : x - y ≤ - (x - y)
+  ω = isTrans≤ (x - y) 0 (- (x - y)) ψ ψ'
+
+  χ : distance x y ≡ - (x - y)
+  χ = ≤→max (x - y) (- (x - y)) ω
+
+  π : - (x - y) ≡ y - x
+  π = negateSubtract' x y
+
 ℚ-isPoset : IsPoset _≤_
 ℚ-isPoset = isposet isSetℚ isProp≤ isRefl≤ isTrans≤ isAntisym≤
 
@@ -675,3 +986,193 @@ distanceTriangleInequality x y z =
 
 0<2 : 0 < 2
 0<2 = Bool.toWitness {Q = <Dec 0 2} tt
+
+2≠0 : ¬ 2 ≡ 0
+2≠0 = Bool.toWitnessFalse {Q = discreteℚ 2 0} tt
+
+0≤2 : 0 ≤ 2
+0≤2 = Bool.toWitness {Q = ≤Dec 0 2} tt
+
+0≤2⁻¹ : 0 ≤ 2 [ 2≠0 ]⁻¹
+0≤2⁻¹ = Bool.toWitness {Q = ≤Dec 0 (2 [ 2≠0 ]⁻¹)} tt
+
+-- The max is equal to the midpoint + half the distance
+max≡midpoint+halfDistance :
+  (x y : ℚ) →
+  max x y ≡ ((x + y) + distance x y) / 2 [ 2≠0 ]
+max≡midpoint+halfDistance x y =
+  PropositionalTruncation.rec (isSetℚ _ _) φ (isTotal≤ x y)
+  where
+  φ : (x ≤ y) ⊎ (y ≤ x) → max x y ≡ ((x + y + distance x y) / 2 [ 2≠0 ])
+  φ (inl ψ) = σ
+    where
+    ω : max x y ≡ y
+    ω = ≤→max x y ψ
+
+    χ : distance x y ≡ y - x
+    χ = ≤→distance≡RightSubtractLeft x y ψ
+
+    π : (x + y) + (y - x) ≡ y + y
+    π = (x + y) + (y - x)
+          ≡⟨ cong (flip _+_ $ y - x) (+Comm x y) ⟩
+        (y + x) + (y - x)
+          ≡⟨ sym $ +Assoc y x (y - x) ⟩
+        y + (x + (y - x))
+          ≡⟨ cong (_+_ y) (addLeftSubtractCancel x y) ⟩
+        y + y ∎
+
+    ρ : (x + y + distance x y) / 2 [ 2≠0 ] ≡ y
+    ρ = (x + y + distance x y) / 2 [ 2≠0 ]
+          ≡⟨ cong (λ ?x → (x + y + ?x) / 2 [ 2≠0 ]) χ ⟩
+        (x + y + (y - x)) / 2 [ 2≠0 ]
+          ≡⟨ cong (λ ?x → ?x / 2 [ 2≠0 ]) π ⟩
+        (y + y) / 2 [ 2≠0 ]
+          ≡⟨ cong (λ ?x → ?x / 2 [ 2≠0 ]) (self+≡2· y) ⟩
+        (2 · y) / 2 [ 2≠0 ]
+          ≡⟨ ·/' 2 y 2≠0 ⟩
+        y ∎
+
+    σ : max x y ≡ ((x + y + distance x y) / 2 [ 2≠0 ])
+    σ = ω ∙ sym ρ
+  φ (inr ψ) = σ
+    where
+    ω : max x y ≡ x
+    ω = ≤→max' ψ
+
+    χ : distance x y ≡ x - y
+    χ = ≤→distance≡LeftSubtractRight x y ψ
+
+    π : (x + y) + (x - y) ≡ x + x
+    π = (x + y) + (x - y)
+          ≡⟨ (sym $ +Assoc x y (x - y)) ⟩
+        x + (y + (x - y))
+          ≡⟨ cong (_+_ x) (addLeftSubtractCancel y x) ⟩
+        x + x ∎
+
+    ρ : (x + y + distance x y) / 2 [ 2≠0 ] ≡ x
+    ρ = (x + y + distance x y) / 2 [ 2≠0 ]
+          ≡⟨ cong (λ ?x → (x + y + ?x) / 2 [ 2≠0 ]) χ ⟩
+        (x + y + (x - y)) / 2 [ 2≠0 ]
+          ≡⟨ cong (λ ?x → ?x / 2 [ 2≠0 ]) π ⟩
+        (x + x) / 2 [ 2≠0 ]
+          ≡⟨ cong (λ ?x → ?x / 2 [ 2≠0 ]) (self+≡2· x) ⟩
+        (2 · x) / 2 [ 2≠0 ]
+          ≡⟨ ·/' 2 x 2≠0 ⟩
+        x ∎
+
+    σ : max x y ≡ ((x + y + distance x y) / 2 [ 2≠0 ])
+    σ = ω ∙ sym ρ
+
+maxNonexpandingˡ : 
+  (q r s : ℚ.ℚ) → distance (max q s) (max r s) ≤ distance q r
+maxNonexpandingˡ q r s = τ
+  where
+  -- TODO: Replace
+  φ : (q + s + ∣ q - s ∣) - (r + s + ∣ r - s ∣) ≡
+      (q - r) + (∣ q - s ∣ - ∣ r - s ∣)
+  φ = (q + s + ∣ q - s ∣) - (r + s + ∣ r - s ∣)
+         ≡⟨ cong (_+_ (q + s + ∣ q - s ∣)) (negateAdd (r + s) ∣ r - s ∣) ⟩
+      (q + s + ∣ q - s ∣) + (- (r + s) + - ∣ r - s ∣)
+         ≡⟨ cong (λ ?x → ((q + s + ∣ q - s ∣)+ (?x + - ∣ r - s ∣)))
+                 (negateAdd r s) ⟩
+      (q + s + ∣ q - s ∣) + (((- r) + (- s)) + - ∣ r - s ∣)
+         ≡⟨ cong (λ ?x → ((q + s + ∣ q - s ∣) + (?x + - ∣ r - s ∣)))
+                 (+Comm (- r) (- s)) ⟩
+      ((q + s) + ∣ q - s ∣) + (((- s) + (- r)) + - ∣ r - s ∣)
+         ≡⟨ cong (flip _+_ _) (+Comm (q + s) ∣ q - s ∣) ⟩
+      (∣ q - s ∣ + (q + s)) + (((- s) + (- r)) + - ∣ r - s ∣)
+         ≡⟨ (sym $ +Assoc ∣ q - s ∣ (q + s) _) ⟩
+      ∣ q - s ∣ + ((q + s) + (((- s) + (- r)) + - ∣ r - s ∣))
+         ≡⟨ cong (_+_ ∣ q - s ∣) (+Assoc (q + s) ((- s) + (- r)) _) ⟩
+      ∣ q - s ∣ + (((q + s) + ((- s) + (- r))) + - ∣ r - s ∣)
+         ≡⟨ cong (λ ?x → ∣ q - s ∣ + (?x + - ∣ r - s ∣))
+                 (sym $ +Assoc q s ((- s) + (- r))) ⟩
+      ∣ q - s ∣ + ((q + (s + ((- s) + (- r)))) + - ∣ r - s ∣)
+         ≡⟨ cong (λ ?x → ∣ q - s ∣ + ((q + ?x) + - ∣ r - s ∣))
+                 (+Assoc s (- s) (- r)) ⟩
+      ∣ q - s ∣ + ((q + ((s + (- s)) + (- r))) + - ∣ r - s ∣)
+         ≡⟨ cong (λ ?x → ∣ q - s ∣ + ((q + (?x + (- r))) + - ∣ r - s ∣))
+                 (+InvR s) ⟩
+      ∣ q - s ∣ + ((q + (0 + (- r))) + - ∣ r - s ∣)
+         ≡⟨ cong (λ ?x → ∣ q - s ∣ + ((q + ?x) + - ∣ r - s ∣))
+                 (+IdL (- r)) ⟩
+      ∣ q - s ∣ + ((q + (- r)) + - ∣ r - s ∣)
+         ≡⟨ addRightSwap ∣ q - s ∣ (q - r) (- ∣ r - s ∣) ⟩
+      (q - r) + (∣ q - s ∣ - ∣ r - s ∣) ∎
+
+  ψ : ∣ max q s - max r s ∣ ≡
+      ∣ (q - r) + (∣ q - s ∣ - ∣ r - s ∣) ∣ / 2 [ 2≠0 ]
+  ψ = ∣ max q s - max r s ∣
+        ≡⟨ cong₂ distance (max≡midpoint+halfDistance q s)
+                          (max≡midpoint+halfDistance r s) ⟩
+      ∣ ((q + s + ∣ q - s ∣) / 2 [ 2≠0 ]) - ((r + s + ∣ r - s ∣) / 2 [ 2≠0 ]) ∣
+        ≡⟨ cong (λ ?x → ∣ ((q + s + ∣ q - s ∣) / 2 [ 2≠0 ]) + ?x ∣)
+                (-·≡-· ((r + s + ∣ r - s ∣)) (2 [ 2≠0 ]⁻¹)) ⟩
+      ∣ ((q + s + ∣ q - s ∣) / 2 [ 2≠0 ]) +
+        ((- (r + s + ∣ r - s ∣)) / 2 [ 2≠0 ]) ∣
+        ≡⟨ cong ∣_∣ (sym $ ·DistR+ (q + s + ∣ q - s ∣) _ (2 [ 2≠0 ]⁻¹)) ⟩
+      ∣ ((q + s + ∣ q - s ∣) - (r + s + ∣ r - s ∣)) / 2 [ 2≠0 ] ∣
+        ≡⟨ magnitudeMultiply≡multiplyMagnitude
+             ((q + s + ∣ q - s ∣) - (r + s + ∣ r - s ∣))
+             (2 [ 2≠0 ]⁻¹) ⟩
+      ∣ (q + s + ∣ q - s ∣) - (r + s + ∣ r - s ∣) ∣ · ∣ 2 [ 2≠0 ]⁻¹ ∣
+        ≡⟨ cong (_·_ ∣ (q + s + ∣ q - s ∣) - (r + s + ∣ r - s ∣) ∣)
+                (0≤→∣∣≡self (2 [ 2≠0 ]⁻¹) 0≤2⁻¹) ⟩
+      ∣ (q + s + ∣ q - s ∣) - (r + s + ∣ r - s ∣) ∣ · 2 [ 2≠0 ]⁻¹
+        ≡⟨ cong (λ ?x → ∣ ?x ∣ / 2 [ 2≠0 ]) φ ⟩
+      ∣ (q - r) + (∣ q - s ∣ - ∣ r - s ∣) ∣ / 2 [ 2≠0 ] ∎
+
+  ω : ∣ (q - r) + (∣ q - s ∣ - ∣ r - s ∣) ∣ ≤
+      ∣ q - r ∣ + ∣ ∣ q - s ∣ - ∣ r - s ∣ ∣
+  ω = magnitudeTriangleInequality (q - r) (∣ q - s ∣ - ∣ r - s ∣)
+
+  χ : ∣ ∣ q - s ∣ - ∣ r - s ∣ ∣ ≤ ∣ (q - s) - (r - s) ∣
+  χ = magnitudeReverseTriangleInequality (q - s) (r - s)
+
+  -- TODO: Replace
+  π : (q - s) - (r - s) ≡ q - r
+  π = (q - s) - (r - s)
+        ≡⟨ cong (_+_ (q - s)) (negateSubtract' r s) ⟩
+      (q - s) + (s - r)
+        ≡⟨ sym $ +Assoc q (- s) (s - r) ⟩
+      q + ((- s) + (s - r))
+        ≡⟨ cong (_+_ q) $ +Assoc (- s) s (- r) ⟩
+      q + (((- s) + s) - r)
+        ≡⟨ cong (λ ?x → q + (?x - r)) (+InvL s) ⟩
+      q + (0 - r)
+        ≡⟨ cong (_+_ q) (+IdL $ - r) ⟩
+      q - r ∎
+
+  χ' : ∣ ∣ q - s ∣ - ∣ r - s ∣ ∣ ≤ ∣ q - r ∣
+  χ' = subst (_≤_ ∣ ∣ q - s ∣ - ∣ r - s ∣ ∣) (cong ∣_∣ π) χ
+
+  ρ : ∣ (q - r) + (∣ q - s ∣ - ∣ r - s ∣) ∣ ≤ 
+      ∣ q - r ∣ + ∣ q - r ∣
+  ρ = isTrans≤
+        ∣ (q - r) + (∣ q - s ∣ - ∣ r - s ∣) ∣
+        (∣ q - r ∣ + ∣ ∣ q - s ∣ - ∣ r - s ∣ ∣)
+        (∣ q - r ∣ + ∣ q - r ∣)
+        ω (≤-o+ _ _ ∣ q - r ∣ χ')
+
+  ρ' : ∣ (q - r) + (∣ q - s ∣ - ∣ r - s ∣) ∣ / 2 [ 2≠0 ] ≤
+       (∣ q - r ∣ + ∣ q - r ∣) / 2 [ 2≠0 ]
+  ρ' = ≤-·o ∣ (q - r) + (∣ q - s ∣ - ∣ r - s ∣) ∣
+            (∣ q - r ∣ + ∣ q - r ∣)
+            (2 [ 2≠0 ]⁻¹)
+            0≤2⁻¹ ρ
+
+  σ : (∣ q - r ∣ + ∣ q - r ∣) / 2 [ 2≠0 ] ≡ ∣ q - r ∣
+  σ = self+self/2≡self ∣ q - r ∣ 2≠0
+
+  τ : ∣ max q s - max r s ∣ ≤ ∣ q - r ∣
+  τ = subst2 _≤_ (sym ψ) σ ρ'
+
+maxNonexpandingʳ : 
+  (q r s : ℚ.ℚ) → distance (max q r) (max q s) ≤ distance r s
+maxNonexpandingʳ q r s =
+  subst (flip _≤_ $ distance r s) φ (maxNonexpandingˡ r s q)
+  where
+  φ : distance (max r q) (max s q) ≡ distance (max q r) (max q s)
+  φ = cong₂ distance (maxComm r q) (maxComm s q)
+
+-- Similarly, the min is equal to the midpoint - half the distance

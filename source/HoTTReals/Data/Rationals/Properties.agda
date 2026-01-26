@@ -174,6 +174,16 @@ addLeftSubtractCancel x y =
             ≡⟨ ·Comm (- y) x ⟩
           x · (- y) ∎
 
+-·-≡· : (x y : ℚ) → (- x) · (- y) ≡ x · y
+-·-≡· x y =
+  (- x) · (- y)
+    ≡⟨ (sym $ -·≡-· x (- y)) ⟩
+  - (x · (- y))
+    ≡⟨ cong -_ (sym $ -·≡·- x y)  ⟩
+  - - (x · y)
+    ≡⟨ -Invol $ x · y ⟩
+  x · y ∎
+
 self-2⁻¹·self≡2⁻¹·self :
   (x : ℚ) →
   let φ : ¬ 2 ≡ 0
@@ -340,6 +350,15 @@ inverseUnique {x} {y} {z} p q =
             1 · y
               ≡⟨ ·IdL y ⟩
             y ∎
+
+self+self/2≡self : (x : ℚ) (φ : ¬ 2 ≡ 0) →
+                   (x + x) / 2 [ φ ] ≡ x
+self+self/2≡self x φ =
+  (x + x) / 2 [ φ ]
+    ≡⟨ cong (λ ?x → ?x / 2 [ φ ]) (self+≡2· x) ⟩
+  (2 · x) / 2 [ φ ]
+    ≡⟨ ·/' 2 x φ ⟩
+  x ∎
 
 distance : ℚ → ℚ → ℚ
 distance x y = ∣ x - y ∣

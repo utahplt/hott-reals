@@ -835,10 +835,10 @@ magnitudeReverseTriangleInequality x y =
 ∣∣<-open :
   (x : ℚ) (ε : ℚ) (φ : 0 < ε) →
   ∣ x ∣ < ε →
-  ∃ ℚ (λ θ → (0 < θ) ×
+  Σ ℚ (λ θ → (0 < θ) ×
            Σ (0 < ε - θ)
            (λ ψ → ∣ x ∣ < ε - θ))
-∣∣<-open x ε φ ψ = ∣ θ , χ' , τ , σ'' ∣₁
+∣∣<-open x ε φ ψ = θ , χ' , τ , σ''
   where
   ω : ¬ 2 ≡ 0
   ω = Bool.toWitnessFalse {Q = discreteℚ 2 0} tt

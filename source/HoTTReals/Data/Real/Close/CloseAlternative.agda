@@ -282,7 +282,7 @@ Close'Σ =
       ∃ ℚ (λ θ → (0 < θ) ×
                Σ (0 < (ε - θ))
                (λ ψ → Close'RationalRational r (ε - θ) ψ))
-    close'RationalRationalOpen r ε φ ψ = ∣∣<-open (q - r) ε φ ψ
+    close'RationalRationalOpen r ε φ ψ = ∣ (∣∣<-open (q - r) ε φ ψ) ∣₁
 
     close'RationalRationalMonotone :
       (r : ℚ) (ε : ℚ) (φ : 0 < ε) →

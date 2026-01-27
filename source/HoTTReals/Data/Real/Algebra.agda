@@ -3,12 +3,16 @@ module HoTTReals.Data.Real.Algebra where
 import Cubical.Data.Bool as Bool
 import Cubical.Data.Rationals as ℚ
 import Cubical.Data.Rationals.Order as ℚ
+open import Cubical.Algebra.AbGroup.Base
+open import Cubical.Data.Empty as Empty
 open import Cubical.Data.Nat.Literals public
+open import Cubical.Data.Sigma
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.Prelude
+open import Cubical.HITs.PropositionalTruncation as PropositionalTruncation
 open import Cubical.Homotopy.Base
-open import Cubical.Algebra.AbGroup.Base
 open import Cubical.Relation.Binary
+open import Cubical.Relation.Binary.Order
 
 open BinaryRelation
 
@@ -24,17 +28,15 @@ open import HoTTReals.Data.Rationals.Properties as ℚ
 
 instance
   fromNatℝ : HasFromNat ℝ
-  fromNatℝ = record { Constraint = λ _ → Unit ; fromNat = λ n → rational $ fromNat n }
+  fromNatℝ = record
+    { Constraint = λ _ → Unit ;
+      fromNat = λ n → rational $ fromNat n }
 
 instance
   fromNegℝ : HasFromNeg ℝ
-  fromNegℝ = record { Constraint = λ _ → Unit ; fromNeg = λ n → rational $ fromNat n }
-
--- 0ℝ : ℝ
--- 0ℝ = rational {!0!}
-
--- 1ℝ : ℝ
--- 1ℝ = rational {!!}
+  fromNegℝ = record
+    { Constraint = λ _ → Unit ;
+      fromNeg = λ n → rational $ fromNat n }
 
 -lipschitzℚ : Lipschitzℚ (rational ∘ ℚ.-_) 1 0<1
 -lipschitzℚ q r ε φ ψ =
@@ -522,3 +524,97 @@ infix 4 _≤_
   max y z
     ≡⟨ ψ ⟩
   z ∎
+
+ℝ≤-isPoset : IsPoset _≤_
+ℝ≤-isPoset = isposet ℝ-isSet ≤-isProp ≤-reflexive ≤-transitive ≤-antisymmetric
+
+ℝ≤-posetStructure : PosetStr ℓ-zero ℝ
+ℝ≤-posetStructure = posetstr _≤_ ℝ≤-isPoset
+
+ℝ≤ : Poset ℓ-zero ℓ-zero
+ℝ≤ = ℝ , ℝ≤-posetStructure
+
+_<_ : ℝ → ℝ → Type ℓ-zero
+_<_ x y = ∃ (ℚ.ℚ × ℚ.ℚ)
+            (λ where (q , r) → (x ≤ rational q) × (q ℚ.< r) × (rational r ≤ y))
+
+infix 4 _<_ 
+
+<-isProp : (x y : ℝ) → isProp $ x < y
+<-isProp x y = isPropPropTrunc
+
+-- TODO: I think there is an IsIsotone definition and we should probably use
+-- that, but honestly a lot of the cubical library seems half baked
+rationalMonotone :
+  {q r : ℚ.ℚ} → q ℚ.≤ r → rational q ≤ rational r
+rationalMonotone {q} {r} φ =
+  ω
+  where
+  φ' : ℚ.max q r ≡ r
+  φ' = ℚ.≤→max q r φ
+
+  ψ : max (rational q) (rational r) ≡ rational (ℚ.max q r)
+  ψ = liftNonexpanding₂≡rational ℚ.max maxNonexpandingℚ₂ q r
+
+  ω = max (rational q) (rational r)
+        ≡⟨ ψ ⟩
+      rational (ℚ.max q r)
+        ≡⟨ cong rational φ' ⟩
+      rational r ∎
+
+rationalReflective :
+  {q r : ℚ.ℚ} → rational q ≤ rational r → q ℚ.≤ r
+rationalReflective {q} {r} φ = π
+  where
+  ψ : max (rational q) (rational r) ≡ rational (ℚ.max q r)
+  ψ = liftNonexpanding₂≡rational ℚ.max maxNonexpandingℚ₂ q r
+
+  ω : rational (ℚ.max q r) ≡ rational r
+  ω = sym ψ ∙ φ
+
+  χ : ℚ.max q r ≡ r
+  χ = rationalInjective ω
+
+  π : q ℚ.≤ r
+  π = ≡max→≤₂ {x = q} {y = r} χ
+
+<→≤ : {x y : ℝ} → x < y → x ≤ y
+<→≤ {x} {y} = ∃-rec (≤-isProp x y) φ
+  where
+  φ : (u : ℚ.ℚ × ℚ.ℚ) →
+      (x ≤ rational (fst u)) × ((fst u) ℚ.< (snd u)) × (rational (snd u) ≤ y) →
+      x ≤ y
+  φ (q , r) (ψ , ω , χ) =
+    ≤-transitive x (rational r) y
+      (≤-transitive x (rational q) (rational r)
+        ψ (rationalMonotone {q = q} {r = r} (ℚ.<Weaken≤ q r ω)))
+      χ
+
+<-irreflexive : isIrrefl _<_
+<-irreflexive x φ = ∃-rec isProp⊥ ψ φ
+  where
+  ψ : (u : ℚ.ℚ × ℚ.ℚ) →
+      ((x ≤ rational (fst u)) × (fst u ℚ.< snd u) × (rational (snd u) ≤ x)) →
+      ⊥
+  ψ (q , r) (ω , χ , π) = τ
+    where
+    ρ : rational r ≤ rational q
+    ρ = ≤-transitive (rational r) x (rational q) π ω
+
+    σ : r ℚ.≤ q
+    σ = rationalReflective {q = r} {r = q} ρ
+
+    τ : ⊥
+    τ = ℚ.≤→≯ r q σ χ
+
+<-transitive : isTrans _<_
+<-transitive x y z φ ψ = ∃-rec (<-isProp x z) ω ψ
+  where
+  ω : (u : ℚ.ℚ × ℚ.ℚ) →
+      ((y ≤ rational (fst u)) ×
+       ((fst u) ℚ.< (snd u)) ×
+       (rational (snd u) ≤ z)) →
+      x < z
+  ω (s , t) (σ , τ , υ) =
+    ∣ (s , t) ,
+      ((≤-transitive x y (rational s) (<→≤ {x = x} {y = y} φ) σ) , τ , υ) ∣₁

@@ -8,6 +8,7 @@ open import Cubical.Foundations.Equiv
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.HLevels
 open import Cubical.Foundations.Prelude
+open import Cubical.Functions.Embedding
 open import Cubical.Functions.Surjection
 open import Cubical.HITs.PropositionalTruncation
 open import Cubical.Homotopy.Base
@@ -475,3 +476,20 @@ continuousExtensionLaw₃ f g f' g' H K L φ ψ ω χ π ρ =
       f (rational q) (rational r) (rational s) ≡
       g (rational q) (rational r) (rational s)
   M q r s = H q r s ∙ cong rational (L q r s) ∙ (sym $ K q r s)
+
+rationalInjective : {q r : ℚ} → rational q ≡ rational r → q ≡ r
+rationalInjective {q} {r} p = ω
+  where
+  φ : (ε : ℚ) (ω : 0 < ε) → Close ε ω (rational q) (rational r)
+  φ ε ω = subst (Close ε ω (rational q))
+                p
+                (closeReflexive (rational q) ε ω)
+
+  ψ : (ε : ℚ) (ω : 0 < ε) → ∣ q - r ∣ < ε
+  ψ ε ω = close→close' (rational q) (rational r) ε ω (φ ε ω)
+
+  ω : q ≡ r
+  ω = distance<ε→≡ ψ
+
+rationalEmbedding : isEmbedding rational 
+rationalEmbedding = injEmbedding ℝ-isSet rationalInjective

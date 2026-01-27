@@ -152,6 +152,13 @@ addLeftSubtractCancel x y =
     ≡⟨ +IdL y ⟩
   y ∎
 
+-≡0→≡ : {x y : ℚ} → x - y ≡ 0 → x ≡ y
+-≡0→≡ {x} {y} φ = ψ ∙ -Invol y
+  where
+  ψ : x ≡ - - y
+  ψ = +≡0→≡- {x = x} {y = - y} φ
+  
+
 -·≡-· : (x y : ℚ) → - (x · y) ≡ (- x) · y
 -·≡-· x y = sym (+≡0→≡- p)
   where

@@ -1176,3 +1176,55 @@ maxNonexpandingʳ q r s =
   φ = cong₂ distance (maxComm r q) (maxComm s q)
 
 -- Similarly, the min is equal to the midpoint - half the distance
+
+magntiude≡0→≡0 : {x : ℚ} → ∣ x ∣ ≡ 0 → x ≡ 0
+magntiude≡0→≡0 {x} φ =
+  PropositionalTruncation.rec (isSetℚ x 0) ψ (isTotal≤ x (- x))
+  where
+  ψ : (x ≤ - x) ⊎ (- x ≤ x) → x ≡ 0
+  ψ (inl ω) = π'
+    where
+    χ : max x (- x) ≡ (- x)
+    χ = ≤→max x (- x) ω
+
+    π : - x ≡ 0
+    π = sym χ ∙ φ
+
+    π' : x ≡ 0
+    π' = sym (-Invol x) ∙ cong -_ π
+  ψ (inr ω) = π
+    where
+    χ : max x (- x) ≡ x
+    χ = ≤→max' ω
+
+    π : x ≡ 0
+    π = sym χ ∙ φ
+
+≤→≡⊎< : {x y : ℚ} → x ≤ y → (x ≡ y) ⊎ (x < y)
+≤→≡⊎< {x} {y} φ with x ≟ y
+... | lt ψ = inr ψ
+... | eq ψ = inl ψ
+... | gt ψ = Empty.rec (≤→≯ x y φ ψ)
+
+distance≡0→≡ : {x y : ℚ} → distance x y ≡ 0 → x ≡ y
+distance≡0→≡ {x} {y} φ = ψ'
+  where
+  ψ : x - y ≡ 0
+  ψ = magntiude≡0→≡0 {x = x - y} φ
+
+  ψ' : x ≡ y
+  ψ' = -≡0→≡ ψ
+
+∣∣<ε→∣∣≡0 : {x : ℚ} → ((ε : ℚ) → 0 < ε → ∣ x ∣ < ε) → ∣ x ∣ ≡ 0
+∣∣<ε→∣∣≡0 {x} φ with ≤→≡⊎< {x = 0} {y = ∣ x ∣} (0≤∣∣ x)
+... | inl ψ = sym ψ
+... | inr ψ = Empty.rec (isIrrefl< ∣ x ∣ (φ ∣ x ∣ ψ))
+
+distance<ε→≡ : {x y : ℚ} → ((ε : ℚ) → 0 < ε → distance x y < ε) → x ≡ y
+distance<ε→≡ {x} {y} φ = ω
+  where
+  ψ : distance x y ≡ 0
+  ψ = ∣∣<ε→∣∣≡0 {x = x - y} φ
+
+  ω : x ≡ y
+  ω = distance≡0→≡ ψ

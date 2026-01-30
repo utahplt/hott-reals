@@ -9,6 +9,7 @@ open import Cubical.Data.Nat.Literals public
 open import Cubical.Data.Sigma
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.Prelude
+open import Cubical.Foundations.HLevels
 open import Cubical.HITs.PropositionalTruncation as PropositionalTruncation
 open import Cubical.Homotopy.Base
 open import Cubical.Relation.Binary
@@ -19,12 +20,15 @@ open BinaryRelation
 open import HoTTReals.Data.Real.Base
 open import HoTTReals.Data.Real.Close
 open import HoTTReals.Data.Real.Definitions
+open import HoTTReals.Data.Real.Induction
 open import HoTTReals.Data.Real.Lipschitz
 open import HoTTReals.Data.Real.Nonexpanding
 open import HoTTReals.Data.Real.Properties
 
 open import HoTTReals.Data.Rationals.Order as ℚ
 open import HoTTReals.Data.Rationals.Properties as ℚ
+open import HoTTReals.Algebra.Field.Instances.Rationals as ℚ
+open import HoTTReals.Logic
 
 instance
   fromNatℝ : HasFromNat ℝ
@@ -89,10 +93,10 @@ infixl 6 _+_
 +nonexpandingℝ₂ = liftNonexpanding₂NonExpanding ℚ._+_ +nonexpandingℚ₂
 
 +lipschitz₁ : (v : ℝ) → Lipschitzℝ (flip _+_ v) 1 0<1
-+lipschitz₁ = nonexpanding₂→lipschitz₁ _+_ +nonexpandingℝ₂
++lipschitz₁ = nonexpandingℝ₂→lipschitzℝ₁ _+_ +nonexpandingℝ₂
 
 +lipschitz₂ : (u : ℝ) → Lipschitzℝ (_+_ u) 1 0<1
-+lipschitz₂ = nonexpanding₂→lipschitz₂ _+_ +nonexpandingℝ₂
++lipschitz₂ = nonexpandingℝ₂→lipschitzℝ₂ _+_ +nonexpandingℝ₂
 
 +continuous₁ : (v : ℝ) → Continuous (flip _+_ v)
 +continuous₁ v = lipschitz→continuous (flip _+_ v) 1 0<1 (+lipschitz₁ v)
@@ -338,10 +342,10 @@ maxNonexpandingℝ₂ : Nonexpandingℝ₂ max
 maxNonexpandingℝ₂ = liftNonexpanding₂NonExpanding ℚ.max maxNonexpandingℚ₂
 
 maxLipschitz₁ : (v : ℝ) → Lipschitzℝ (flip max v) 1 0<1
-maxLipschitz₁ = nonexpanding₂→lipschitz₁ max maxNonexpandingℝ₂
+maxLipschitz₁ = nonexpandingℝ₂→lipschitzℝ₁ max maxNonexpandingℝ₂
 
 maxLipschitz₂ : (u : ℝ) → Lipschitzℝ (max u) 1 0<1
-maxLipschitz₂ = nonexpanding₂→lipschitz₂ max maxNonexpandingℝ₂
+maxLipschitz₂ = nonexpandingℝ₂→lipschitzℝ₂ max maxNonexpandingℝ₂
 
 maxContinuous₁ : (v : ℝ) → Continuous (flip max v)
 maxContinuous₁ v = lipschitz→continuous (flip max v) 1 0<1 (maxLipschitz₁ v)
@@ -534,6 +538,28 @@ infix 4 _≤_
 ℝ≤ : Poset ℓ-zero ℓ-zero
 ℝ≤ = ℝ , ℝ≤-posetStructure
 
+-- TODO: This shouldn't be a lemma we should just use properties of join
+-- semilatice
+≤-max₁ : (x y : ℝ) → x ≤ max x y
+≤-max₁ x y =
+  max x (max x y)
+    ≡⟨ (sym $ maxAssociative x x y) ⟩
+  max (max x x) y
+    ≡⟨ cong (flip max y) (maxIdempotent x) ⟩
+  max x y ∎
+
+≤-max₂ : (x y : ℝ) → y ≤ max x y
+≤-max₂ x y =
+  max y (max x y)
+    ≡⟨ cong (max y) (maxCommutative x y) ⟩
+  max y (max y x)
+    ≡⟨ (sym $ maxAssociative y y x) ⟩
+  max (max y y) x
+    ≡⟨ cong (flip max x) (maxIdempotent y) ⟩
+  max y x
+    ≡⟨ maxCommutative y x ⟩
+  max x y ∎
+
 _<_ : ℝ → ℝ → Type ℓ-zero
 _<_ x y = ∃ (ℚ.ℚ × ℚ.ℚ)
             (λ where (q , r) → (x ≤ rational q) × (q ℚ.< r) × (rational r ≤ y))
@@ -618,3 +644,212 @@ rationalReflective {q} {r} φ = π
   ω (s , t) (σ , τ , υ) =
     ∣ (s , t) ,
       ((≤-transitive x y (rational s) (<→≤ {x = x} {y = y} φ) σ) , τ , υ) ∣₁
+
+<-archimedian :
+  (x y : ℝ) → x < y → ∃ ℚ.ℚ (λ q → (x < rational q) × (rational q < y))
+<-archimedian x y φ = ∃-rec isPropPropTrunc ψ φ
+  where
+  ψ : (u : ℚ.ℚ × ℚ.ℚ) →
+      ((x ≤ rational (fst u)) ×
+       ((fst u) ℚ.< (snd u)) ×
+       (rational (snd u) ≤ y)) →
+      ∃ ℚ.ℚ (λ q → (x < rational q) × (rational q < y))
+  ψ (q , r) (ω , χ , π) = ∣ m , (ρ , σ) ∣₁
+    where
+    m : ℚ.ℚ
+    m = (q ℚ.+ r) / 2 [ 2≠0 ]
+
+    ρ : x < rational m
+    ρ = ∣ (q , m) ,
+          (ω ,
+           (<→<-midpoint {x = q} {y = r} χ) ,
+           (≤-reflexive $ rational m)) ∣₁
+
+    σ : rational m < y
+    σ = ∣ (m , r) ,
+          ((≤-reflexive $ rational m) ,
+           (<→midpoint-< {x = q} {y = r} χ) ,
+           π) ∣₁
+
+≤rational→close→≤rational+ε :
+  {q : ℚ.ℚ} {x y : ℝ} {ε : ℚ.ℚ}
+  (φ : 0 ℚ.< ε) →
+  x ≤ rational q →
+  x ∼[ ε , φ ] y →
+  y ≤ rational (q ℚ.+ ε)
+≤rational→close→≤rational+ε {q} {x} {y} {ε} φ ψ ω = σ
+  where
+  χ : {q r : ℚ.ℚ} {y : ℝ} {ε : ℚ.ℚ}
+      (φ : 0 ℚ.< ε) →
+      rational r ≤ rational q →
+      rational r ∼[ ε , φ ] y →
+      y ≤ rational (q ℚ.+ ε)
+  χ {q} {r} {y} {ε} φ ψ = inductionProposition {A = P} (χ' , χ'' , χ''') y
+    where
+    P : ℝ → Type ℓ-zero
+    P y = rational r ∼[ ε , φ ] y → y ≤ rational (q ℚ.+ ε)
+
+    χ' : (s : ℚ.ℚ) →
+         rational r ∼[ ε , φ ] rational s →
+         rational s ≤ rational (q ℚ.+ ε)
+    χ' s π = υ'
+      where
+      π' : ∣ r ℚ.- s ∣ ℚ.< ε
+      π' = close→close' (rational r) (rational s) ε φ π
+
+      ρ : s ℚ.- r ℚ.≤ ∣ r ℚ.- s ∣
+      ρ = subst (flip ℚ._≤_ ∣ r ℚ.- s ∣)
+                (negateSubtract' r s)
+                (≤max' (r ℚ.- s) (ℚ.- (r ℚ.- s)))
+
+      σ : r ℚ.+ (s ℚ.- r) ℚ.≤ r ℚ.+ ∣ r ℚ.- s ∣
+      σ = ℚ.≤-o+ (s ℚ.- r) ∣ r ℚ.- s ∣ r ρ
+
+      σ' : s ℚ.≤ r ℚ.+ ∣ r ℚ.- s ∣
+      σ' = subst (flip ℚ._≤_ $ r ℚ.+ ∣ r ℚ.- s ∣)
+                 (addLeftSubtractCancel r s)
+                 σ
+
+      τ : r ℚ.+ ∣ r ℚ.- s ∣ ℚ.≤ q ℚ.+ ε
+      τ = +≤+ {x = r} {y = q} {z = ∣ r ℚ.- s ∣} {w = ε}
+              (rationalReflective {q = r} {r = q} ψ)
+              (ℚ.<Weaken≤ ∣ r ℚ.- s ∣ ε π')
+
+      υ : s ℚ.≤ q ℚ.+ ε
+      υ = ℚ.isTrans≤ s (r ℚ.+ ∣ r ℚ.- s ∣) (q ℚ.+ ε) σ' τ
+
+      υ' : rational s ≤ rational (q ℚ.+ ε)
+      υ' = rationalMonotone {q = s} {r = q ℚ.+ ε} υ
+
+    χ'' : (x : (ε : ℚ.ℚ) → 0 ℚ.< ε → ℝ) (ω : CauchyApproximation x) →
+          ((δ : ℚ.ℚ) (χ : 0 ℚ.< δ) →
+           rational r ∼[ ε , φ ] x δ χ →
+           x δ χ ≤ rational (q ℚ.+ ε)) →
+          rational r ∼[ ε , φ ] limit x ω →
+          limit x ω ≤ rational (q ℚ.+ ε)
+    χ'' x ω χ π =
+      ∃-rec (≤-isProp (limit x ω) (rational (q ℚ.+ ε)))
+            ρ
+            π'
+      where
+      π' : ∃ ℚ.ℚ
+             (λ θ → (0 ℚ.< θ) ×
+                  Σ (0 ℚ.< (ε ℚ.- θ))
+                    (λ ξ → Close (ε ℚ.- θ) ξ (rational r) (limit x ω)))
+      π' = closeOpen (rational r) (limit x ω) ε φ π
+
+      ρ : (θ : ℚ.ℚ) →
+          (0 ℚ.< θ) ×
+          Σ (0 ℚ.< (ε ℚ.- θ))
+          (λ ξ → Close (ε ℚ.- θ) ξ (rational r) (limit x ω)) →
+          limit x ω ≤ rational (q ℚ.+ ε)
+      ρ θ (σ , τ , υ) = γ
+        where
+        ο : (δ : ℚ.ℚ) (ξ : 0 ℚ.< δ) →
+            δ ℚ.< θ →
+            rational r ∼[ ε , φ ] x δ ξ
+        ο δ ξ ο = γ''
+          where
+          α : 0 ℚ.< (θ ℚ.- δ) ℚ.+ δ
+          α = 0<+' {x = θ ℚ.- δ} {y = δ} (<→0<- {x = δ} {y = θ} ο) ξ
+
+          β : limit x ω ∼[ (θ ℚ.- δ) ℚ.+ δ , α ] x δ ξ
+          β = limitClose'' x ω δ (θ ℚ.- δ) ξ (<→0<- {x = δ} {y = θ} ο)
+
+          γ  : rational r ∼[ (ε ℚ.- θ) ℚ.+ ((θ ℚ.- δ) ℚ.+ δ) ,
+                             0<+' {x = ε ℚ.- θ} τ α ]
+               x δ ξ
+          γ = closeTriangleInequality
+              (rational r) (limit x ω) (x δ ξ)
+                (ε ℚ.- θ) ((θ ℚ.- δ) ℚ.+ δ) τ α
+                υ β
+
+          ζ : (ε ℚ.- θ) ℚ.+ ((θ ℚ.- δ) ℚ.+ δ) ≡ ε
+          ζ = (ε ℚ.- θ) ℚ.+ ((θ ℚ.- δ) ℚ.+ δ)
+                 ≡⟨ cong (ℚ._+_ (ε ℚ.- θ)) (subtractAddRightCancel δ θ) ⟩
+              (ε ℚ.- θ) ℚ.+ θ
+                 ≡⟨ subtractAddRightCancel θ ε ⟩
+              ε ∎
+
+          γ' : Σ (0 ℚ.< ε) (λ ι → rational r ∼[ ε , ι ] x δ ξ)
+          γ' = subst (λ ?x → Σ (0 ℚ.< ?x)
+                               (λ ι → rational r ∼[ ?x , ι ] x δ ξ))
+                     ζ
+                     ((0<+' {x = ε ℚ.- θ} τ α) , γ) 
+
+          γ'' : rational r ∼[ ε , φ ] x δ ξ
+          γ'' = subst (λ ?φ → rational r ∼[ ε , ?φ ] x δ ξ)
+                      (ℚ.isProp< 0 ε (fst γ') φ)
+                      (snd γ')
+
+        z : (ε : ℚ.ℚ) → 0 ℚ.< ε → ℝ
+        z = λ δ ζ → max (rational $ q ℚ.+ ε) (x δ ζ)
+
+        ξ : EventuallyConstantAt θ σ z (rational $ q ℚ.+ ε)
+        ξ δ ψ ω = maxCommutative (rational $ q ℚ.+ ε) (x δ ψ) ∙ χ δ ψ (ο δ ψ ω)
+
+        ξ' : EventuallyConstantAt θ σ
+               (liftLipschitzApproximation z 1 0<1)
+               (rational $ q ℚ.+ ε)
+        ξ' δ ψ ω = γ'
+          where
+          α = ≠-symmetric $ <→≠ 0<1
+
+          β = 0</ {x = δ} {y = 1} ψ 0<1
+
+          γ : Σ (0 ℚ.< δ / 1 [ α ])
+                   (λ ?φ → max (rational $ q ℚ.+ ε) (x (δ / 1 [ α ]) ?φ) ≡
+                           (rational $ q ℚ.+ ε))
+          γ = subst (λ ?δ → Σ (0 ℚ.< ?δ)
+                                 (λ ?φ → max (rational $ q ℚ.+ ε) (x ?δ ?φ) ≡
+                                         (rational $ q ℚ.+ ε)))
+                       (sym $ ℚ.·IdR δ)
+                       (ψ , ξ δ ψ ω)
+
+          γ' : max (rational $ q ℚ.+ ε) (x (δ / 1 [ α ]) β) ≡
+                   (rational $ q ℚ.+ ε)
+          γ' = subst (λ ?φ →
+                        max (rational $ q ℚ.+ ε) (x (δ / 1 [ α ]) ?φ) ≡
+                          (rational $ q ℚ.+ ε))
+                        (ℚ.isProp< 0 (δ / 1 [ α ]) (fst γ) β)
+                        (snd γ)
+
+        α : max (rational $ q ℚ.+ ε) (limit x ω) ≡
+            limit (liftLipschitzApproximation z 1 0<1) _
+        α = refl
+
+        β : limit (liftLipschitzApproximation z 1 0<1) _ ≡ rational (q ℚ.+ ε)
+        β = eventuallyConstantAt≡constant
+              θ σ
+              (liftLipschitzApproximation z 1 0<1) _
+              (rational $ q ℚ.+ ε)
+              ξ'
+
+        γ : max (limit x ω) (rational $ q ℚ.+ ε) ≡ rational (q ℚ.+ ε)
+        γ = max (limit x ω) (rational $ q ℚ.+ ε)
+              ≡⟨ maxCommutative (limit x ω) (rational $ q ℚ.+ ε) ⟩
+            max (rational $ q ℚ.+ ε) (limit x ω)
+              ≡⟨ α ⟩
+            limit (liftLipschitzApproximation z 1 0<1) _
+              ≡⟨ β ⟩
+            rational (q ℚ.+ ε) ∎
+
+    χ''' : (x : ℝ) → isProp (P x)
+    χ''' x = isProp→ (≤-isProp x (rational (q ℚ.+ ε)))
+
+  π : max (rational q) x ∼[ ε , φ ] max (rational q) y
+  π = snd maxNonexpandingℝ₂ (rational q) x y ε φ ω
+
+  π' : rational q ∼[ ε , φ ] max (rational q) y
+  π' = subst (λ ?x → ?x ∼[ ε , φ ] max (rational q) y)
+             (maxCommutative (rational q) x ∙ ψ)
+             π
+
+  ρ : max (rational q) y ≤ rational (q ℚ.+ ε)
+  ρ = χ φ (≤-reflexive (rational q)) π'
+
+  σ : y ≤ rational (q ℚ.+ ε)
+  σ = ≤-transitive
+        y (max (rational q) y) (rational (q ℚ.+ ε))
+        (≤-max₂ (rational q) y) ρ
+  

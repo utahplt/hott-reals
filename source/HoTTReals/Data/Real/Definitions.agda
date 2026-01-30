@@ -133,3 +133,11 @@ ContinuousAt f u =
 
 Continuous : (ℝ → ℝ) → Type
 Continuous f = (u : ℝ) → ContinuousAt f u
+
+EventuallyConstantAt :
+  (θ : ℚ) →
+  0 < θ →
+  ((ε : ℚ) → 0 < ε → ℝ) →
+  ℝ →
+  Type ℓ-zero
+EventuallyConstantAt θ φ x c = (δ : ℚ) (ψ : 0 < δ) (ω : δ < θ) → x δ ψ ≡ c

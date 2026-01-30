@@ -340,42 +340,6 @@ lipschitz→continuous f L φ ψ u ε ω =
     σ'' : Close ε ω (f u) (f v)
     σ'' = subst (λ ?x → Close ε ?x _ _) (isProp< 0 ε (fst σ') ω) (snd σ')
 
-nonexpanding₂→lipschitz₂ : 
-  (f : ℝ → ℝ → ℝ) →
-  (φ : Nonexpandingℝ₂ f) →
-  (u : ℝ) → Lipschitzℝ (f u) 1 0<1 
-nonexpanding₂→lipschitz₂ f φ u v w ε ψ ω =
-  ρ
-  where
-  χ : Close ε ψ (f u v) (f u w)
-  χ = snd φ u v w ε ψ ω
-
-  π : Σ (0 < 1 · ε) (λ ρ → Close (1 · ε) ρ (f u v) (f u w))
-  π = subst (λ ?x → Σ (0 < ?x) (λ ρ → Close ?x ρ _ _)) (sym $ ·IdL ε) (ψ , χ)
-
-  ρ : Close (1 · ε) (0<· {x = 1} {y = ε} 0<1 ψ) (f u v) (f u w)
-  ρ = subst (λ ?x → Close (1 · ε) ?x (f u v) (f u w))
-            (isProp< 0 (1 · ε) (fst π) (0<· {x = 1} {y = ε} 0<1 ψ))
-            (snd π)
-
-nonexpanding₂→lipschitz₁ : 
-  (f : ℝ → ℝ → ℝ) →
-  (φ : Nonexpandingℝ₂ f) →
-  (w : ℝ) → Lipschitzℝ (flip f w) 1 0<1 
-nonexpanding₂→lipschitz₁ f φ w u v ε ψ ω =
-  ρ
-  where
-  χ : Close ε ψ (f u w) (f v w)
-  χ = fst φ u v w ε ψ ω
-
-  π : Σ (0 < 1 · ε) (λ ρ → Close (1 · ε) ρ (f u w) (f v w))
-  π = subst (λ ?x → Σ (0 < ?x) (λ ρ → Close ?x ρ _ _)) (sym $ ·IdL ε) (ψ , χ)
-
-  ρ : Close (1 · ε) (0<· {x = 1} {y = ε} 0<1 ψ) (f u w) (f v w)
-  ρ = subst (λ ?x → Close (1 · ε) ?x (f u w) (f v w))
-            (isProp< 0 (1 · ε) (fst π) (0<· {x = 1} {y = ε} 0<1 ψ))
-            (snd π)
-
 continuousAtCompose :
   (f g : ℝ → ℝ)
   (u : ℝ) →
@@ -493,3 +457,46 @@ rationalInjective {q} {r} p = ω
 
 rationalEmbedding : isEmbedding rational 
 rationalEmbedding = injEmbedding ℝ-isSet rationalInjective
+
+eventuallyConstantAt≡constant :
+  (θ : ℚ) (φ : 0 < θ)
+  (x : (ε : ℚ) → 0 < ε → ℝ)
+  (ψ : CauchyApproximation x)
+  (c : ℝ) →
+  EventuallyConstantAt θ φ x c →
+  limit x ψ ≡ c
+eventuallyConstantAt≡constant θ φ x ψ c ω =
+  path (limit x ψ) c χ
+  where
+  χ : (ε : ℚ) (π : 0 < ε) → Close ε π (limit x ψ) c
+  χ ε π = limitClose' c x ψ ε δ π τ σ' ξ
+    where
+    δ : ℚ
+    δ = min (θ / 2 [ 2≠0 ]) (ε / 2 [ 2≠0 ])
+
+    ρ : δ < θ
+    ρ = isTrans≤< δ (θ / 2 [ 2≠0 ]) θ
+                  (min≤ (θ / 2 [ 2≠0 ]) (ε / 2 [ 2≠0 ]))
+                  (self/2<self θ φ)
+
+    σ : δ < ε
+    σ = isTrans≤< δ (ε / 2 [ 2≠0 ]) ε
+                  (min≤' (θ / 2 [ 2≠0 ]) (ε / 2 [ 2≠0 ]))
+                  (self/2<self ε π)
+
+    σ' : 0 < ε - δ
+    σ' = <→0<- {x = δ} {y = ε} σ
+
+    τ : 0 < δ
+    τ = minGreatestLowerBound<
+          {x = θ / 2 [ 2≠0 ]} {y = ε / 2 [ 2≠0 ]} {z = 0}
+          (0</ {x = θ} {y = 2} φ 0<2)
+          (0</ {x = ε} {y = 2} π 0<2)
+
+    υ : x δ τ ≡ c
+    υ = ω δ τ ρ
+
+    ξ : x δ τ ∼[ ε - δ , σ' ] c
+    ξ = subst (λ ?x → x δ τ ∼[ ε - δ , σ' ] ?x)
+              υ
+              (closeReflexive (x δ τ) (ε - δ) σ')

@@ -23,6 +23,24 @@ open import HoTTReals.Algebra.Field.Instances.Rationals as ℚ
 open import HoTTReals.Logic
 open import HoTTReals.Data.Rationals.Properties
 
+0<1 : 0 < 1
+0<1 = Bool.toWitness {Q = <Dec 0 1} tt
+
+0<2 : 0 < 2
+0<2 = Bool.toWitness {Q = <Dec 0 2} tt
+
+2≠0 : ¬ 2 ≡ 0
+2≠0 = Bool.toWitnessFalse {Q = discreteℚ 2 0} tt
+
+0≤2 : 0 ≤ 2
+0≤2 = Bool.toWitness {Q = ≤Dec 0 2} tt
+
+0≤2⁻¹ : 0 ≤ 2 [ 2≠0 ]⁻¹
+0≤2⁻¹ = Bool.toWitness {Q = ≤Dec 0 (2 [ 2≠0 ]⁻¹)} tt
+
+0<2⁻¹ : 0 < 2 [ 2≠0 ]⁻¹
+0<2⁻¹ = Bool.toWitness {Q = <Dec 0 (2 [ 2≠0 ]⁻¹)} tt
+
 ≤-o· : {x y z : ℚ} → 0 ≤ x → y ≤ z → x · y ≤ x · z
 ≤-o· {x} {y} {z} p q =
   subst2 (λ ?a ?b → ?a ≤ ?b)
@@ -335,6 +353,8 @@ open import HoTTReals.Data.Rationals.Properties
 ≤→max' : {x y : ℚ} → y ≤ x → max x y ≡ x
 ≤→max' {x} {y} p = maxComm x y ∙ ≤→max y x p
 
+-- TODO: This is a more fundamental one from below composed with negation
+-- resolution
 ≤→≠→< : {x y : ℚ} → x ≤ y → ¬ x ≡ y → x < y
 ≤→≠→< {x} {y} p q with x ≟ y
 ... | lt r = r
@@ -832,6 +852,47 @@ magnitudeReverseTriangleInequality x y =
   σ : - ∣ x - y ∣ ≤ ∣ x ∣ - ∣ y ∣
   σ = subtract≤→negate≤subtract (∣ y ∣) (∣ x ∣) (∣ x - y ∣) ρ
 
+<→<-midpoint : {x y : ℚ} → x < y → x < (x + y) / 2 [ 2≠0 ]
+<→<-midpoint {x} {y} φ = ω'
+  where
+  ψ : x + x < x + y
+  ψ = <-o+ x y x φ
+
+  ψ' : 2 · x < x + y
+  ψ' = subst (flip _<_ $ x + y) (self+≡2· x) ψ
+
+  ω : (2 · x) / 2 [ 2≠0 ] < (x + y) / 2 [ 2≠0 ]
+  ω = <-·o (2 · x) (x + y) (2 [ 2≠0 ]⁻¹) 0<2⁻¹ ψ'
+
+  ω' : x < (x + y) / 2 [ 2≠0 ]
+  ω' = subst (flip _<_ $ (x + y) / 2 [ 2≠0 ]) (·/' 2 x 2≠0) ω
+
+<→midpoint-< : {x y : ℚ} → x < y → (x + y) / 2 [ 2≠0 ] < y
+<→midpoint-< {x} {y} φ = ω'
+  where
+  ψ : x + y < y + y
+  ψ = <-+o x y y φ
+
+  ψ' : x + y < 2 · y
+  ψ' = subst (_<_ $ x + y) (self+≡2· y) ψ
+
+  ω : (x + y) / 2 [ 2≠0 ] < (2 · y) / 2 [ 2≠0 ]
+  ω = <-·o (x + y) (2 · y) (2 [ 2≠0 ]⁻¹) 0<2⁻¹ ψ'
+
+  ω' : (x + y) / 2 [ 2≠0 ] < y
+  ω' = subst (_<_ $ (x + y) / 2 [ 2≠0 ]) (·/' 2 y 2≠0) ω
+
+self/2<self : (θ : ℚ) (φ : 0 < θ) → θ / 2 [ 2≠0 ] < θ
+self/2<self θ φ = ω
+  where
+  ψ : (0 + θ) / 2 [ 2≠0 ] < θ
+  ψ = <→midpoint-< {x = 0} {y = θ} φ
+
+  ω : θ / 2 [ 2≠0 ] < θ
+  ω = subst (λ ?x → ?x / 2 [ 2≠0 ] < θ) (+IdL θ) ψ
+
+-- TODO: Probably use these new midpoint lemmas above but I don't want to write
+-- this
 ∣∣<-open :
   (x : ℚ) (ε : ℚ) (φ : 0 < ε) →
   ∣ x ∣ < ε →
@@ -980,21 +1041,6 @@ magnitudeReverseTriangleInequality x y =
 
 ℚ-quosetStructure : QuosetStr ℓ-zero ℚ
 ℚ-quosetStructure = quosetstr _<_ ℚ-isQuoset
-
-0<1 : 0 < 1
-0<1 = Bool.toWitness {Q = <Dec 0 1} tt
-
-0<2 : 0 < 2
-0<2 = Bool.toWitness {Q = <Dec 0 2} tt
-
-2≠0 : ¬ 2 ≡ 0
-2≠0 = Bool.toWitnessFalse {Q = discreteℚ 2 0} tt
-
-0≤2 : 0 ≤ 2
-0≤2 = Bool.toWitness {Q = ≤Dec 0 2} tt
-
-0≤2⁻¹ : 0 ≤ 2 [ 2≠0 ]⁻¹
-0≤2⁻¹ = Bool.toWitness {Q = ≤Dec 0 (2 [ 2≠0 ]⁻¹)} tt
 
 -- The max is equal to the midpoint + half the distance
 max≡midpoint+halfDistance :

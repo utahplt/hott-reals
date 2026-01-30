@@ -455,6 +455,7 @@ limitClose' u y φ ε δ ψ ω θ χ =
   π : u ∼[ ε , ψ ] (limit y φ)
   π = closeLimit' u y φ ε δ ψ ω θ (closeSymmetric (y δ ω) u (ε - δ) θ χ)
 
+-- TODO: Change the argument order of δ and η it's confusing
 limitClose'' : (y : (ε : ℚ) → 0 < ε → ℝ) (φ : CauchyApproximation y)
                (δ η : ℚ) (ψ : 0 < δ) (ω : 0 < η) →
                limit y φ ∼[ η + δ , 0<+' {x = η} {y = δ} ω ψ ] y δ ψ

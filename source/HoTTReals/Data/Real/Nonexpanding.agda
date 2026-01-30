@@ -22,6 +22,81 @@ open import HoTTReals.Data.Rationals.Order as ℚ
 open import HoTTReals.Data.Rationals.Properties as ℚ
 open import HoTTReals.Logic
 
+nonexpandingℚ₂→lipschitzℚ₂ :
+  (f : ℚ → ℚ → ℚ) →
+  (φ : Nonexpandingℚ₂ f) →
+  (q : ℚ) → Lipschitzℚ (rational ∘ f q) 1 0<1 
+nonexpandingℚ₂→lipschitzℚ₂ f φ q r s ε ψ ω =
+  rationalRational
+    (f q r) (f q s)
+    (1 · ε) (0<· {x = 1} {y = ε} 0<1 ψ)
+    (∣∣<→<₂ {x = f q r - f q s} {ε = 1 · ε} π)
+    (∣∣<→<₁ {x = f q r - f q s} {ε = 1 · ε} π)
+  where
+  ω' : ∣ r - s ∣ < 1 · ε
+  ω' = subst (_<_ ∣ r - s ∣) (sym $ ·IdL ε) ω
+
+  χ : ∣ f q r - f q s ∣ ≤ ∣ r - s ∣
+  χ = snd φ q r s
+
+  π : ∣ f q r - f q s ∣ < 1 · ε
+  π = isTrans≤< ∣ f q r - f q s ∣ ∣ r - s ∣ (1 · ε) χ ω'
+
+nonexpandingℚ₂→lipschitzℚ₁ :
+  (f : ℚ → ℚ → ℚ) →
+  (φ : Nonexpandingℚ₂ f) →
+  (r : ℚ) → Lipschitzℚ (rational ∘ flip f r) 1 0<1 
+nonexpandingℚ₂→lipschitzℚ₁ f φ r q s ε ψ ω =
+  rationalRational
+    (flip f r q) (flip f r s)
+    (1 · ε) (0<· {x = 1} {y = ε} 0<1 ψ)
+    (∣∣<→<₂ {x = f q r - f s r} {ε = 1 · ε} π)
+    (∣∣<→<₁ {x = f q r - f s r} {ε = 1 · ε} π)
+  where
+  ω' : ∣ q - s ∣ < 1 · ε
+  ω' = subst (_<_ ∣ q - s ∣) (sym $ ·IdL ε) ω
+
+  χ : ∣ f q r - f s r ∣ ≤ ∣ q - s ∣
+  χ = fst φ q s r
+
+  π : ∣ f q r - f s r ∣ < 1 · ε
+  π = isTrans≤< ∣ f q r - f s r ∣ ∣ q - s ∣ (1 · ε) χ ω'
+
+nonexpandingℝ₂→lipschitzℝ₂ : 
+  (f : ℝ → ℝ → ℝ) →
+  (φ : Nonexpandingℝ₂ f) →
+  (u : ℝ) → Lipschitzℝ (f u) 1 0<1 
+nonexpandingℝ₂→lipschitzℝ₂ f φ u v w ε ψ ω = ρ
+  where
+  χ : Close ε ψ (f u v) (f u w)
+  χ = snd φ u v w ε ψ ω
+
+  π : Σ (0 < 1 · ε) (λ ρ → Close (1 · ε) ρ (f u v) (f u w))
+  π = subst (λ ?x → Σ (0 < ?x) (λ ρ → Close ?x ρ _ _)) (sym $ ·IdL ε) (ψ , χ)
+
+  ρ : Close (1 · ε) (0<· {x = 1} {y = ε} 0<1 ψ) (f u v) (f u w)
+  ρ = subst (λ ?x → Close (1 · ε) ?x (f u v) (f u w))
+            (isProp< 0 (1 · ε) (fst π) (0<· {x = 1} {y = ε} 0<1 ψ))
+            (snd π)
+
+nonexpandingℝ₂→lipschitzℝ₁ : 
+  (f : ℝ → ℝ → ℝ) →
+  (φ : Nonexpandingℝ₂ f) →
+  (w : ℝ) → Lipschitzℝ (flip f w) 1 0<1 
+nonexpandingℝ₂→lipschitzℝ₁ f φ w u v ε ψ ω =
+  ρ
+  where
+  χ : Close ε ψ (f u w) (f v w)
+  χ = fst φ u v w ε ψ ω
+
+  π : Σ (0 < 1 · ε) (λ ρ → Close (1 · ε) ρ (f u w) (f v w))
+  π = subst (λ ?x → Σ (0 < ?x) (λ ρ → Close ?x ρ _ _)) (sym $ ·IdL ε) (ψ , χ)
+
+  ρ : Close (1 · ε) (0<· {x = 1} {y = ε} 0<1 ψ) (f u w) (f v w)
+  ρ = subst (λ ?x → Close (1 · ε) ?x (f u w) (f v w))
+            (isProp< 0 (1 · ε) (fst π) (0<· {x = 1} {y = ε} 0<1 ψ))
+            (snd π)
+
 liftNonexpanding₂Type : Type
 liftNonexpanding₂Type =
   Σ (ℝ → ℝ)
@@ -54,22 +129,7 @@ liftNonexpanding₂Recursion f (φ , ψ) =
     ω = Bool.toWitness {Q = <Dec 0 1} tt
 
     χ : Lipschitzℚ (rational ∘ (f q)) 1 ω
-    χ r s ε π ρ =
-      rationalRational
-        (f q r) (f q s) (1 · ε)
-        (0<· {x = 1} {y = ε} ω π)
-        (∣∣<→<₂ {x = f q r - f q s} {ε = 1 · ε} χ')
-        (∣∣<→<₁ {x = f q r - f q s} {ε = 1 · ε} χ')
-      where
-      χ' : ∣ f q r - f q s ∣ < 1 · ε
-      χ' =
-        -- TODO: Figure out how to use their <-≤-Reasoning module
-        isTrans≤<
-          ∣ f q r - f q s ∣ ∣ r - s ∣ (1 · ε)
-          (ψ q r s)
-          (isTrans<≤
-            ∣ r - s ∣ ε (1 · ε)
-            ρ (≡Weaken≤ ε (1 · ε) (sym (·IdL ε))))
+    χ r s ε π ρ = nonexpandingℚ₂→lipschitzℚ₂ f (φ , ψ) q r s ε π ρ
 
     fRational : ℝ → ℝ
     fRational = liftLipschitz (rational ∘ (f q)) 1 ω χ
@@ -227,7 +287,7 @@ liftNonexpanding₂Recursion f (φ , ψ) =
       ξ' = <→∣∣< {x = q - r} {ε = ε} π χ
 
       ξ : ∃ ℚ (λ θ → (0 < θ) × Σ (0 < ε - θ) (λ ψ → ∣ q - r ∣ < ε - θ))
-      ξ = ∣∣<-open (q - r) ε ω ξ'
+      ξ = ∣ ∣∣<-open (q - r) ε ω ξ' ∣₁
 
       ο : (θ : ℚ) →
           (0 < θ) × Σ (0 < ε - θ) (λ ψ → ∣ q - r ∣ < ε - θ) →

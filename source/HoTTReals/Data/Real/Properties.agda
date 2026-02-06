@@ -19,6 +19,7 @@ open import HoTTReals.Data.Real.Base
 open import HoTTReals.Data.Real.Close
 open import HoTTReals.Data.Real.Definitions
 open import HoTTReals.Data.Real.Induction
+open import HoTTReals.Data.Real.Nonexpanding
 
 open import HoTTReals.Algebra.Field.Instances.Rationals as ℚ
 open import HoTTReals.Data.Rationals.Order as ℚ
@@ -376,6 +377,45 @@ continuousCompose :
   Continuous f → Continuous g → Continuous (g ∘ f)
 continuousCompose f g φ ψ u = continuousAtCompose f g u (φ u) (ψ $ f u)
 
+lipschitzCompose :
+  (g f : ℝ → ℝ)
+  (L M : ℚ) (φ : 0 < L) (ψ : 0 < M) →
+  Lipschitzℝ g L φ →
+  Lipschitzℝ f M ψ →
+  Lipschitzℝ (g ∘ f) (L · M) (0<· {x = L} {y = M} φ ψ)
+lipschitzCompose g f L M φ ψ ω χ u v ε π ρ = τ'
+  where
+  σ : Close (L · (M · ε))
+              (0<· {x = L} {y = M · ε} φ (0<· {x = M} {y = ε} ψ π))
+              (g (f u)) (g (f v))
+  σ = (ω (f u) (f v) (M · ε) (0<· {x = M} {y = ε} ψ π)) ((χ u v ε π) ρ)
+
+  τ : Σ (0 < ((L · M) · ε))
+        (λ ξ → Close ((L · M) · ε) ξ (g (f u)) (g (f v)))
+  τ = subst (λ ?x → Σ (0 < ?x) (λ ξ → Close ?x ξ _ _))
+            (·Assoc L M ε)
+            (0<· {x = L} {y = M · ε} φ (0<· {x = M} {y = ε} ψ π) , σ)
+
+  τ' : Close ((L · M) · ε)
+             (0<· {x = L · M} {y = ε} (0<· {x = L} {y = M} φ ψ) π)
+             (g (f u)) (g (f v))
+  τ' = subst (λ ?ξ → Close ((L · M) · ε) ?ξ (g (f u)) (g (f v)))
+             (isProp< 0 ((L · M) · ε)
+               (fst τ)
+               (0<· {x = L · M} {y = ε} (0<· {x = L} {y = M} φ ψ) π))
+             (snd τ) 
+
+nonexpandingCompose :
+  (g f : ℝ → ℝ) →
+  Nonexpandingℝ g → Nonexpandingℝ f → Nonexpandingℝ (g ∘ f)
+nonexpandingCompose g f φ ψ u v ε ω = (φ (f u) (f v) ε ω) ∘ (ψ u v ε ω)
+
+identityNonexpandingℝ : Nonexpandingℝ $ idfun ℝ
+identityNonexpandingℝ u v ε φ ψ = ψ
+
+identityLipschitzℝ : Lipschitzℝ (idfun ℝ) 1 0<1
+identityLipschitzℝ = nonexpandingℝ→lipschitzℝ (idfun ℝ) identityNonexpandingℝ
+
 identityContinuous : Continuous $ idfun ℝ
 identityContinuous u ε φ = ∣ ε , φ , (λ v → idfun _) ∣₁
 
@@ -500,3 +540,81 @@ eventuallyConstantAt≡constant θ φ x ψ c ω =
     ξ = subst (λ ?x → x δ τ ∼[ ε - δ , σ' ] ?x)
               υ
               (closeReflexive (x δ τ) (ε - δ) σ')
+
+lipschitz₂-composeLipschitz₁-lipschitz :
+  {f g : ℝ → ℝ} {h : ℝ → ℝ → ℝ} →
+  (L M N₁ N₂ : ℚ) (φ : 0 < L) (ψ : 0 < M) (ω : 0 < N₁) (χ : 0 < N₂) →
+  Lipschitzℝ f L φ →
+  Lipschitzℝ g M ψ →
+  ((y : ℝ) → Lipschitzℝ (flip h y) N₁ ω) →
+  ((x : ℝ) → Lipschitzℝ (h x) N₂ χ) →
+  let
+    ξ : 0 < N₁ · L + N₂ · M
+    ξ = (0<+' {x = N₁ · L} {y = N₂ · M}
+          (0<· {x = N₁} {y = L} ω φ) (0<· {x = N₂} {y = M} χ ψ))
+  in Lipschitzℝ (λ x → h (f x) (g x)) (N₁ · L + N₂ · M) ξ
+lipschitz₂-composeLipschitz₁-lipschitz {f} {g} {h}
+  L M N₁ N₂ φ ψ ω χ π ρ σ τ x y ε υ ο =
+  μ'
+  where
+  ξ : 0 < N₁ · L + N₂ · M
+  ξ = (0<+' {x = N₁ · L} {y = N₂ · M}
+      (0<· {x = N₁} {y = L} ω φ) (0<· {x = N₂} {y = M} χ ψ))
+
+  α' : 0 < L · ε
+  α' = 0<· {x = L} {y = ε} φ υ
+
+  α : f x ∼[ L · ε , α' ] f y
+  α = π x y ε υ ο
+
+  β' : 0 < M · ε 
+  β' = 0<· {x = M} {y = ε} ψ υ
+
+  β : g x ∼[ M · ε , β' ] g y
+  β = ρ x y ε υ ο
+
+  γ' : 0 < N₁ · (L · ε) 
+  γ' = 0<· {x = N₁} {y = L · ε} ω α'
+
+  γ : h (f x) (g x) ∼[ N₁ · (L · ε) , γ' ] h (f y) (g x)
+  γ = σ (g x) (f x) (f y) (L · ε) α' α
+
+  ζ' : 0 < N₂ · (M · ε)
+  ζ' = 0<· {x = N₂} {y = M · ε} χ β'
+
+  ζ : h (f y) (g x) ∼[ N₂ · (M · ε) , ζ' ] h (f y) (g y)
+  ζ = τ (f y) (g x) (g y) (M · ε) β' β
+
+  ι' : 0 < N₁ · (L · ε) + N₂ · (M · ε)
+  ι' = 0<+' {x = N₁ · (L · ε)} {y = N₂ · (M · ε)} γ' ζ'
+
+  ι : h (f x) (g x) ∼[ N₁ · (L · ε) + N₂ · (M · ε) , ι' ] h (f y) (g y)
+  ι = closeTriangleInequality
+        (h (f x) (g x)) (h (f y) (g x)) (h (f y) (g y))
+        (N₁ · (L · ε)) (N₂ · (M · ε)) γ' ζ'
+        γ ζ
+  
+  κ : N₁ · (L · ε) + N₂ · (M · ε) ≡ (N₁ · L + N₂ · M) · ε
+  κ = N₁ · (L · ε) + N₂ · (M · ε)
+        ≡⟨ cong (flip _+_ (N₂ · (M · ε))) (·Assoc N₁ L ε)  ⟩
+      (N₁ · L) · ε + N₂ · (M · ε)
+        ≡⟨ cong (_+_ ((N₁ · L) · ε)) (·Assoc N₂ M ε) ⟩
+      (N₁ · L) · ε + (N₂ · M) · ε
+        ≡⟨ (sym $ ·DistR+ (N₁ · L) (N₂ · M) ε) ⟩
+      (N₁ · L + N₂ · M) · ε ∎
+
+  μ : Σ (0 < (N₁ · L + N₂ · M) · ε)
+        (λ ξ' → h (f x) (g x) ∼[ (N₁ · L + N₂ · M) · ε , ξ' ] h (f y) (g y))
+  μ = subst (λ ?x → Σ (0 < ?x)
+                      (λ ξ' → h (f x) (g x) ∼[ ?x , ξ' ] h (f y) (g y)))
+            κ
+            (ι' , ι)
+
+  ξ' : 0 < (N₁ · L + N₂ · M) · ε
+  ξ' = 0<· {x = N₁ · L + N₂ · M} {y = ε} ξ υ
+
+  μ' : h (f x) (g x) ∼[ (N₁ · L + N₂ · M) · ε , ξ' ] h (f y) (g y)
+  μ' = subst
+         (λ ?ξ → h (f x) (g x) ∼[ (N₁ · L + N₂ · M) · ε , ?ξ ] h (f y) (g y))
+         (isProp< 0 ((N₁ · L + N₂ · M) · ε) (fst μ) ξ')
+         (snd μ)

@@ -22,9 +22,74 @@ open import HoTTReals.Data.Rationals.Order as ℚ
 open import HoTTReals.Data.Rationals.Properties as ℚ
 open import HoTTReals.Logic
 
+nonexpandingℚ→lipschitzℚ :
+  (f : ℚ → ℚ) →
+  Nonexpandingℚ f → Lipschitzℚ (rational ∘ f) 1 0<1
+nonexpandingℚ→lipschitzℚ f φ q r ε ψ ω = π'
+  where
+  χ : ∣ f q - f r ∣ < ε
+  χ = isTrans≤< ∣ f q - f r ∣ ∣ q - r ∣ ε (φ q r) ω
+
+  χ' : Close ε ψ (rational (f q)) (rational (f r))
+  χ' = rationalRational
+         (f q) (f r)
+         ε ψ
+         (∣∣<→<₂ {x = f q - f r} {ε = ε} χ)
+         (∣∣<→<₁ {x = f q - f r} {ε = ε} χ)
+
+  π : Σ (0 < 1 · ε) (λ ξ → Close (1 · ε) ξ (rational (f q)) (rational (f r)))
+  π = subst (λ ?x → Σ (0 < ?x)
+                      (λ ξ → Close ?x ξ (rational (f q)) (rational (f r))))
+            (sym $ ·IdL ε)
+            (ψ , χ')
+
+  π' : Close (1 · ε) (0<· {x = 1} {y = ε} 0<1 ψ)
+             (rational (f q)) (rational (f r))
+  π' = subst (λ ?ξ → Close (1 · ε) ?ξ (rational (f q)) (rational (f r)))
+             (isProp< 0 (1 · ε) (fst π) (0<· {x = 1} {y = ε} 0<1 ψ))
+             (snd π)
+
+-- TODO: lipschitz → nonexpanding for rationals kind of difficult
+
+nonexpandingℝ→lipschitzℝ :
+  (f : ℝ → ℝ) →
+  Nonexpandingℝ f → Lipschitzℝ f 1 0<1
+nonexpandingℝ→lipschitzℝ f φ u v ε ψ ω = π'
+  where
+  χ : Close ε ψ (f u) (f v)
+  χ = φ u v ε ψ ω
+
+  π : Σ (0 < 1 · ε) (λ ξ → Close (1 · ε) ξ (f u) (f v))
+  π = subst (λ ?x → Σ (0 < ?x) (λ ξ → Close ?x ξ (f u) (f v)))
+            (sym $ ·IdL ε)
+            (ψ , χ)
+
+  π' : Close (1 · ε) (0<· {x = 1} {y = ε} 0<1 ψ) (f u) (f v)
+  π' = subst (λ ?ξ → Close (1 · ε) ?ξ (f u) (f v))
+             (isProp< 0 (1 · ε) (fst π) (0<· {x = 1} {y = ε} 0<1 ψ))
+             (snd π)
+
+lipschitzℝ→nonexpandingℝ :
+  (f : ℝ → ℝ) →
+  Lipschitzℝ f 1 0<1 → Nonexpandingℝ f
+lipschitzℝ→nonexpandingℝ f φ u v ε ψ ω = π'
+  where
+  χ : Close (1 · ε) (0<· {x = 1} {y = ε} 0<1 ψ) (f u) (f v)
+  χ = φ u v ε ψ ω
+
+  π : Σ (0 < ε) (λ ξ → Close ε ξ (f u) (f v))
+  π = subst (λ ?x → Σ (0 < ?x) (λ ξ → Close ?x ξ (f u) (f v)))
+            (·IdL ε)
+            ((0<· {x = 1} {y = ε} 0<1 ψ) , χ)
+
+  π' : Close ε ψ (f u) (f v)
+  π' = subst (λ ?ξ → Close ε ?ξ (f u) (f v))
+             (isProp< 0 ε (fst π) ψ)
+             (snd π)
+
 nonexpandingℚ₂→lipschitzℚ₂ :
-  (f : ℚ → ℚ → ℚ) →
-  (φ : Nonexpandingℚ₂ f) →
+  (f : ℚ → ℚ → ℚ)
+  (φ : Nonexpandingℚ₂ f)
   (q : ℚ) → Lipschitzℚ (rational ∘ f q) 1 0<1 
 nonexpandingℚ₂→lipschitzℚ₂ f φ q r s ε ψ ω =
   rationalRational
@@ -57,7 +122,7 @@ nonexpandingℚ₂→lipschitzℚ₁ f φ r q s ε ψ ω =
   ω' = subst (_<_ ∣ q - s ∣) (sym $ ·IdL ε) ω
 
   χ : ∣ f q r - f s r ∣ ≤ ∣ q - s ∣
-  χ = fst φ q s r
+  χ = fst φ r q s
 
   π : ∣ f q r - f s r ∣ < 1 · ε
   π = isTrans≤< ∣ f q r - f s r ∣ ∣ q - s ∣ (1 · ε) χ ω'
@@ -87,7 +152,7 @@ nonexpandingℝ₂→lipschitzℝ₁ f φ w u v ε ψ ω =
   ρ
   where
   χ : Close ε ψ (f u w) (f v w)
-  χ = fst φ u v w ε ψ ω
+  χ = fst φ w u v ε ψ ω
 
   π : Σ (0 < 1 · ε) (λ ρ → Close (1 · ε) ρ (f u w) (f v w))
   π = subst (λ ?x → Σ (0 < ?x) (λ ρ → Close ?x ρ _ _)) (sym $ ·IdL ε) (ψ , χ)
@@ -253,7 +318,7 @@ liftNonexpanding₂Recursion f (φ , ψ) =
     ρ s ε ω χ π = τ'
       where
       σ : ∣ f q s - f r s ∣ ≤ ∣ q - r ∣
-      σ = φ q r s
+      σ = φ s q r
 
       τ : ∣ f q s - f r s ∣ < ε
       τ = isTrans≤<
@@ -436,7 +501,7 @@ liftNonexpanding₂NonExpanding :
   (φ : Nonexpandingℚ₂ f) →
   Nonexpandingℝ₂ $ liftNonexpanding₂ f φ
 liftNonexpanding₂NonExpanding f φ =
-  (λ u v w ε ψ ω → recursion∼ (liftNonexpanding₂Recursion f φ) ω w) ,
+  (λ u v w ε ψ ω → recursion∼ (liftNonexpanding₂Recursion f φ) ω u) ,
   (λ u v w ε ψ →
     let
       ω : (ε : ℚ) (χ : 0 < ε) (v w : ℝ) →

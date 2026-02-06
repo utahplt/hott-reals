@@ -49,19 +49,26 @@ Lipschitzℝ f L φ =
   u ∼[ ε , ψ ] v →
   f u ∼[ L · ε , 0<· {x = L} {y = ε} φ ψ ] f v
 
+Nonexpandingℚ : (ℚ → ℚ) → Type ℓ-zero
+Nonexpandingℚ f =
+  (q r : ℚ) →
+  distance (f q) (f r) ≤ distance q r
+
+Nonexpandingℝ : (ℝ → ℝ) → Type ℓ-zero
+Nonexpandingℝ f =
+  (u v : ℝ)
+  (ε : ℚ) (φ : 0 < ε) →
+  u ∼[ ε , φ ] v → f u ∼[ ε , φ ] f v
+
 Nonexpandingℚ₂ : (ℚ → ℚ → ℚ) → Type ℓ-zero
 Nonexpandingℚ₂ f =
-  ((q r s : ℚ) → distance (f q s) (f r s) ≤ distance q r) ×
-  ((q r s : ℚ) → distance (f q r) (f q s) ≤ distance r s)
+  ((s : ℚ) → Nonexpandingℚ (flip f s)) ×
+  ((q : ℚ) → Nonexpandingℚ (f q))
 
 Nonexpandingℝ₂ : (ℝ → ℝ → ℝ) → Type ℓ-zero
 Nonexpandingℝ₂ f =
-  ((u v w : ℝ)
-   (ε : ℚ) (φ : 0 < ε) →
-   u ∼[ ε , φ ] v → f u w ∼[ ε , φ ] f v w) ×
-  ((u v w : ℝ)
-   (ε : ℚ) (φ : 0 < ε) →
-   v ∼[ ε , φ ] w → f u v ∼[ ε , φ ] f u w)
+  ((w : ℝ) → Nonexpandingℝ (flip f w)) ×
+  ((u : ℝ) → Nonexpandingℝ (f u))
 
 Open : {i : Level}
        (B : (ε : ℚ) → 0 < ε → ℝ → ℝ → Type i) →

@@ -152,12 +152,31 @@ addLeftSubtractCancel x y =
     ≡⟨ +IdL y ⟩
   y ∎
 
+leftSubtractAddCancel : (x y : ℚ) → x - (y + x) ≡ - y
+leftSubtractAddCancel x y =
+  x - (y + x)
+    ≡⟨ cong (_+_ x) (negateAdd y x) ⟩ 
+  x + ((- y) - x)
+    ≡⟨ addLeftSubtractCancel x (- y) ⟩ 
+  - y ∎
+
+leftSubtractSubtractCancel : (x y : ℚ) → x - (x - y) ≡ y
+leftSubtractSubtractCancel x y =
+  x - (x - y)
+    ≡⟨ cong (_+_ x) (negateSubtract x y) ⟩
+  x + (- x + y)
+    ≡⟨ +Assoc x (- x) y ⟩
+  (x + - x) + y
+    ≡⟨ cong (flip _+_ y) (+InvR x) ⟩
+  0 + y
+    ≡⟨ +IdL y ⟩
+  y ∎
+
 -≡0→≡ : {x y : ℚ} → x - y ≡ 0 → x ≡ y
 -≡0→≡ {x} {y} φ = ψ ∙ -Invol y
   where
   ψ : x ≡ - - y
   ψ = +≡0→≡- {x = x} {y = - y} φ
-  
 
 -·≡-· : (x y : ℚ) → - (x · y) ≡ (- x) · y
 -·≡-· x y = sym (+≡0→≡- p)

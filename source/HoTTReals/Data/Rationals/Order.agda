@@ -38,6 +38,12 @@ open import HoTTReals.Data.Rationals.Properties
 0≤2⁻¹ : 0 ≤ 2 [ 2≠0 ]⁻¹
 0≤2⁻¹ = Bool.toWitness {Q = ≤Dec 0 (2 [ 2≠0 ]⁻¹)} tt
 
+-2⁻¹≤0 : - (2 [ 2≠0 ]⁻¹) ≤ 0
+-2⁻¹≤0 = Bool.toWitness {Q = ≤Dec (- (2 [ 2≠0 ]⁻¹)) 0} tt
+
+-2⁻¹≤2⁻¹ : - (2 [ 2≠0 ]⁻¹)  ≤ 2 [ 2≠0 ]⁻¹
+-2⁻¹≤2⁻¹ = Bool.toWitness {Q = ≤Dec (- (2 [ 2≠0 ]⁻¹)) (2 [ 2≠0 ]⁻¹)} tt 
+
 0<2⁻¹ : 0 < 2 [ 2≠0 ]⁻¹
 0<2⁻¹ = Bool.toWitness {Q = <Dec 0 (2 [ 2≠0 ]⁻¹)} tt
 
@@ -1109,6 +1115,74 @@ max≡midpoint+halfDistance x y =
     σ : max x y ≡ ((x + y + distance x y) / 2 [ 2≠0 ])
     σ = ω ∙ sym ρ
 
+min≡midpoint-halfDistance :
+  (x y : ℚ) →
+  min x y ≡ ((x + y) - distance x y) / 2 [ 2≠0 ]
+min≡midpoint-halfDistance x y =
+  PropositionalTruncation.rec (isSetℚ _ _) φ (isTotal≤ x y)
+  where
+  φ : (x ≤ y) ⊎ (y ≤ x) →
+      min x y ≡ (((x + y) - distance x y) / 2 [ 2≠0 ])
+  φ (inl ψ) = σ
+    where
+    ω : min x y ≡ x
+    ω = ≤→min x y ψ
+
+    χ : distance x y ≡ y - x
+    χ = ≤→distance≡RightSubtractLeft x y ψ
+
+    π : (x + y) - (y - x) ≡ x + x
+    π = (x + y) - (y - x)
+          ≡⟨ (sym $ +Assoc x y (- (y - x))) ⟩
+        x + (y - (y - x))
+          ≡⟨ cong (_+_ x) (leftSubtractSubtractCancel y x) ⟩
+        x + x ∎
+
+    ρ : ((x + y) - distance x y) / 2 [ 2≠0 ] ≡ x
+    ρ = ((x + y) - distance x y) / 2 [ 2≠0 ]
+          ≡⟨ cong (λ ?x → ((x + y) - ?x) / 2 [ 2≠0 ]) χ ⟩
+        ((x + y) - (y - x)) / 2 [ 2≠0 ]
+          ≡⟨ cong (λ ?x → ?x / 2 [ 2≠0 ]) π ⟩
+        (x + x) / 2 [ 2≠0 ]
+          ≡⟨ cong (λ ?x → ?x / 2 [ 2≠0 ]) (self+≡2· x) ⟩
+        (2 · x) / 2 [ 2≠0 ]
+          ≡⟨ ·/' 2 x 2≠0 ⟩
+        x ∎
+
+    σ : min x y ≡ ((x + y) - distance x y) / 2 [ 2≠0 ]
+    σ = ω ∙ sym ρ
+  φ (inr ψ) = σ
+    where
+    ω : min x y ≡ y
+    ω = ≤→min' x y ψ
+
+    χ : distance x y ≡ x - y
+    χ = ≤→distance≡LeftSubtractRight x y ψ
+
+    -- TODO: Replace
+    π : (x + y) - (x - y) ≡ y + y
+    π = (x + y) - (x - y)
+          ≡⟨ cong (_+_ (x + y)) (negateSubtract x y) ⟩
+        (x + y) + (- x + y)
+          ≡⟨ +Assoc (x + y) (- x) y ⟩
+        ((x + y) + - x) + y
+          ≡⟨ cong (flip _+_ y) (addSubtractLeftCancel x y) ⟩
+        y + y ∎
+
+    ρ : ((x + y) - distance x y) / 2 [ 2≠0 ] ≡ y
+    ρ = ((x + y) - distance x y) / 2 [ 2≠0 ]
+          ≡⟨ cong (λ ?x → ((x + y) - ?x) / 2 [ 2≠0 ]) χ ⟩
+        ((x + y) - (x - y)) / 2 [ 2≠0 ]
+          ≡⟨ cong (λ ?x → ?x / 2 [ 2≠0 ]) π ⟩
+        (y + y) / 2 [ 2≠0 ]
+          ≡⟨ cong (λ ?x → ?x / 2 [ 2≠0 ]) (self+≡2· y) ⟩
+        (2 · y) / 2 [ 2≠0 ]
+          ≡⟨ ·/' 2 y 2≠0 ⟩
+        y ∎
+
+    σ : min x y ≡ ((x + y) - distance x y) / 2 [ 2≠0 ]
+    σ = ω ∙ sym ρ
+
 maxNonexpandingˡ : 
   (q r s : ℚ.ℚ) → distance (max q s) (max r s) ≤ distance q r
 maxNonexpandingˡ q r s = τ
@@ -1221,7 +1295,113 @@ maxNonexpandingʳ q r s =
   φ : distance (max r q) (max s q) ≡ distance (max q r) (max q s)
   φ = cong₂ distance (maxComm r q) (maxComm s q)
 
--- Similarly, the min is equal to the midpoint - half the distance
+minNonexpandingˡ : 
+  (q r s : ℚ.ℚ) → distance (min q s) (min r s) ≤ distance q r
+minNonexpandingˡ q r s = τ
+  where
+  φ : ((q + s) - ∣ q - s ∣) + (- (r + s) + ∣ r - s ∣) ≡
+      (q - r) + (∣ r - s ∣ - ∣ q - s ∣)
+  φ = ((q + s) - ∣ q - s ∣) + (- (r + s) + ∣ r - s ∣)
+        ≡⟨ +Assoc ((q + s) - ∣ q - s ∣) (- (r + s)) ∣ r - s ∣ ⟩
+      (((q + s) - ∣ q - s ∣) + - (r + s)) + ∣ r - s ∣
+        ≡⟨ cong (flip _+_ ∣ r - s ∣)
+                (addLeftSwap (q + s) (- ∣ q - s ∣) (- (r + s))) ⟩
+      (((q + s) - (r + s)) + - ∣ q - s ∣) + ∣ r - s ∣
+        ≡⟨ cong (λ ?x → (?x - ∣ q - s ∣) + ∣ r - s ∣)
+                (sym $ +Assoc q s (- (r + s))) ⟩
+      ((q + (s - (r + s))) + - ∣ q - s ∣) + ∣ r - s ∣
+        ≡⟨ cong (λ ?x → ((q + ?x) - ∣ q - s ∣) + ∣ r - s ∣)
+                (leftSubtractAddCancel s r) ⟩
+      ((q + - r) + - ∣ q - s ∣) + ∣ r - s ∣
+        ≡⟨ ( sym $ +Assoc (q - r) (- ∣ q - s ∣) ∣ r - s ∣) ⟩
+      (q - r) + (- ∣ q - s ∣ + ∣ r - s ∣)
+        ≡⟨ cong (_+_ (q - r)) (+Comm (- ∣ q - s ∣) ∣ r - s ∣) ⟩
+      (q - r) + (∣ r - s ∣ - ∣ q - s ∣) ∎
+
+  ψ : ∣ min q s - min r s ∣ ≡
+      ∣ (q - r) + (∣ r - s ∣ - ∣ q - s ∣) ∣ · 2 [ 2≠0 ]⁻¹
+  ψ = ∣ min q s - min r s ∣
+        ≡⟨ cong₂ distance (min≡midpoint-halfDistance q s)
+                          (min≡midpoint-halfDistance r s) ⟩
+      ∣ (((q + s) - ∣ q - s ∣) / 2 [ 2≠0 ]) -
+        (((r + s) - ∣ r - s ∣) / 2 [ 2≠0 ]) ∣
+        ≡⟨ cong (λ ?x → ∣ (((q + s) - ∣ q - s ∣) / 2 [ 2≠0 ]) + ?x ∣)
+                (-·≡-· ((r + s) - ∣ r - s ∣) (2 [ 2≠0 ]⁻¹)) ⟩
+      ∣ (((q + s) - ∣ q - s ∣) / 2 [ 2≠0 ]) +
+        ((- ((r + s) - ∣ r - s ∣)) / 2 [ 2≠0 ]) ∣
+        ≡⟨ cong (λ ?x → ∣ (((q + s) - ∣ q - s ∣) / 2 [ 2≠0 ]) +
+                          (?x / 2 [ 2≠0 ]) ∣)
+                (negateSubtract (r + s) ∣ r - s ∣) ⟩
+      ∣ (((q + s) - ∣ q - s ∣) / 2 [ 2≠0 ]) +
+        ((- (r + s) + ∣ r - s ∣) / 2 [ 2≠0 ]) ∣
+        ≡⟨ cong ∣_∣ (sym $ ·DistR+ ((q + s) - ∣ q - s ∣)
+                                   (- (r + s) + ∣ r - s ∣)
+                                   (2 [ 2≠0 ]⁻¹)) ⟩
+      ∣ (((q + s) - ∣ q - s ∣) + (- (r + s) + ∣ r - s ∣)) / 2 [ 2≠0 ] ∣
+        ≡⟨ magnitudeMultiply≡multiplyMagnitude
+             (((q + s) - ∣ q - s ∣) + (- (r + s) + ∣ r - s ∣))
+             (2 [ 2≠0 ]⁻¹) ⟩
+      ∣ ((q + s) - ∣ q - s ∣) + (- (r + s) + ∣ r - s ∣) ∣ · ∣ 2 [ 2≠0 ]⁻¹ ∣
+        ≡⟨ cong (λ ?x → ∣ ((q + s) - ∣ q - s ∣) +
+                          (- (r + s) + ∣ r - s ∣) ∣ · ?x)
+                (≤→max' {x = 2 [ 2≠0 ]⁻¹} {y = - (2 [ 2≠0 ]⁻¹)} -2⁻¹≤2⁻¹) ⟩
+      ∣ ((q + s) - ∣ q - s ∣) + (- (r + s) + ∣ r - s ∣) ∣ · 2 [ 2≠0 ]⁻¹
+        ≡⟨ cong (λ ?x → ∣ ?x ∣ · 2 [ 2≠0 ]⁻¹) φ ⟩
+      ∣ (q - r) + (∣ r - s ∣ - ∣ q - s ∣) ∣ · 2 [ 2≠0 ]⁻¹ ∎
+
+  ω : ∣ (q - r) + (∣ r - s ∣ - ∣ q - s ∣) ∣ ≤
+      ∣ q - r ∣ + ∣ ∣ r - s ∣ - ∣ q - s ∣ ∣
+  ω = magnitudeTriangleInequality (q - r) (∣ r - s ∣ - ∣ q - s ∣)
+
+  χ : ∣ ∣ r - s ∣ - ∣ q - s ∣ ∣ ≤ ∣ (r - s) - (q - s) ∣
+  χ = magnitudeReverseTriangleInequality (r - s) (q - s)
+
+  -- TODO: Remove
+  π : (r - s) - (q - s) ≡ r - q
+  π = (r - s) - (q - s)
+        ≡⟨ cong (_+_ (r - s)) (negateSubtract q s) ⟩
+      (r - s) + ((- q) + s)
+        ≡⟨ (sym $ +Assoc r (- s) ((- q) + s)) ⟩
+      r + ((- s) + ((- q) + s))
+        ≡⟨ cong (_+_ r) (addRightSwap (- s) (- q) s) ⟩
+      r + ((- q) + ((- s) + s))
+        ≡⟨ cong (λ ?x → r + ((- q) + ?x)) (+InvL s) ⟩
+      r + ((- q) + 0)
+        ≡⟨ cong (_+_ r) (+IdR (- q)) ⟩
+      r + (- q) ∎
+
+  χ' : ∣ ∣ r - s ∣ - ∣ q - s ∣ ∣ ≤ ∣ q - r ∣
+  χ' = subst (_≤_ ∣ ∣ r - s ∣ - ∣ q - s ∣ ∣)
+             (cong ∣_∣ π ∙ distanceCommutative r q)
+             χ
+
+  ρ : ∣ (q - r) + (∣ r - s ∣ - ∣ q - s ∣) ∣ ≤ 
+      ∣ q - r ∣ + ∣ q - r ∣
+  ρ = isTrans≤ ∣ (q - r) + (∣ r - s ∣ - ∣ q - s ∣) ∣
+               (∣ q - r ∣ + ∣ ∣ r - s ∣ - ∣ q - s ∣ ∣)
+               (∣ q - r ∣ + ∣ q - r ∣)
+               ω (≤-o+ (∣ ∣ r - s ∣ - ∣ q - s ∣ ∣) ∣ q - r ∣ ∣ q - r ∣ χ')
+
+  ρ' : ∣ (q - r) + (∣ r - s ∣ - ∣ q - s ∣) ∣ / 2 [ 2≠0 ] ≤ 
+       (∣ q - r ∣ + ∣ q - r ∣) / 2 [ 2≠0 ]
+  ρ' = ≤-·o ∣ (q - r) + (∣ r - s ∣ - ∣ q - s ∣) ∣
+            (∣ q - r ∣ + ∣ q - r ∣)
+            (2 [ 2≠0 ]⁻¹)
+            0≤2⁻¹ ρ
+
+  σ : (∣ q - r ∣ + ∣ q - r ∣) / 2 [ 2≠0 ] ≡ ∣ q - r ∣
+  σ = self+self/2≡self ∣ q - r ∣ 2≠0
+
+  τ : ∣ min q s - min r s ∣ ≤ ∣ q - r ∣
+  τ = subst2 _≤_ (sym ψ) σ ρ'
+
+minNonexpandingʳ : 
+  (q r s : ℚ.ℚ) → distance (min q r) (min q s) ≤ distance r s
+minNonexpandingʳ q r s =
+  subst (flip _≤_ $ distance r s) φ (minNonexpandingˡ r s q)
+  where
+  φ : distance (min r q) (min s q) ≡ distance (min q r) (min q s)
+  φ = cong₂ distance (minComm r q) (minComm s q)
 
 magntiude≡0→≡0 : {x : ℚ} → ∣ x ∣ ≡ 0 → x ≡ 0
 magntiude≡0→≡0 {x} φ =
@@ -1274,3 +1454,93 @@ distance<ε→≡ {x} {y} φ = ω
 
   ω : x ≡ y
   ω = distance≡0→≡ ψ
+
+-- Just the reverse triangle inequality!
+magnitudeNonexpanding : (x y : ℚ) →
+  distance ∣ x ∣ ∣ y ∣ ≤ distance x y
+magnitudeNonexpanding = magnitudeReverseTriangleInequality
+
+min+max≡+ : (x y : ℚ) → min x y + max x y ≡ x + y
+min+max≡+ x y =
+  PropositionalTruncation.rec
+    (isSetℚ (min x y + max x y) (x + y))
+    φ
+    (isTotal≤ x y)
+  where
+  φ : (x ≤ y) ⊎ (y ≤ x) → min x y + max x y ≡ x + y
+  φ (inl ψ) = π
+    where
+    ω : min x y ≡ x
+    ω = ≤→min x y ψ
+
+    χ : max x y ≡ y
+    χ = ≤→max x y ψ
+
+    π : min x y + max x y ≡ x + y
+    π = cong₂ _+_ ω χ 
+  φ (inr ψ) = π
+    where
+    ω : min x y ≡ y
+    ω = ≤→min' x y ψ
+
+    χ : max x y ≡ x
+    χ = ≤→max' ψ
+
+    π : min x y + max x y ≡ x + y
+    π = cong₂ _+_ ω χ ∙ +Comm y x
+
+negateMaxNegateNegate≡min : (x y : ℚ) → - max (- x) (- y) ≡ min x y
+negateMaxNegateNegate≡min x y =
+  isAntisym≤ (- max (- x) (- y)) (min x y) ω ρ'
+  where
+  φ : - x ≤ max (- x) (- y)
+  φ = ≤max (- x) (- y)
+
+  ψ : - y ≤ max (- x) (- y)
+  ψ = ≤max' (- x) (- y)
+
+  φ' : - max (- x) (- y) ≤ x
+  φ' = subst (_≤_ $ - max (- x) (- y))
+             (-Invol x)
+             (≤antitone- {x = - x} {y = max (- x) (- y)} φ)
+
+  ψ' : - max (- x) (- y) ≤ y
+  ψ' = subst (_≤_ $ - max (- x) (- y))
+             (-Invol y)
+             (≤antitone- {x = - y} {y = max (- x) (- y)} ψ)
+
+  ω : - max (- x) (- y) ≤ min x y
+  ω = minGreatestLowerBound {x = x} {y = y} {z = - max (- x) (- y)} φ' ψ'
+
+  χ : min x y ≤ x
+  χ = min≤ x y
+
+  π : min x y ≤ y
+  π = min≤' x y
+
+  χ' : - x ≤ - min x y
+  χ' = ≤antitone- {x = min x y} {y = x} χ
+
+  π' : - y ≤ - min x y
+  π' = ≤antitone- {x = min x y} {y = y} π
+
+  ρ : max (- x) (- y) ≤ - min x y
+  ρ = maxLeastUpperBound {x = - x} {y = - y} {z = - min x y} χ' π'
+
+  ρ' : min x y ≤ - max (- x) (- y)
+  ρ' = subst (flip _≤_ $ - max (- x) (- y))
+             (-Invol $ min x y)
+             (≤antitone- {x = max (- x) (- y)} {y = - min x y} ρ)
+
+negateMinNegateNegate≡max : (x y : ℚ) → - min (- x) (- y) ≡ max x y
+negateMinNegateNegate≡max x y =
+  ψ
+  where
+  φ : - max (- - x) (- - y) ≡ min (- x) (- y)
+  φ = negateMaxNegateNegate≡min (- x) (- y)
+
+  φ' : max (- - x) (- - y) ≡ - min (- x) (- y)
+  φ' = sym (-Invol _) ∙ cong -_ φ
+
+  ψ : - min (- x) (- y) ≡ max x y
+  ψ = sym φ' ∙ cong₂ max (-Invol x) (-Invol y)

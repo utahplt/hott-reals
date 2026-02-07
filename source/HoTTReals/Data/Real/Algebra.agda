@@ -1280,6 +1280,18 @@ negateMaxNegateNegate≡min =
   σ : (v : ℝ) → Continuous $ flip min v
   σ = minContinuous₁
 
+negateMinNegateNegate≡max : (x y : ℝ) → - min (- x) (- y) ≡ max x y
+negateMinNegateNegate≡max x y = ψ
+  where
+  φ : - max (- - x) (- - y) ≡ min (- x) (- y)
+  φ = negateMaxNegateNegate≡min (- x) (- y)
+
+  φ' : max (- - x) (- - y) ≡ - min (- x) (- y)
+  φ' = sym (-involutive _) ∙ cong -_ φ
+
+  ψ : - min (- x) (- y) ≡ max x y
+  ψ = sym φ' ∙ cong₂ max (-involutive x) (-involutive y)
+
 -- TODO:
 -- -antitone≤ : {x y : ℝ} → x ≤ y → - y ≤ - x
 -- -antitone≤ {x} {y} = {!!}

@@ -1393,7 +1393,7 @@ close→distance< :
   {x y : ℝ} {ε : ℚ.ℚ} (φ : 0 ℚ.< ε) →
   x ∼[ ε , φ ] y →
   distance x y < rational ε
-close→distance< {x} {y} {ε} φ ψ = {!!}
+close→distance< {x} {y} {ε} φ ψ = χ'
   where
   ω : ∣ x - y ∣ ∼[ ε , φ ] ∣ y - y ∣
   ω = fst distanceNonexpandingℝ₂ y x y ε φ ψ
@@ -1401,4 +1401,8 @@ close→distance< {x} {y} {ε} φ ψ = {!!}
   ω' : ∣ x - y ∣ ∼[ ε , φ ] 0
   ω' = subst (λ ?x → ∣ x - y ∣ ∼[ ε , φ ] ?x) (≡0→magnitude≡0 $ +-inverseᵣ y) ω
   
-  χ = let foo = close-0→magnitude< φ ω' in {!!}
+  χ : ∣ ∣ x - y ∣ ∣ < rational ε
+  χ = close-0→magnitude< φ ω'
+
+  χ' : ∣ x - y ∣ < rational ε
+  χ' = subst (flip _<_ $ rational ε) (magnitudeMagnitude≡magnitude $ x - y) χ

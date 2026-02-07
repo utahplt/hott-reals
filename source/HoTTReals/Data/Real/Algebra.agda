@@ -1204,17 +1204,33 @@ magnitudeNonexpandingℝ =
 
 maxNegateNegateLipschitz₁ :
   (y : ℝ) → Lipschitzℝ (λ x → max (- x) (- y)) 2 ℚ.0<2
-maxNegateNegateLipschitz₁ = {!!}
+maxNegateNegateLipschitz₁ y =
+  lipschitz₂-composeLipschitz₁-lipschitz
+    1 1 1 1
+    ℚ.0<1 ℚ.0<1 ℚ.0<1 ℚ.0<1
+    -lipschitzℝ (constantLipschitzℝ (- y)) maxLipschitz₁ maxLipschitz₂
 
 maxNegateNegateLipschitz₂ :
   (x : ℝ) → Lipschitzℝ (λ y → max (- x) (- y)) 2 ℚ.0<2
-maxNegateNegateLipschitz₂ = {!!}
+maxNegateNegateLipschitz₂ x =
+  lipschitz₂-composeLipschitz₁-lipschitz
+    1 1 1 1
+    ℚ.0<1 ℚ.0<1 ℚ.0<1 ℚ.0<1
+    (constantLipschitzℝ (- x)) -lipschitzℝ maxLipschitz₁ maxLipschitz₂
 
 maxNegateNegateContinuous₁ : (y : ℝ) → Continuous (λ x → max (- x) (- y))
-maxNegateNegateContinuous₁ = {!!}
+maxNegateNegateContinuous₁ y =
+  lipschitz→continuous
+    (λ x → max (- x) (- y))
+    2 ℚ.0<2
+    (maxNegateNegateLipschitz₁ y)
 
 maxNegateNegateContinuous₂ : (x : ℝ) → Continuous (λ y → max (- x) (- y))
-maxNegateNegateContinuous₂ = {!!}
+maxNegateNegateContinuous₂ x =
+  lipschitz→continuous
+    (λ y → max (- x) (- y))
+    2 ℚ.0<2
+    (maxNegateNegateLipschitz₂ x)
 
 negateMaxNegateNegate≡min : (x y : ℝ) → - max (- x) (- y) ≡ min x y
 negateMaxNegateNegate≡min =
@@ -1249,10 +1265,14 @@ negateMaxNegateNegate≡min =
   ω = ℚ.negateMaxNegateNegate≡min
 
   χ : (u : ℝ) → Continuous $ (λ y → - max (- u) (- y))
-  χ = {!!}
+  χ u = continuousCompose
+          (λ y → max (- u) (- y)) -_
+          (maxNegateNegateContinuous₂ u) -continuous
 
   π : (v : ℝ) → Continuous $ flip (λ x y → - max (- x) (- y)) v
-  π = {!!}
+  π v = continuousCompose
+          (λ x → max (- x) (- v)) -_
+          (maxNegateNegateContinuous₁ v) -continuous
 
   ρ : (u : ℝ) → Continuous $ min u
   ρ = minContinuous₂

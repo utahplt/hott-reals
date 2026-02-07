@@ -618,3 +618,10 @@ lipschitz₂-composeLipschitz₁-lipschitz {f} {g} {h}
          (λ ?ξ → h (f x) (g x) ∼[ (N₁ · L + N₂ · M) · ε , ?ξ ] h (f y) (g y))
          (isProp< 0 ((N₁ · L + N₂ · M) · ε) (fst μ) ξ')
          (snd μ)
+
+constantNonexpandingℝ : (c : ℝ) → Nonexpandingℝ (const c)
+constantNonexpandingℝ c u v ε φ ψ = closeReflexive c ε φ
+
+constantLipschitzℝ : (c : ℝ) → Lipschitzℝ (const c) 1 ℚ.0<1
+constantLipschitzℝ c =
+  nonexpandingℝ→lipschitzℝ (const c) (constantNonexpandingℝ c)

@@ -857,6 +857,30 @@ rationalReflective {q} {r} φ = π
     ο = rationalMonotone {q = s ℚ.+ ε} {r = q ℚ.+ ε}
                          (ℚ.≤-+o s q ε (rationalReflective {q = s} {r = q} σ))
 
+rationalStrictMonotone : (q r : ℚ.ℚ) → q ℚ.< r → rational q < rational r
+rationalStrictMonotone q r φ =
+  ∣ ((q , r) , (≤-reflexive $ rational q) , φ , (≤-reflexive $ rational r)) ∣₁
+
+rationalStrictReflective : (q r : ℚ.ℚ) → rational q < rational r → q ℚ.< r
+rationalStrictReflective q r φ =
+  ∃-rec (ℚ.isProp< q r) ψ φ
+  where
+  ψ : (u : ℚ.ℚ × ℚ.ℚ) →
+      (rational q ≤ rational (fst u)) ×
+      (fst u ℚ.< snd u) ×
+      (rational (snd u) ≤ rational r) →
+      q ℚ.< r
+  ψ (s , t) (ω , χ , π) = ρ
+    where
+    ω' : q ℚ.≤ s
+    ω' = rationalReflective {q = q} {r = s} ω
+
+    π' : t ℚ.≤ r
+    π' = rationalReflective {q = t} {r = r} π
+
+    ρ : q ℚ.< r
+    ρ = ℚ.isTrans≤< q s r ω' (ℚ.isTrans<≤ s t r χ π')
+
 -- TODO:
 -- <rational→existsBound→<rational :
 --   {q : ℚ.ℚ} {x y : ℝ} →
@@ -1387,7 +1411,29 @@ close-0→magnitude< :
   {x : ℝ} {ε : ℚ.ℚ} (φ : 0 ℚ.< ε) →
   x ∼[ ε , φ ] 0 →
   ∣ x ∣ < rational ε
-close-0→magnitude< = {!!}
+close-0→magnitude< {x} {ε} =
+  inductionProposition {A = P} (φ , ψ , χ) x ε
+  where
+  P : ℝ → Type ℓ-zero
+  P x = (ε : ℚ.ℚ) (φ : 0 ℚ.< ε) → x ∼[ ε , φ ] 0 → ∣ x ∣ < rational ε
+
+  φ : (q : ℚ.ℚ) (ε : ℚ.ℚ) (ψ : 0 ℚ.< ε) →
+      rational q ∼[ ε , ψ ] 0 →
+      ∣ rational q ∣ < rational ε
+  φ q ε ψ ω = {!!}
+
+  ψ : (x : (ε : ℚ.ℚ) → 0 ℚ.< ε → ℝ) (χ : CauchyApproximation x) →
+      ((δ : ℚ.ℚ) (π : 0 ℚ.< δ) →
+       (ε : ℚ.ℚ) (ρ : 0 ℚ.< ε) →
+       x δ π ∼[ ε , ρ ] 0 →
+       ∣ x δ π ∣ < rational ε) →
+      (ε : ℚ.ℚ) (π : 0 ℚ.< ε) →
+      limit x χ ∼[ ε , π ] 0 →
+      ∣ limit x χ ∣ < rational ε
+  ψ = {!!}
+
+  χ : (x : ℝ) → isProp (P x)
+  χ x = isPropΠ3 (λ ε φ ψ → <-isProp ∣ x ∣ (rational ε))
 
 close→distance< :
   {x y : ℝ} {ε : ℚ.ℚ} (φ : 0 ℚ.< ε) →

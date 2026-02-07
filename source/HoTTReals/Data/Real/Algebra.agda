@@ -1316,16 +1316,14 @@ negateMinNegateNegate≡max x y = ψ
   π : max (- y) (- x) ≡ - x
   π = maxCommutative (- y) (- x) ∙ χ
 
+magnitudeNegate≡magnitude : (x : ℝ) → ∣ - x ∣ ≡ ∣ x ∣
+magnitudeNegate≡magnitude x = {!!}
+
 self≤∣∣ : (x : ℝ) → x ≤ ∣ x ∣
 self≤∣∣ x = ≤-max₁ x (- x)
 
--- TODO:
--- -∣∣≤self : (x : ℝ) → - ∣ x ∣ ≤ x
--- -∣∣≤self x = {!!}
-
--- TODO:
--- magnitude≡0→≡0 : {x : ℝ} → ∣ x ∣ ≡ 0 → x ≡ 0
--- magnitude≡0→≡0 {x} φ = {!!}
+-∣∣≤self : (x : ℝ) → - ∣ x ∣ ≤ x
+-∣∣≤self x = {!!}
 
 ≡0→magnitude≡0 : {x : ℝ} → x ≡ 0 → ∣ x ∣ ≡ 0
 ≡0→magnitude≡0 {x} φ = ω
@@ -1336,9 +1334,12 @@ self≤∣∣ x = ≤-max₁ x (- x)
   ω : ∣ x ∣ ≡ 0
   ω = cong ∣_∣ φ ∙ ψ
 
+magnitudeMagnitude≡magnitude : (x : ℝ) → ∣ ∣ x ∣ ∣ ≡ ∣ x ∣
+magnitudeMagnitude≡magnitude x = {!!}
+
 -- TODO:
--- magnitudeMagnitude≡magnitude : (x : ℝ) → ∣ ∣ x ∣ ∣ ≡ ∣ x ∣
--- magnitudeMagnitude≡magnitude x = {!maxIdempotent!}
+-- magnitude≡0→≡0 : {x : ℝ} → ∣ x ∣ ≡ 0 → x ≡ 0
+-- magnitude≡0→≡0 {x} φ = {!!}
 
 distance : ℝ → ℝ → ℝ
 distance x y = ∣ x - y ∣

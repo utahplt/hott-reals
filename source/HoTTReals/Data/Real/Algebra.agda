@@ -1107,6 +1107,15 @@ max≡→min≡ {x} {y} φ = ψ
   ψ : min x y ≡ x
   ψ = GroupTheory.·CancelR ℝGroup y φ'
 
+min≡→max≡ : {x y : ℝ} → min x y ≡ x → max x y ≡ y
+min≡→max≡ {x} {y} φ = ψ
+  where
+  φ' : x + max x y ≡ x + y
+  φ' = cong (flip _+_ $ max x y) (sym φ) ∙ min+max≡+ x y
+
+  ψ : max x y ≡ y
+  ψ = GroupTheory.·CancelL ℝGroup x φ'
+
 ∣_∣' : ℝ → ℝ
 ∣_∣' = liftLipschitz
          (rational ∘ ℚ.∣_∣)
@@ -1292,9 +1301,8 @@ negateMinNegateNegate≡max x y = ψ
   ψ : - min (- x) (- y) ≡ max x y
   ψ = sym φ' ∙ cong₂ max (-involutive x) (-involutive y)
 
--- TODO:
--- -antitone≤ : {x y : ℝ} → x ≤ y → - y ≤ - x
--- -antitone≤ {x} {y} = {!!}
+-antitone≤ : {x y : ℝ} → x ≤ y → - y ≤ - x
+-antitone≤ {x} {y} = {!!}
 
 self≤∣∣ : (x : ℝ) → x ≤ ∣ x ∣
 self≤∣∣ x = ≤-max₁ x (- x)

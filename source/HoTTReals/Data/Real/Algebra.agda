@@ -647,6 +647,7 @@ rationalReflective {q} {r} φ = π
            (ℚ.<→midpoint-< {x = q} {y = r} χ) ,
            π) ∣₁
 
+-- HoTT Lemma 11.3.42
 ≤rational→close→≤rational+ε :
   {q : ℚ.ℚ} {x y : ℝ} {ε : ℚ.ℚ}
   (φ : 0 ℚ.< ε) →
@@ -829,6 +830,7 @@ rationalReflective {q} {r} φ = π
         y (max (rational q) y) (rational (q ℚ.+ ε))
         (≤-max₂ (rational q) y) ρ
   
+-- HoTT Lemma 11.3.43(i)
 <rational→close→<rational+ε :
   {q : ℚ.ℚ} {x y : ℝ} {ε : ℚ.ℚ}
   (φ : 0 ℚ.< ε) →
@@ -1420,7 +1422,21 @@ close-0→magnitude< {x} {ε} =
   φ : (q : ℚ.ℚ) (ε : ℚ.ℚ) (ψ : 0 ℚ.< ε) →
       rational q ∼[ ε , ψ ] 0 →
       ∣ rational q ∣ < rational ε
-  φ q ε ψ ω = {!!}
+  φ q ε ψ ω = τ
+    where
+    π : ℚ.∣ q ℚ.- 0 ∣ ℚ.< ε
+    π = close→close' (rational q) 0 ε ψ ω
+
+    ρ : ℚ.∣ q ∣ ℚ.< ε
+    ρ = subst (ℚ._< ε) (cong ℚ.∣_∣ $ ℚ.+IdR q) π
+
+    τ : rational ℚ.∣ q ∣ < rational ε
+    τ = rationalStrictMonotone ℚ.∣ q ∣ ε ρ
+
+    τ' : ∣ rational q ∣ < rational ε
+    τ' = subst (_< rational ε)
+               (sym $ magnitudeExtendsRationalMagnitude q)
+               τ
 
   ψ : (x : (ε : ℚ.ℚ) → 0 ℚ.< ε → ℝ) (χ : CauchyApproximation x) →
       ((δ : ℚ.ℚ) (π : 0 ℚ.< δ) →

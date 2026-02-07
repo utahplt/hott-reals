@@ -1317,13 +1317,27 @@ negateMinNegateNegate≡max x y = ψ
   π = maxCommutative (- y) (- x) ∙ χ
 
 magnitudeNegate≡magnitude : (x : ℝ) → ∣ - x ∣ ≡ ∣ x ∣
-magnitudeNegate≡magnitude x = {!!}
+magnitudeNegate≡magnitude x =
+  max (- x) (- - x)
+    ≡⟨ cong (max (- x)) (-involutive x) ⟩
+  max (- x) x
+    ≡⟨ maxCommutative (- x) x ⟩
+  max x (- x) ∎
 
 self≤∣∣ : (x : ℝ) → x ≤ ∣ x ∣
 self≤∣∣ x = ≤-max₁ x (- x)
 
 -∣∣≤self : (x : ℝ) → - ∣ x ∣ ≤ x
--∣∣≤self x = {!!}
+-∣∣≤self x = ω
+  where
+  φ : - x ≤ ∣ - x ∣
+  φ = self≤∣∣ (- x)
+
+  ψ : - ∣ - x ∣ ≤ - - x
+  ψ = -antitone≤ {x = - x} {y = ∣ - x ∣} φ 
+
+  ω : - ∣ x ∣ ≤ x
+  ω = subst2 _≤_ (cong -_ (magnitudeNegate≡magnitude x)) (-involutive x) ψ
 
 ≡0→magnitude≡0 : {x : ℝ} → x ≡ 0 → ∣ x ∣ ≡ 0
 ≡0→magnitude≡0 {x} φ = ω
@@ -1335,7 +1349,19 @@ self≤∣∣ x = ≤-max₁ x (- x)
   ω = cong ∣_∣ φ ∙ ψ
 
 magnitudeMagnitude≡magnitude : (x : ℝ) → ∣ ∣ x ∣ ∣ ≡ ∣ x ∣
-magnitudeMagnitude≡magnitude x = {!!}
+magnitudeMagnitude≡magnitude x = χ
+  where
+  φ : - ∣ x ∣ ≤ x
+  φ = -∣∣≤self x
+
+  ψ : x ≤ ∣ x ∣
+  ψ = self≤∣∣ x
+
+  ω : - ∣ x ∣ ≤ ∣ x ∣
+  ω = ≤-transitive (- ∣ x ∣) x ∣ x ∣ φ ψ
+
+  χ : max ∣ x ∣ (- ∣ x ∣) ≡ ∣ x ∣
+  χ = maxCommutative ∣ x ∣ (- ∣ x ∣) ∙ ω
 
 -- TODO:
 -- magnitude≡0→≡0 : {x : ℝ} → ∣ x ∣ ≡ 0 → x ≡ 0

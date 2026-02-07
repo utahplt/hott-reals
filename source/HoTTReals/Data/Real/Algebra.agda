@@ -1302,7 +1302,19 @@ negateMinNegateNegate≡max x y = ψ
   ψ = sym φ' ∙ cong₂ max (-involutive x) (-involutive y)
 
 -antitone≤ : {x y : ℝ} → x ≤ y → - y ≤ - x
--antitone≤ {x} {y} = {!!}
+-antitone≤ {x} {y} φ = π
+  where
+  ψ : min x y ≡ x
+  ψ = max≡→min≡ φ
+
+  ω : - max (- x) (- y) ≡ x
+  ω = negateMaxNegateNegate≡min x y ∙ ψ
+
+  χ : max (- x) (- y) ≡ - x
+  χ = sym (-involutive _) ∙ cong -_ ω
+
+  π : max (- y) (- x) ≡ - x
+  π = maxCommutative (- y) (- x) ∙ χ
 
 self≤∣∣ : (x : ℝ) → x ≤ ∣ x ∣
 self≤∣∣ x = ≤-max₁ x (- x)

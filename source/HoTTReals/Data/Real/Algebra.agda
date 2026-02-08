@@ -859,12 +859,12 @@ rationalReflective {q} {r} φ = π
     ο = rationalMonotone {q = s ℚ.+ ε} {r = q ℚ.+ ε}
                          (ℚ.≤-+o s q ε (rationalReflective {q = s} {r = q} σ))
 
-rationalStrictMonotone : (q r : ℚ.ℚ) → q ℚ.< r → rational q < rational r
-rationalStrictMonotone q r φ =
+rationalStrictMonotone : {q r : ℚ.ℚ} → q ℚ.< r → rational q < rational r
+rationalStrictMonotone {q} {r} φ =
   ∣ ((q , r) , (≤-reflexive $ rational q) , φ , (≤-reflexive $ rational r)) ∣₁
 
-rationalStrictReflective : (q r : ℚ.ℚ) → rational q < rational r → q ℚ.< r
-rationalStrictReflective q r φ =
+rationalStrictReflective : {q r : ℚ.ℚ} → rational q < rational r → q ℚ.< r
+rationalStrictReflective {q} {r} φ =
   ∃-rec (ℚ.isProp< q r) ψ φ
   where
   ψ : (u : ℚ.ℚ × ℚ.ℚ) →
@@ -1409,6 +1409,11 @@ distanceNonexpandingℝ₂ = φ , ψ
           ∣_∣ (_-_ u)
           magnitudeNonexpandingℝ (snd -nonexpandingℝ₂ u)
 
+distanceExtendsRationalDistance : (q r : ℚ.ℚ) →
+  distance (rational q) (rational r) ≡ rational (ℚ.distance q r)
+distanceExtendsRationalDistance q r =
+  cong ∣_∣ (liftNonexpanding₂≡rational ℚ._+_ +nonexpandingℚ₂ q (ℚ.- r))
+
 close-0→magnitude< :
   {x : ℝ} {ε : ℚ.ℚ} (φ : 0 ℚ.< ε) →
   x ∼[ ε , φ ] 0 →
@@ -1431,22 +1436,22 @@ close-0→magnitude< {x} {ε} =
     ρ = subst (ℚ._< ε) (cong ℚ.∣_∣ $ ℚ.+IdR q) π
 
     τ : rational ℚ.∣ q ∣ < rational ε
-    τ = rationalStrictMonotone ℚ.∣ q ∣ ε ρ
+    τ = rationalStrictMonotone {ℚ.∣ q ∣} {ε} ρ
 
     τ' : ∣ rational q ∣ < rational ε
     τ' = subst (_< rational ε)
                (sym $ magnitudeExtendsRationalMagnitude q)
                τ
 
-  ψ : (x : (ε : ℚ.ℚ) → 0 ℚ.< ε → ℝ) (χ : CauchyApproximation x) →
-      ((δ : ℚ.ℚ) (π : 0 ℚ.< δ) →
-       (ε : ℚ.ℚ) (ρ : 0 ℚ.< ε) →
-       x δ π ∼[ ε , ρ ] 0 →
-       ∣ x δ π ∣ < rational ε) →
+  ψ : (x : (ε : ℚ.ℚ) → 0 ℚ.< ε → ℝ) (ω : CauchyApproximation x) →
+      ((δ : ℚ.ℚ) (χ : 0 ℚ.< δ) →
+       (ε : ℚ.ℚ) (π : 0 ℚ.< ε) →
+       x δ χ ∼[ ε , π ] 0 →
+       ∣ x δ χ ∣ < rational ε) →
       (ε : ℚ.ℚ) (π : 0 ℚ.< ε) →
-      limit x χ ∼[ ε , π ] 0 →
-      ∣ limit x χ ∣ < rational ε
-  ψ x ω IH ε π ρ =
+      limit x ω ∼[ ε , π ] 0 →
+      ∣ limit x ω ∣ < rational ε
+  ψ x ω χ ε π ρ =
     ∃-rec (<-isProp ∣ limit x ω ∣ (rational ε))
           ψ'
           (closeOpen (limit x ω) 0 ε π ρ)
@@ -1454,95 +1459,91 @@ close-0→magnitude< {x} {ε} =
     ψ' : (θ : ℚ.ℚ) →
          (0 ℚ.< θ) × Σ (0 ℚ.< ε ℚ.- θ) (λ σ → limit x ω ∼[ ε ℚ.- θ , σ ] 0) →
          ∣ limit x ω ∣ < rational ε
-    ψ' θ (θ>0 , ε-θ>0 , close-ε-θ) = ξ
+    ψ' θ (σ , τ , υ) = κ'
       where
-      -- Define δ = θ/4
-      0<4 : 0 ℚ.< 4
-      0<4 = ℚ.0<+' {x = 2} {y = 2} ℚ.0<2 ℚ.0<2
+      α : 0 ℚ.< θ / 4 [ ℚ.4≠0 ]
+      α = ℚ.0</ {x = θ} {y = 4} σ ℚ.0<4
 
-      4≠0 : (4 ≡ 0) → ⊥
-      4≠0 = ≠-symmetric $ ℚ.<→≠ 0<4
+      α' : 0 ℚ.< θ / 2 [ ℚ.2≠0 ]
+      α' = ℚ.0</ {x = θ} {y = 2} σ ℚ.0<2
 
-      δ : ℚ.ℚ
-      δ = θ / 4 [ 4≠0 ]
+      β : Close ((θ / 4 [ ℚ.4≠0 ]) ℚ.+ (θ / 4 [ ℚ.4≠0 ]))
+                (ℚ.0<+' {x = θ / 4 [ ℚ.4≠0 ]} {y = θ / 4 [ ℚ.4≠0 ]} α α)
+                (x (θ / 4 [ ℚ.4≠0 ]) α)
+                (limit x ω)
+      β = closeLimit'' x ω (θ / 4 [ ℚ.4≠0 ]) (θ / 4 [ ℚ.4≠0 ]) α α
 
-      δ>0 : 0 ℚ.< δ
-      δ>0 = ℚ.0</ {x = θ} {y = 4} θ>0 0<4
+      γ : x (θ / 4 [ ℚ.4≠0 ]) α
+          ∼[ ((θ / 4 [ ℚ.4≠0 ]) ℚ.+ (θ / 4 [ ℚ.4≠0 ])) ℚ.+ (ε ℚ.- θ) ,
+             ℚ.0<+'
+               {x = ((θ / 4 [ ℚ.4≠0 ]) ℚ.+ (θ / 4 [ ℚ.4≠0 ]))} {y = ε ℚ.- θ}
+               (ℚ.0<+' {x = θ / 4 [ ℚ.4≠0 ]} α α) τ ]
+          0
+      γ = closeTriangleInequality
+            (x (θ / 4 [ ℚ.4≠0 ]) α) (limit x ω) 0
+            ((θ / 4 [ ℚ.4≠0 ]) ℚ.+ (θ / 4 [ ℚ.4≠0 ])) (ε ℚ.- θ)
+            (ℚ.0<+' {x = θ / 4 [ ℚ.4≠0 ]} α α) τ
+            β υ
 
-      -- θ/2 = δ + δ
-      θ/2 : ℚ.ℚ
-      θ/2 = δ ℚ.+ δ
+      ζ : ((θ / 4 [ ℚ.4≠0 ]) ℚ.+ (θ / 4 [ ℚ.4≠0 ])) ℚ.+ (ε ℚ.- θ) ≡
+          ε ℚ.- (θ / 2 [ ℚ.2≠0 ])
+      ζ = ((θ / 4 [ ℚ.4≠0 ]) ℚ.+ (θ / 4 [ ℚ.4≠0 ])) ℚ.+ (ε ℚ.- θ)
+            ≡⟨ cong (flip ℚ._+_ $ ε ℚ.- θ) (ℚ.self/4≡self/2 θ ℚ.4≠0 ℚ.2≠0) ⟩
+          (θ / 2 [ ℚ.2≠0 ]) ℚ.+ (ε ℚ.- θ)
+            ≡⟨ ℚ.addRightSwap (θ / 2 [ ℚ.2≠0 ]) ε (ℚ.- θ) ⟩
+          ε ℚ.+ ((θ / 2 [ ℚ.2≠0 ]) ℚ.- θ)
+            ≡⟨ cong (ℚ._+_ ε) (sym $ ℚ.negateSubtract' θ (θ / 2 [ ℚ.2≠0 ])) ⟩
+          ε ℚ.- (θ ℚ.- (θ / 2 [ ℚ.2≠0 ]))
+            ≡⟨ cong (ℚ._-_ ε) (ℚ.self-self/2≡self/2 θ) ⟩
+          ε ℚ.- (θ / 2 [ ℚ.2≠0 ]) ∎
 
-      θ/2>0 : 0 ℚ.< θ/2
-      θ/2>0 = ℚ.0<+' {x = δ} {y = δ} δ>0 δ>0
+      ι : ∣ x (θ / 4 [ ℚ.4≠0 ]) α ∣ <
+          rational (((θ / 4 [ ℚ.4≠0 ]) ℚ.+ (θ / 4 [ ℚ.4≠0 ])) ℚ.+ (ε ℚ.- θ))
+      ι = χ (θ / 4 [ ℚ.4≠0 ]) α
+            (((θ / 4 [ ℚ.4≠0 ]) ℚ.+ (θ / 4 [ ℚ.4≠0 ])) ℚ.+ (ε ℚ.- θ))
+            (ℚ.0<+'
+               {x = ((θ / 4 [ ℚ.4≠0 ]) ℚ.+ (θ / 4 [ ℚ.4≠0 ]))} {y = ε ℚ.- θ}
+               (ℚ.0<+' {x = θ / 4 [ ℚ.4≠0 ]} α α) τ)
+            γ 
 
-      -- θ/2 + θ/2 = θ (since δ + δ + δ + δ = 4δ = θ)
-      θ/2+θ/2≡θ : θ/2 ℚ.+ θ/2 ≡ θ
-      θ/2+θ/2≡θ =
-        (δ ℚ.+ δ) ℚ.+ (δ ℚ.+ δ)
-          ≡⟨ cong (flip ℚ._+_ (δ ℚ.+ δ)) (ℚ.self+≡2· δ) ⟩
-        (2 ℚ.· δ) ℚ.+ (δ ℚ.+ δ)
-          ≡⟨ cong (ℚ._+_ (2 ℚ.· δ)) (ℚ.self+≡2· δ) ⟩
-        (2 ℚ.· δ) ℚ.+ (2 ℚ.· δ)
-          ≡⟨ ℚ.self+≡2· (2 ℚ.· δ) ⟩
-        2 ℚ.· (2 ℚ.· δ)
-          ≡⟨ ℚ.·Assoc 2 2 δ ⟩
-        (2 ℚ.· 2) ℚ.· δ
-          ≡⟨ ℚ.·Comm ((2 ℚ.· 2)) δ ⟩
-        δ ℚ.· (2 ℚ.· 2)
-          ≡⟨ cong (ℚ._·_ δ) refl ⟩
-        (θ / 4 [ 4≠0 ]) ℚ.· 4
-          ≡⟨ ℚ./· θ 4 4≠0 ⟩
-        θ ∎
+      ι' : ∣ x (θ / 4 [ ℚ.4≠0 ]) α ∣ <
+           rational (ε ℚ.- (θ / 2 [ ℚ.2≠0 ]))
+      ι' = subst (_<_ ∣ x (θ / 4 [ ℚ.4≠0 ]) α ∣) (cong rational ζ) ι
 
-      -- limit x ω ∼[θ/2] x δ (by limitClose'')
-      α : limit x ω ∼[ θ/2 , θ/2>0 ] x δ δ>0
-      α = limitClose'' x ω δ δ δ>0 δ>0
+      β' : Close ((θ / 4 [ ℚ.4≠0 ]) ℚ.+ (θ / 4 [ ℚ.4≠0 ]))
+                 (ℚ.0<+' {x = θ / 4 [ ℚ.4≠0 ]} {y = θ / 4 [ ℚ.4≠0 ]} α α)
+                 ∣ x (θ / 4 [ ℚ.4≠0 ]) α ∣
+                 ∣ limit x ω ∣
+      β' = magnitudeNonexpandingℝ
+             (x (θ / 4 [ ℚ.4≠0 ]) α) (limit x ω)
+             ((θ / 4 [ ℚ.4≠0 ]) ℚ.+ (θ / 4 [ ℚ.4≠0 ]))
+             (ℚ.0<+' {x = θ / 4 [ ℚ.4≠0 ]} {y = θ / 4 [ ℚ.4≠0 ]} α α)
+             β
 
-      -- x δ ∼[θ/2 + (ε - θ)] 0 (by triangle inequality)
-      ε-θ/2 : ℚ.ℚ
-      ε-θ/2 = θ/2 ℚ.+ (ε ℚ.- θ)
+      κ : ∣ limit x ω ∣ <
+          rational ((ε ℚ.- (θ / 2 [ ℚ.2≠0 ])) ℚ.+
+                    ((θ / 4 [ ℚ.4≠0 ]) ℚ.+ (θ / 4 [ ℚ.4≠0 ])))
+      κ = <rational→close→<rational+ε
+            {x = ∣ x (θ / 4 [ ℚ.4≠0 ]) α ∣} {y = ∣ limit x ω ∣}
+            (ℚ.0<+' {x = θ / 4 [ ℚ.4≠0 ]} {y = θ / 4 [ ℚ.4≠0 ]} α α) ι' β'
 
-      ε-θ/2>0 : 0 ℚ.< ε-θ/2
-      ε-θ/2>0 = ℚ.0<+' {x = θ/2} {y = ε ℚ.- θ} θ/2>0 ε-θ>0
+      μ : (ε ℚ.- (θ / 2 [ ℚ.2≠0 ])) ℚ.+
+          ((θ / 4 [ ℚ.4≠0 ]) ℚ.+ (θ / 4 [ ℚ.4≠0 ])) ≡
+          ε
+      μ = (ε ℚ.- (θ / 2 [ ℚ.2≠0 ])) ℚ.+
+          ((θ / 4 [ ℚ.4≠0 ]) ℚ.+ (θ / 4 [ ℚ.4≠0 ]))
+            ≡⟨ cong (ℚ._+_ (ε ℚ.- (θ / 2 [ ℚ.2≠0 ])))
+                    (ℚ.self/4≡self/2 θ ℚ.4≠0 ℚ.2≠0) ⟩ 
+          (ε ℚ.- (θ / 2 [ ℚ.2≠0 ])) ℚ.+ (θ / 2 [ ℚ.2≠0 ])
+            ≡⟨ (sym $ ℚ.+Assoc ε (ℚ.- (θ / 2 [ ℚ.2≠0 ])) (θ / 2 [ ℚ.2≠0 ])) ⟩ 
+          ε ℚ.+ (ℚ.- (θ / 2 [ ℚ.2≠0 ]) ℚ.+ (θ / 2 [ ℚ.2≠0 ]))
+            ≡⟨ cong (ℚ._+_ ε) (ℚ.+InvL (θ / 2 [ ℚ.2≠0 ])) ⟩ 
+          ε ℚ.+ 0
+            ≡⟨ ℚ.+IdR ε ⟩ 
+          ε ∎
 
-      β : x δ δ>0 ∼[ ε-θ/2 , ε-θ/2>0 ] 0
-      β = closeTriangleInequality
-            (x δ δ>0) (limit x ω) 0
-            θ/2 (ε ℚ.- θ) θ/2>0 ε-θ>0
-            (closeSymmetric (limit x ω) (x δ δ>0) θ/2 θ/2>0 α)
-            close-ε-θ
-
-      -- |x δ| < rational (ε - θ/2) (by inductive hypothesis)
-      γ : ∣ x δ δ>0 ∣ < rational ε-θ/2
-      γ = IH δ δ>0 ε-θ/2 ε-θ/2>0 β
-
-      -- |x δ| ∼[θ/2] |limit x ω| (by nonexpanding)
-      ζ : ∣ x δ δ>0 ∣ ∼[ θ/2 , θ/2>0 ] ∣ limit x ω ∣
-      ζ = magnitudeNonexpandingℝ (x δ δ>0) (limit x ω) θ/2 θ/2>0
-            (closeSymmetric (limit x ω) (x δ δ>0) θ/2 θ/2>0 α)
-
-      -- |limit x ω| < rational (ε-θ/2 + θ/2) = rational ε
-      η : ∣ limit x ω ∣ < rational (ε-θ/2 ℚ.+ θ/2)
-      η = <rational→close→<rational+ε θ/2>0 γ ζ
-
-      -- θ/2 + (ε - θ) + θ/2 = θ + (ε - θ) = ε
-      ε-θ/2+θ/2≡ε : ε-θ/2 ℚ.+ θ/2 ≡ ε
-      ε-θ/2+θ/2≡ε =
-        (θ/2 ℚ.+ (ε ℚ.- θ)) ℚ.+ θ/2
-          ≡⟨ ℚ.+Comm (θ/2 ℚ.+ (ε ℚ.- θ)) θ/2 ⟩
-        θ/2 ℚ.+ (θ/2 ℚ.+ (ε ℚ.- θ))
-          ≡⟨ ℚ.+Assoc θ/2 θ/2 (ε ℚ.- θ) ⟩
-        (θ/2 ℚ.+ θ/2) ℚ.+ (ε ℚ.- θ)
-          ≡⟨ cong (flip ℚ._+_ (ε ℚ.- θ)) θ/2+θ/2≡θ ⟩
-        θ ℚ.+ (ε ℚ.- θ)
-          ≡⟨ ℚ.+Comm θ (ε ℚ.- θ) ⟩
-        (ε ℚ.- θ) ℚ.+ θ
-          ≡⟨ ℚ.subtractAddRightCancel θ ε ⟩
-        ε ∎
-
-      ξ : ∣ limit x ω ∣ < rational ε
-      ξ = subst (∣ limit x ω ∣ <_) (cong rational ε-θ/2+θ/2≡ε) η
+      κ' : ∣ limit x ω ∣ < rational ε
+      κ' = subst (∣ limit x ω ∣ <_) (cong rational μ) κ
 
   χ : (x : ℝ) → isProp (P x)
   χ x = isPropΠ3 (λ ε φ ψ → <-isProp ∣ x ∣ (rational ε))
@@ -1564,3 +1565,54 @@ close→distance< {x} {y} {ε} φ ψ = χ'
 
   χ' : ∣ x - y ∣ < rational ε
   χ' = subst (flip _<_ $ rational ε) (magnitudeMagnitude≡magnitude $ x - y) χ
+
+distance<→close : 
+  {x y : ℝ} {ε : ℚ.ℚ} (φ : 0 ℚ.< ε) →
+  distance x y < rational ε →
+  x ∼[ ε , φ ] y
+distance<→close {x} {y} {ε} =
+  inductionProposition₂ {A = P}
+  (rationalRationalCase ,
+   rationalLimitCase ,
+   limitRationalCase ,
+   limitLimitCase ,
+   pProposition)
+  x y ε
+  where
+  P : ℝ → ℝ → Type ℓ-zero
+  P x y = (ε : ℚ.ℚ) (φ : 0 ℚ.< ε) → distance x y < rational ε → x ∼[ ε , φ ] y
+
+  rationalRationalCase :
+    (q r : ℚ.ℚ) →
+    (ε : ℚ.ℚ) (φ : 0 ℚ.< ε) →
+    distance (rational q) (rational r) < rational ε →
+    (rational q) ∼[ ε , φ ] (rational r)
+  rationalRationalCase q r ε φ ψ = χ
+    where
+    ω : distance (rational q) (rational r) ≡ rational (ℚ.distance q r)
+    ω = distanceExtendsRationalDistance q r
+
+    ψ' : rational (ℚ.distance q r) < rational ε
+    ψ' = subst (flip _<_ $ rational ε) ω ψ
+
+    ψ'' : ℚ.distance q r ℚ.< ε
+    ψ'' = rationalStrictReflective {q = ℚ.distance q r} {r = ε} ψ'
+
+    χ : rational q ∼[ ε , φ ] rational r
+    χ = close'→close (rational q) (rational r) ε φ ψ''
+
+  rationalLimitCase :
+    (q : ℚ.ℚ) (y₁ : (ε₁ : ℚ.ℚ) → 0 ℚ.< ε₁ → ℝ)
+    (φ : CauchyApproximation y₁) →
+    ((ε₁ : ℚ.ℚ) (ψ : 0 ℚ.< ε₁) → P (rational q) (y₁ ε₁ ψ)) →
+    P (rational q) (limit y₁ φ)
+  rationalLimitCase = {!!}
+
+  limitRationalCase : {!!}
+  limitRationalCase = {!!}
+
+  limitLimitCase : {!!}
+  limitLimitCase = {!!}
+
+  pProposition : (x y : ℝ) → isProp (P x y)
+  pProposition x y = isPropΠ3 (λ ε φ ψ → squash ε φ x y)

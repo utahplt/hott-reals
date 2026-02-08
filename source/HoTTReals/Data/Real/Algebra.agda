@@ -909,7 +909,14 @@ rationalStrictReflective {q} {r} φ =
       ((≤-transitive x y (rational q) φ χ) , π , ρ)) ∣₁
 
 <→≤→< : {x y z : ℝ} → x < y → y ≤ z → x < z
-<→≤→< {x} {y} {z} φ ψ = {!!}
+<→≤→< {x} {y} {z} φ ψ = ∃-rec (<-isProp x z) ω φ
+  where
+  ω : (u : ℚ.ℚ × ℚ.ℚ) →
+      (x ≤ rational (fst u)) × ((fst u) ℚ.< (snd u)) × (rational (snd u) ≤ y) →
+      x < z
+  ω (q , r) (χ , π , ρ) =
+    ∣ ((q , r) ,
+      (χ , π , ≤-transitive (rational r) y z ρ ψ)) ∣₁
 
 minNonexpandingℚ₂ : Nonexpandingℚ₂ ℚ.min
 minNonexpandingℚ₂ = φ , ψ
@@ -1672,120 +1679,75 @@ distance<→close {x} {y} {ε} =
       (distance (rational q) (limit y φ) < rational θ) ×
       (rational θ < rational ε) →
       rational q ∼[ ε , ω ] limit y φ
-    rationalLimitCase' θ (π , ρ) = {!!}
+    rationalLimitCase' θ (π , ρ) = ζ''
       where
       σ : 0 ℚ.< θ
       σ = rationalStrictReflective {q = 0} {r = θ}
-            {!!}
-            -- (ℚ.isTrans≤< 0 {!distance (rational q) (limit y φ)!} {!rational θ!} (0≤distance (rational q) (limit y φ)) {!!})
-        -- where
-        -- 0<θ : 0 < rational θ
-        -- 0<θ = ℚ.isTrans≤<
-        --         0 (distance (rational q) (limit y ω)) (rational θ)
-        --         (0≤distance (rational q) (limit y ω))
-        --         dist<θ
+            (≤→<→< {x = 0} (0≤distance (rational q) (limit y φ)) π)
 
       ρ' : θ ℚ.< ε
       ρ' = rationalStrictReflective {q = θ} {r = ε} ρ
 
-      -- ε-θ>0 : 0 ℚ.< ε ℚ.- θ
-      -- ε-θ>0 = ℚ.<→0<- {x = θ} {y = ε} θ<ε'
+      τ : 0 ℚ.< ε ℚ.- θ
+      τ = ℚ.<→0<- {x = θ} {y = ε} ρ'
 
-      -- -- Define δ = (ε - θ)/4
-      -- 0<4 : 0 ℚ.< 4
-      -- 0<4 = ℚ.0<+' {x = 2} {y = 2} ℚ.0<2 ℚ.0<2
+      δ : ℚ.ℚ
+      δ = (ε ℚ.- θ) / 4 [ ℚ.4≠0 ]
 
-      -- 4≠0 : (4 ≡ 0) → ⊥
-      -- 4≠0 = ≠-symmetric $ ℚ.<→≠ 0<4
+      σ' : 0 ℚ.< δ
+      σ' = ℚ.0</ {x = ε ℚ.- θ} {y = 4} τ ℚ.0<4
 
-      -- δ : ℚ.ℚ
-      -- δ = (ε ℚ.- θ) / 4 [ 4≠0 ]
+      υ : limit y φ ∼[ (δ ℚ.+ δ) , ℚ.0<+' {x = δ} {y = δ} σ' σ' ] y δ σ'
+      υ = limitClose'' y φ δ δ σ' σ'
 
-      -- δ>0 : 0 ℚ.< δ
-      -- δ>0 = ℚ.0</ {x = ε ℚ.- θ} {y = 4} ε-θ>0 0<4
+      υ' : y δ σ' ∼[ (δ ℚ.+ δ) , ℚ.0<+' {x = δ} {y = δ} σ' σ' ] limit y φ
+      υ' = closeSymmetric (limit y φ) (y δ σ') (δ ℚ.+ δ)
+                          (ℚ.0<+' {x = δ} {y = δ} σ' σ') υ
 
-      -- -- 2δ
-      -- 2δ : ℚ.ℚ
-      -- 2δ = δ ℚ.+ δ
+      α : distance (rational q) (limit y φ)
+          ∼[ δ ℚ.+ δ , ℚ.0<+' {x = δ} {y = δ} σ' σ' ]
+          distance (rational q) (y δ σ')
+      α = snd distanceNonexpandingℝ₂
+            (rational q) (limit y φ) (y δ σ')
+            (δ ℚ.+ δ) (ℚ.0<+' {x = δ} {y = δ} σ' σ')
+            υ
 
-      -- 2δ>0 : 0 ℚ.< 2δ
-      -- 2δ>0 = ℚ.0<+' {x = δ} {y = δ} δ>0 δ>0
+      β : distance (rational q) (y δ σ') < rational (θ ℚ.+ (δ ℚ.+ δ))
+      β = <rational→close→<rational+ε (ℚ.0<+' {x = δ} {y = δ} σ' σ') π α
 
-      -- -- 4δ = ε - θ
-      -- 4δ≡ε-θ : (2δ ℚ.+ 2δ) ≡ ε ℚ.- θ
-      -- 4δ≡ε-θ =
-      --   (δ ℚ.+ δ) ℚ.+ (δ ℚ.+ δ)
-      --     ≡⟨ cong (flip ℚ._+_ (δ ℚ.+ δ)) (ℚ.self+≡2· δ) ⟩
-      --   (2 ℚ.· δ) ℚ.+ (δ ℚ.+ δ)
-      --     ≡⟨ cong (ℚ._+_ (2 ℚ.· δ)) (ℚ.self+≡2· δ) ⟩
-      --   (2 ℚ.· δ) ℚ.+ (2 ℚ.· δ)
-      --     ≡⟨ ℚ.self+≡2· (2 ℚ.· δ) ⟩
-      --   2 ℚ.· (2 ℚ.· δ)
-      --     ≡⟨ ℚ.·Assoc 2 2 δ ⟩
-      --   (2 ℚ.· 2) ℚ.· δ
-      --     ≡⟨ ℚ.·Comm (2 ℚ.· 2) δ ⟩
-      --   δ ℚ.· (2 ℚ.· 2)
-      --     ≡⟨ ℚ./· (ε ℚ.- θ) 4 4≠0 ⟩
-      --   ε ℚ.- θ ∎
+      γ : rational q
+          ∼[ θ ℚ.+ (δ ℚ.+ δ) ,
+             ℚ.0<+' {x = θ} {y = δ ℚ.+ δ} σ (ℚ.0<+' {x = δ} {y = δ} σ' σ') ]
+          y δ σ'
+      γ = ψ δ
+            σ'
+            (θ ℚ.+ (δ ℚ.+ δ))
+            (ℚ.0<+' {x = θ} {y = δ ℚ.+ δ} σ (ℚ.0<+' {x = δ} {y = δ} σ' σ'))
+            β
 
-      -- -- limit y ∼[2δ] y δ
-      -- α : limit y ω ∼[ 2δ , 2δ>0 ] y δ δ>0
-      -- α = limitClose'' y ω δ δ δ>0 δ>0
+      ζ : rational q ∼[ (θ ℚ.+ (δ ℚ.+ δ)) ℚ.+ (δ ℚ.+ δ) , _ ] limit y φ
+      ζ = closeTriangleInequality
+            (rational q) (y δ σ') (limit y φ)
+            (θ ℚ.+ (δ ℚ.+ δ)) (δ ℚ.+ δ)
+            (ℚ.0<+' {x = θ} {y = δ ℚ.+ δ} σ
+              (ℚ.0<+' {x = δ} {y = δ} σ' σ'))
+            (ℚ.0<+' {x = δ} {y = δ} σ' σ')
+            γ υ'
 
-      -- -- |rational q - limit y| ∼[2δ] |rational q - y δ| (by nonexpanding)
-      -- β : distance (rational q) (limit y ω) ∼[ 2δ , 2δ>0 ]
-      --     distance (rational q) (y δ δ>0)
-      -- β = snd distanceNonexpandingℝ₂ (rational q) (limit y ω) (y δ δ>0) 2δ 2δ>0 α
+      ι : (θ ℚ.+ (δ ℚ.+ δ)) ℚ.+ (δ ℚ.+ δ) ≡ ε
+      ι = {!!}
 
-      -- -- θ + 2δ
-      -- θ+2δ : ℚ.ℚ
-      -- θ+2δ = θ ℚ.+ 2δ
+      ζ' : Σ (0 ℚ.< ε)
+             (λ ?ξ → Close ε ?ξ (rational q) (limit y φ))
+      ζ' = subst (λ ?x → Σ (0 ℚ.< ?x)
+                           (λ ξ → Close ?x ξ (rational q) (limit y φ)))
+                 ι
+                 (_ , ζ)
 
-      -- θ+2δ>0 : 0 ℚ.< θ+2δ
-      -- θ+2δ>0 = ℚ.0<+' {x = θ} {y = 2δ} θ>0 2δ>0
-
-      -- -- |rational q - y δ| < rational (θ + 2δ) (by Lemma 11.3.43(i))
-      -- γ : distance (rational q) (y δ δ>0) < rational θ+2δ
-      -- γ = <rational→close→<rational+ε 2δ>0 dist<θ β
-
-      -- -- rational q ∼[θ + 2δ] y δ (by IH)
-      -- ζ : rational q ∼[ θ+2δ , θ+2δ>0 ] y δ δ>0
-      -- ζ = IH δ δ>0 θ+2δ θ+2δ>0 γ
-
-      -- -- y δ ∼[2δ] limit y (symmetric of α)
-      -- α' : y δ δ>0 ∼[ 2δ , 2δ>0 ] limit y ω
-      -- α' = closeSymmetric (limit y ω) (y δ δ>0) 2δ 2δ>0 α
-
-      -- -- θ + 4δ
-      -- θ+4δ : ℚ.ℚ
-      -- θ+4δ = θ+2δ ℚ.+ 2δ
-
-      -- θ+4δ>0 : 0 ℚ.< θ+4δ
-      -- θ+4δ>0 = ℚ.0<+' {x = θ+2δ} {y = 2δ} θ+2δ>0 2δ>0
-
-      -- -- rational q ∼[θ + 4δ] limit y (by triangle)
-      -- η : rational q ∼[ θ+4δ , θ+4δ>0 ] limit y ω
-      -- η = closeTriangleInequality
-      --       (rational q) (y δ δ>0) (limit y ω)
-      --       θ+2δ 2δ θ+2δ>0 2δ>0
-      --       ζ α'
-
-      -- -- θ + 4δ = θ + (ε - θ) = ε
-      -- θ+4δ≡ε : θ+4δ ≡ ε
-      -- θ+4δ≡ε = {!!}
-      --   -- (θ ℚ.+ 2δ) ℚ.+ 2δ
-      --   --   ≡⟨ ℚ.+Assoc θ 2δ 2δ ⟩
-      --   -- θ ℚ.+ (2δ ℚ.+ 2δ)
-      --   --   ≡⟨ cong (ℚ._+_ θ) 4δ≡ε-θ ⟩
-      --   -- θ ℚ.+ (ε ℚ.- θ)
-      --   --   ≡⟨ ℚ.addSubtractRightCancel ε θ ⟩
-      --   -- ε ∎
-
-      -- ξ : rational q ∼[ ε , ε>0 ] limit y ω
-      -- ξ = subst2 (λ ε' ε'>0 → rational q ∼[ ε' , {!!} ] limit y ω)
-      --            θ+4δ≡ε
-      --            (ℚ.isProp< 0 ε {!!} ε>0)
-      --            η
+      ζ'' : rational q ∼[ ε , ω ] limit y φ
+      ζ'' = subst (λ ?ξ → Close ε ?ξ (rational q) (limit y φ))
+                  (ℚ.isProp< 0 ε (fst ζ') ω)
+                  (snd ζ') 
 
   limitRationalCase : {!!}
   limitRationalCase = {!!}

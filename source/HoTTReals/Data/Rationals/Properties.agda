@@ -11,6 +11,15 @@ open import Cubical.Relation.Nullary
 
 open import HoTTReals.Algebra.Field.Instances.Rationals as ℚ
 
+2≠0 : ¬ 2 ≡ 0
+2≠0 = Bool.toWitnessFalse {Q = discreteℚ 2 0} tt
+
+4≠0 : ¬ 4 ≡ 0
+4≠0 = Bool.toWitnessFalse {Q = discreteℚ 4 0} tt
+
+8≠0 : ¬ 8 ≡ 0
+8≠0 = Bool.toWitnessFalse {Q = discreteℚ 8 0} tt
+
 self+≡2· : (x : ℚ) → x + x ≡ 2 · x
 self+≡2· x =
   x + x
@@ -241,15 +250,29 @@ self/2≡self x φ =
 
 self/4≡self/2 : (x : ℚ) (φ : ¬ 4 ≡ 0) (ψ : ¬ 2 ≡ 0) →
                 (x / 4 [ φ ]) + (x / 4 [ φ ]) ≡ x / 2 [ ψ ]
-self/4≡self/2 x φ ψ = 
+self/4≡self/2 x φ ψ =
   (x / 4 [ φ ]) + (x / 4 [ φ ])
     ≡⟨ cong₂ _+_ (·Assoc x (2 [ ψ ]⁻¹) (2 [ ψ ]⁻¹))
                  (·Assoc x (2 [ ψ ]⁻¹) (2 [ ψ ]⁻¹)) ⟩
   ((x / 2 [ ψ ]) · 2 [ ψ ]⁻¹) + ((x / 2 [ ψ ]) · 2 [ ψ ]⁻¹)
     ≡⟨ (sym $ ·DistR+ (x / 2 [ ψ ]) (x / 2 [ ψ ]) (2 [ ψ ]⁻¹)) ⟩
-  (x / 2 [ ψ ] + x / 2 [ ψ ]) · 2 [ ψ ]⁻¹ 
+  (x / 2 [ ψ ] + x / 2 [ ψ ]) · 2 [ ψ ]⁻¹
     ≡⟨ cong (flip _·_ (2 [ ψ ]⁻¹ )) (self/2≡self x ψ)  ⟩
   x / 2 [ ψ ] ∎
+
+self/8≡self/4 : (x : ℚ) (φ : ¬ 8 ≡ 0) (ψ : ¬ 4 ≡ 0) →
+                (x / 8 [ φ ]) + (x / 8 [ φ ]) ≡ x / 4 [ ψ ]
+self/8≡self/4 x φ ψ =
+  (x / 8 [ φ ]) + (x / 8 [ φ ])
+     ≡⟨ cong₂ _+_ (·Assoc x (4 [ ψ ]⁻¹) (2 [ 2≠0 ]⁻¹))
+                  (·Assoc x (4 [ ψ ]⁻¹) (2 [ 2≠0 ]⁻¹)) ⟩
+  ((x / 4 [ ψ ]) · 2 [ 2≠0 ]⁻¹) + ((x / 4 [ ψ ]) · 2 [ 2≠0 ]⁻¹)
+      ≡⟨ sym $ ·DistR+ (x / 4 [ ψ ]) (x / 4 [ ψ ]) (2 [ 2≠0 ]⁻¹) ⟩
+  (x / 4 [ ψ ] + x / 4 [ ψ ]) · 2 [ 2≠0 ]⁻¹
+     ≡⟨ cong (flip _·_ (2 [ 2≠0 ]⁻¹)) (self/4≡self/2 x ψ 2≠0) ⟩
+  (x / 2 [ 2≠0 ]) · 2 [ 2≠0 ]⁻¹
+     ≡⟨ sym $ ·Assoc x (2 [ 2≠0 ]⁻¹) (2 [ 2≠0 ]⁻¹) ⟩
+  x / 4 [ ψ ] ∎
 
 self-self/2≡self/2 :
   (x : ℚ) →

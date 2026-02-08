@@ -29,9 +29,6 @@ open import HoTTReals.Data.Rationals.Properties
 0<2 : 0 < 2
 0<2 = Bool.toWitness {Q = <Dec 0 2} tt
 
-2≠0 : ¬ 2 ≡ 0
-2≠0 = Bool.toWitnessFalse {Q = discreteℚ 2 0} tt
-
 0≤2 : 0 ≤ 2
 0≤2 = Bool.toWitness {Q = ≤Dec 0 2} tt
 
@@ -47,11 +44,11 @@ open import HoTTReals.Data.Rationals.Properties
 0<2⁻¹ : 0 < 2 [ 2≠0 ]⁻¹
 0<2⁻¹ = Bool.toWitness {Q = <Dec 0 (2 [ 2≠0 ]⁻¹)} tt
 
-4≠0 : ¬ 4 ≡ 0
-4≠0 = Bool.toWitnessFalse {Q = discreteℚ 4 0} tt
-
 0<4 : 0 ℚ.< 4
 0<4 = Bool.toWitness {Q = <Dec 0 4} tt
+
+0<8 : 0 ℚ.< 8
+0<8 = Bool.toWitness {Q = <Dec 0 8} tt
 
 ≤-o· : {x y z : ℚ} → 0 ≤ x → y ≤ z → x · y ≤ x · z
 ≤-o· {x} {y} {z} p q =

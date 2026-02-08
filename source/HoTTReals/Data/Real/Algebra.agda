@@ -1764,11 +1764,284 @@ distance<→close {x} {y} {ε} =
                   (ℚ.isProp< 0 ε (fst ζ') ω)
                   (snd ζ') 
 
-  limitRationalCase : {!!}
-  limitRationalCase = {!!}
+  limitRationalCase :
+    (x : (ε : ℚ.ℚ) → 0 ℚ.< ε → ℝ) (φ : CauchyApproximation x) (r : ℚ.ℚ) →
+    ((δ : ℚ.ℚ) (ψ : 0 ℚ.< δ) →
+     (ε : ℚ.ℚ) (ω : 0 ℚ.< ε) →
+     distance (x δ ψ) (rational r) < rational ε →
+     x δ ψ ∼[ ε , ω ] rational r) →
+    (ε : ℚ.ℚ) (ω : 0 ℚ.< ε) →
+    distance (limit x φ) (rational r) < rational ε →
+    limit x φ ∼[ ε , ω ] rational r
+  limitRationalCase x φ r ψ ε ω χ =
+    ∃-rec (squash ε ω (limit x φ) (rational r)) limitRationalCase'
+          (<-archimedian (distance (limit x φ) (rational r)) (rational ε) χ)
+    where
+    limitRationalCase' :
+      (θ : ℚ.ℚ) →
+      (distance (limit x φ) (rational r) < rational θ) ×
+      (rational θ < rational ε) →
+      limit x φ ∼[ ε , ω ] rational r
+    limitRationalCase' θ (π , ρ) = ζ''
+      where
+      σ : 0 ℚ.< θ
+      σ = rationalStrictReflective {q = 0} {r = θ}
+            (≤→<→< {x = 0} (0≤distance (limit x φ) (rational r)) π)
 
-  limitLimitCase : {!!}
-  limitLimitCase = {!!}
+      ρ' : θ ℚ.< ε
+      ρ' = rationalStrictReflective {q = θ} {r = ε} ρ
+
+      τ : 0 ℚ.< ε ℚ.- θ
+      τ = ℚ.<→0<- {x = θ} {y = ε} ρ'
+
+      δ : ℚ.ℚ
+      δ = (ε ℚ.- θ) / 4 [ ℚ.4≠0 ]
+
+      σ' : 0 ℚ.< δ
+      σ' = ℚ.0</ {x = ε ℚ.- θ} {y = 4} τ ℚ.0<4
+
+      υ : limit x φ ∼[ (δ ℚ.+ δ) , ℚ.0<+' {x = δ} {y = δ} σ' σ' ] x δ σ'
+      υ = limitClose'' x φ δ δ σ' σ'
+
+      α : distance (limit x φ) (rational r)
+          ∼[ δ ℚ.+ δ , ℚ.0<+' {x = δ} {y = δ} σ' σ' ]
+          distance (x δ σ') (rational r)
+      α = fst distanceNonexpandingℝ₂
+            (rational r) (limit x φ) (x δ σ')
+            (δ ℚ.+ δ) (ℚ.0<+' {x = δ} {y = δ} σ' σ')
+            υ
+
+      β : distance (x δ σ') (rational r) < rational (θ ℚ.+ (δ ℚ.+ δ))
+      β = <rational→close→<rational+ε (ℚ.0<+' {x = δ} {y = δ} σ' σ') π α
+
+      γ : x δ σ'
+          ∼[ θ ℚ.+ (δ ℚ.+ δ) ,
+             ℚ.0<+' {x = θ} {y = δ ℚ.+ δ} σ (ℚ.0<+' {x = δ} {y = δ} σ' σ') ]
+          rational r
+      γ = ψ δ
+            σ'
+            (θ ℚ.+ (δ ℚ.+ δ))
+            (ℚ.0<+' {x = θ} {y = δ ℚ.+ δ} σ (ℚ.0<+' {x = δ} {y = δ} σ' σ'))
+            β
+
+      ζ : limit x φ ∼[ (δ ℚ.+ δ) ℚ.+ (θ ℚ.+ (δ ℚ.+ δ)) , _ ] rational r
+      ζ = closeTriangleInequality
+            (limit x φ) (x δ σ') (rational r)
+            (δ ℚ.+ δ) (θ ℚ.+ (δ ℚ.+ δ))
+            (ℚ.0<+' {x = δ} {y = δ} σ' σ')
+            (ℚ.0<+' {x = θ} {y = δ ℚ.+ δ} σ
+              (ℚ.0<+' {x = δ} {y = δ} σ' σ'))
+            υ γ
+
+      ι' : (δ ℚ.+ δ) ℚ.+ (δ ℚ.+ δ) ≡ ε ℚ.- θ
+      ι' = (δ ℚ.+ δ) ℚ.+ (δ ℚ.+ δ)
+            ≡⟨ cong₂ ℚ._+_
+                     (ℚ.self/4≡self/2 (ε ℚ.- θ) ℚ.4≠0 ℚ.2≠0)
+                     (ℚ.self/4≡self/2 (ε ℚ.- θ) ℚ.4≠0 ℚ.2≠0) ⟩
+          ((ε ℚ.- θ) / 2 [ ℚ.2≠0 ]) ℚ.+ ((ε ℚ.- θ) / 2 [ ℚ.2≠0 ])
+            ≡⟨ ℚ.self/2≡self (ε ℚ.- θ) ℚ.2≠0 ⟩
+          ε ℚ.- θ ∎
+
+      ι : (δ ℚ.+ δ) ℚ.+ (θ ℚ.+ (δ ℚ.+ δ)) ≡ ε
+      ι = (δ ℚ.+ δ) ℚ.+ (θ ℚ.+ (δ ℚ.+ δ))
+            ≡⟨ ℚ.addRightSwap (δ ℚ.+ δ) θ (δ ℚ.+ δ) ⟩
+          θ ℚ.+ ((δ ℚ.+ δ) ℚ.+ (δ ℚ.+ δ))
+            ≡⟨ cong (ℚ._+_ θ) ι' ⟩
+          θ ℚ.+ (ε ℚ.- θ)
+            ≡⟨ ℚ.addLeftSubtractCancel θ ε ⟩
+          ε ∎
+
+      ζ' : Σ (0 ℚ.< ε)
+             (λ ?ξ → Close ε ?ξ (limit x φ) (rational r))
+      ζ' = subst (λ ?x → Σ (0 ℚ.< ?x)
+                           (λ ξ → Close ?x ξ (limit x φ) (rational r)))
+                 ι
+                 (_ , ζ)
+
+      ζ'' : limit x φ ∼[ ε , ω ] rational r
+      ζ'' = subst (λ ?ξ → Close ε ?ξ (limit x φ) (rational r))
+                  (ℚ.isProp< 0 ε (fst ζ') ω)
+                  (snd ζ')
+
+  limitLimitCase :
+    (x y : (ε : ℚ.ℚ) → 0 ℚ.< ε → ℝ)
+    (φ : CauchyApproximation x)
+    (ψ : CauchyApproximation y) →
+    ((δ η : ℚ.ℚ) (ω : 0 ℚ.< δ) (χ : 0 ℚ.< η)
+     (ε : ℚ.ℚ) (π : 0 ℚ.< ε) →
+     distance (x δ ω) (y η χ) < rational ε →
+     x δ ω ∼[ ε , π ] y η χ) →
+    (ε : ℚ.ℚ) (χ : 0 ℚ.< ε) →
+    distance (limit x φ) (limit y ψ) < rational ε →
+    limit x φ ∼[ ε , χ ] limit y ψ
+  limitLimitCase x y φ ψ ω ε χ π =
+    ∃-rec (squash ε χ (limit x φ) (limit y ψ)) limitLimitCase'
+          (<-archimedian (distance (limit x φ) (limit y ψ)) (rational ε) π)
+    where
+    limitLimitCase' :
+      (θ : ℚ.ℚ) →
+      (distance (limit x φ) (limit y ψ) < rational θ) ×
+      (rational θ < rational ε) →
+      limit x φ ∼[ ε , χ ] limit y ψ
+    limitLimitCase' θ (π' , ρ) = ζ''
+      where
+      -- Step 1: Show 0 < θ
+      σ : 0 ℚ.< θ
+      σ = rationalStrictReflective {q = 0} {r = θ}
+            (≤→<→< {x = 0} (0≤distance (limit x φ) (limit y ψ)) π')
+
+      ρ' : θ ℚ.< ε
+      ρ' = rationalStrictReflective {q = θ} {r = ε} ρ
+
+      τ : 0 ℚ.< ε ℚ.- θ
+      τ = ℚ.<→0<- {x = θ} {y = ε} ρ'
+
+      -- Step 2: Define δ = (ε - θ) / 4 / 2 (i.e., (ε - θ) / 8)
+      δ' : ℚ.ℚ
+      δ' = (ε ℚ.- θ) / 4 [ ℚ.4≠0 ]
+
+      σ'' : 0 ℚ.< δ'
+      σ'' = ℚ.0</ {x = ε ℚ.- θ} {y = 4} τ ℚ.0<4
+
+      δ : ℚ.ℚ
+      δ = δ' / 2 [ ℚ.2≠0 ]
+
+      σ' : 0 ℚ.< δ
+      σ' = ℚ.0</ {x = δ'} {y = 2} σ'' ℚ.0<2
+
+      -- Step 3: Relate limits to approximations
+      υ₁ : limit x φ ∼[ (δ ℚ.+ δ) , ℚ.0<+' {x = δ} {y = δ} σ' σ' ] x δ σ'
+      υ₁ = limitClose'' x φ δ δ σ' σ'
+
+      υ₂ : limit y ψ ∼[ (δ ℚ.+ δ) , ℚ.0<+' {x = δ} {y = δ} σ' σ' ] y δ σ'
+      υ₂ = limitClose'' y ψ δ δ σ' σ'
+
+      υ₂' : y δ σ' ∼[ (δ ℚ.+ δ) , ℚ.0<+' {x = δ} {y = δ} σ' σ' ] limit y ψ
+      υ₂' = closeSymmetric (limit y ψ) (y δ σ') (δ ℚ.+ δ)
+                            (ℚ.0<+' {x = δ} {y = δ} σ' σ') υ₂
+
+      -- Step 4: Bound distance at approximation level
+      α₁ : distance (limit x φ) (limit y ψ)
+           ∼[ δ ℚ.+ δ , ℚ.0<+' {x = δ} {y = δ} σ' σ' ]
+           distance (x δ σ') (limit y ψ)
+      α₁ = fst distanceNonexpandingℝ₂
+             (limit y ψ) (limit x φ) (x δ σ')
+             (δ ℚ.+ δ) (ℚ.0<+' {x = δ} {y = δ} σ' σ')
+             υ₁
+
+      β₁ : distance (x δ σ') (limit y ψ) < rational (θ ℚ.+ (δ ℚ.+ δ))
+      β₁ = <rational→close→<rational+ε (ℚ.0<+' {x = δ} {y = δ} σ' σ') π' α₁
+
+      α₂ : distance (x δ σ') (limit y ψ)
+           ∼[ δ ℚ.+ δ , ℚ.0<+' {x = δ} {y = δ} σ' σ' ]
+           distance (x δ σ') (y δ σ')
+      α₂ = snd distanceNonexpandingℝ₂
+             (x δ σ') (limit y ψ) (y δ σ')
+             (δ ℚ.+ δ) (ℚ.0<+' {x = δ} {y = δ} σ' σ')
+             υ₂
+
+      β : distance (x δ σ') (y δ σ') < rational ((θ ℚ.+ (δ ℚ.+ δ)) ℚ.+ (δ ℚ.+ δ))
+      β = <rational→close→<rational+ε (ℚ.0<+' {x = δ} {y = δ} σ' σ') β₁ α₂
+
+      -- Step 5: Apply IH
+      γ : x δ σ'
+          ∼[ (θ ℚ.+ (δ ℚ.+ δ)) ℚ.+ (δ ℚ.+ δ) ,
+             ℚ.0<+' {x = θ ℚ.+ (δ ℚ.+ δ)} {y = δ ℚ.+ δ}
+               (ℚ.0<+' {x = θ} {y = δ ℚ.+ δ} σ (ℚ.0<+' {x = δ} {y = δ} σ' σ'))
+               (ℚ.0<+' {x = δ} {y = δ} σ' σ') ]
+          y δ σ'
+      γ = ω δ δ σ' σ'
+            ((θ ℚ.+ (δ ℚ.+ δ)) ℚ.+ (δ ℚ.+ δ))
+            (ℚ.0<+' {x = θ ℚ.+ (δ ℚ.+ δ)} {y = δ ℚ.+ δ}
+               (ℚ.0<+' {x = θ} {y = δ ℚ.+ δ} σ (ℚ.0<+' {x = δ} {y = δ} σ' σ'))
+               (ℚ.0<+' {x = δ} {y = δ} σ' σ'))
+            β
+
+      -- Step 6: Chain triangle inequalities
+      ζ₁ : limit x φ ∼[ (δ ℚ.+ δ) ℚ.+ ((θ ℚ.+ (δ ℚ.+ δ)) ℚ.+ (δ ℚ.+ δ)) , _ ] y δ σ'
+      ζ₁ = closeTriangleInequality
+             (limit x φ) (x δ σ') (y δ σ')
+             (δ ℚ.+ δ) ((θ ℚ.+ (δ ℚ.+ δ)) ℚ.+ (δ ℚ.+ δ))
+             (ℚ.0<+' {x = δ} {y = δ} σ' σ')
+             (ℚ.0<+' {x = θ ℚ.+ (δ ℚ.+ δ)} {y = δ ℚ.+ δ}
+               (ℚ.0<+' {x = θ} {y = δ ℚ.+ δ} σ (ℚ.0<+' {x = δ} {y = δ} σ' σ'))
+               (ℚ.0<+' {x = δ} {y = δ} σ' σ'))
+             υ₁ γ
+
+      ζ : limit x φ ∼[ ((δ ℚ.+ δ) ℚ.+ ((θ ℚ.+ (δ ℚ.+ δ)) ℚ.+ (δ ℚ.+ δ))) ℚ.+ (δ ℚ.+ δ) , _ ] limit y ψ
+      ζ = closeTriangleInequality
+            (limit x φ) (y δ σ') (limit y ψ)
+            ((δ ℚ.+ δ) ℚ.+ ((θ ℚ.+ (δ ℚ.+ δ)) ℚ.+ (δ ℚ.+ δ))) (δ ℚ.+ δ)
+            _
+            (ℚ.0<+' {x = δ} {y = δ} σ' σ')
+            ζ₁ υ₂'
+
+      -- Step 7: Algebraic equality
+      -- We need to show: ((δ + δ) + ((θ + (δ + δ)) + (δ + δ))) + (δ + δ) ≡ ε
+      -- First, δ + δ = δ'/2 + δ'/2 = δ' by self/2≡self
+      -- Then θ + 4δ' = θ + 4 * (ε - θ)/4 = θ + (ε - θ) = ε
+
+      η : δ ℚ.+ δ ≡ δ'
+      η = ℚ.self/2≡self δ' ℚ.2≠0
+
+      η' : (δ ℚ.+ δ) ℚ.+ (δ ℚ.+ δ) ≡ δ' ℚ.+ δ'
+      η' = cong₂ ℚ._+_ η η
+
+      η'' : δ' ℚ.+ δ' ≡ (ε ℚ.- θ) / 2 [ ℚ.2≠0 ]
+      η'' = ℚ.self/4≡self/2 (ε ℚ.- θ) ℚ.4≠0 ℚ.2≠0
+
+      η''' : (δ' ℚ.+ δ') ℚ.+ (δ' ℚ.+ δ') ≡ ε ℚ.- θ
+      η''' = (δ' ℚ.+ δ') ℚ.+ (δ' ℚ.+ δ')
+               ≡⟨ cong₂ ℚ._+_ η'' η'' ⟩
+             ((ε ℚ.- θ) / 2 [ ℚ.2≠0 ]) ℚ.+ ((ε ℚ.- θ) / 2 [ ℚ.2≠0 ])
+               ≡⟨ ℚ.self/2≡self (ε ℚ.- θ) ℚ.2≠0 ⟩
+             ε ℚ.- θ ∎
+
+      ι : ((δ ℚ.+ δ) ℚ.+ ((θ ℚ.+ (δ ℚ.+ δ)) ℚ.+ (δ ℚ.+ δ))) ℚ.+ (δ ℚ.+ δ) ≡ ε
+      ι = ((δ ℚ.+ δ) ℚ.+ ((θ ℚ.+ (δ ℚ.+ δ)) ℚ.+ (δ ℚ.+ δ))) ℚ.+ (δ ℚ.+ δ)
+            ≡⟨ cong (λ z → ((z ℚ.+ ((θ ℚ.+ z) ℚ.+ z)) ℚ.+ z)) η ⟩
+          ((δ' ℚ.+ ((θ ℚ.+ δ') ℚ.+ δ')) ℚ.+ δ')
+            ≡⟨ cong (λ z → (z ℚ.+ ((θ ℚ.+ z) ℚ.+ z)) ℚ.+ z) (sym η) ⟩
+          (((δ ℚ.+ δ) ℚ.+ ((θ ℚ.+ (δ ℚ.+ δ)) ℚ.+ (δ ℚ.+ δ))) ℚ.+ (δ ℚ.+ δ))
+            ≡⟨ cong₂ (λ a b → (a ℚ.+ ((θ ℚ.+ a) ℚ.+ a)) ℚ.+ b) η η ⟩
+          ((δ' ℚ.+ ((θ ℚ.+ δ') ℚ.+ δ')) ℚ.+ δ')
+            ≡⟨ sym $ ℚ.+Assoc δ' ((θ ℚ.+ δ') ℚ.+ δ') δ' ⟩
+          (δ' ℚ.+ (((θ ℚ.+ δ') ℚ.+ δ') ℚ.+ δ'))
+            ≡⟨ cong (ℚ._+_ δ') (sym $ ℚ.+Assoc (θ ℚ.+ δ') δ' δ') ⟩
+          (δ' ℚ.+ ((θ ℚ.+ δ') ℚ.+ (δ' ℚ.+ δ')))
+            ≡⟨ cong (λ z → δ' ℚ.+ ((θ ℚ.+ δ') ℚ.+ z)) η'' ⟩
+          (δ' ℚ.+ ((θ ℚ.+ δ') ℚ.+ ((ε ℚ.- θ) / 2 [ ℚ.2≠0 ])))
+            ≡⟨ cong (λ z → δ' ℚ.+ (z ℚ.+ ((ε ℚ.- θ) / 2 [ ℚ.2≠0 ]))) (ℚ.+Comm θ δ') ⟩
+          (δ' ℚ.+ ((δ' ℚ.+ θ) ℚ.+ ((ε ℚ.- θ) / 2 [ ℚ.2≠0 ])))
+            ≡⟨ cong (ℚ._+_ δ') (sym $ ℚ.+Assoc δ' θ ((ε ℚ.- θ) / 2 [ ℚ.2≠0 ])) ⟩
+          (δ' ℚ.+ (δ' ℚ.+ (θ ℚ.+ ((ε ℚ.- θ) / 2 [ ℚ.2≠0 ]))))
+            ≡⟨ ℚ.+Assoc δ' δ' (θ ℚ.+ ((ε ℚ.- θ) / 2 [ ℚ.2≠0 ])) ⟩
+          ((δ' ℚ.+ δ') ℚ.+ (θ ℚ.+ ((ε ℚ.- θ) / 2 [ ℚ.2≠0 ])))
+            ≡⟨ cong (flip ℚ._+_ (θ ℚ.+ ((ε ℚ.- θ) / 2 [ ℚ.2≠0 ]))) η'' ⟩
+          (((ε ℚ.- θ) / 2 [ ℚ.2≠0 ]) ℚ.+ (θ ℚ.+ ((ε ℚ.- θ) / 2 [ ℚ.2≠0 ])))
+            ≡⟨ ℚ.+Assoc ((ε ℚ.- θ) / 2 [ ℚ.2≠0 ]) θ ((ε ℚ.- θ) / 2 [ ℚ.2≠0 ]) ⟩
+          ((((ε ℚ.- θ) / 2 [ ℚ.2≠0 ]) ℚ.+ θ) ℚ.+ ((ε ℚ.- θ) / 2 [ ℚ.2≠0 ]))
+            ≡⟨ cong (flip ℚ._+_ ((ε ℚ.- θ) / 2 [ ℚ.2≠0 ])) (ℚ.+Comm ((ε ℚ.- θ) / 2 [ ℚ.2≠0 ]) θ) ⟩
+          ((θ ℚ.+ ((ε ℚ.- θ) / 2 [ ℚ.2≠0 ])) ℚ.+ ((ε ℚ.- θ) / 2 [ ℚ.2≠0 ]))
+            ≡⟨ sym $ ℚ.+Assoc θ ((ε ℚ.- θ) / 2 [ ℚ.2≠0 ]) ((ε ℚ.- θ) / 2 [ ℚ.2≠0 ]) ⟩
+          (θ ℚ.+ (((ε ℚ.- θ) / 2 [ ℚ.2≠0 ]) ℚ.+ ((ε ℚ.- θ) / 2 [ ℚ.2≠0 ])))
+            ≡⟨ cong (ℚ._+_ θ) (ℚ.self/2≡self (ε ℚ.- θ) ℚ.2≠0) ⟩
+          (θ ℚ.+ (ε ℚ.- θ))
+            ≡⟨ ℚ.addLeftSubtractCancel θ ε ⟩
+          ε ∎
+
+      -- Step 8: Transport
+      ζ' : Σ (0 ℚ.< ε)
+             (λ ?ξ → Close ε ?ξ (limit x φ) (limit y ψ))
+      ζ' = subst (λ ?x → Σ (0 ℚ.< ?x)
+                           (λ ξ → Close ?x ξ (limit x φ) (limit y ψ)))
+                 ι
+                 (_ , ζ)
+
+      ζ'' : limit x φ ∼[ ε , χ ] limit y ψ
+      ζ'' = subst (λ ?ξ → Close ε ?ξ (limit x φ) (limit y ψ))
+                  (ℚ.isProp< 0 ε (fst ζ') χ)
+                  (snd ζ')
 
   pProposition : (x y : ℝ) → isProp (P x y)
   pProposition x y = isPropΠ3 (λ ε φ ψ → squash ε φ x y)

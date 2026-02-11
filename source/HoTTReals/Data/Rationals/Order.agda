@@ -7,7 +7,7 @@ open import Cubical.Data.Int.Order as ℤ using ()
 open import Cubical.Data.Int.Properties as ℤ using ()
 open import Cubical.Data.Nat as ℕ using (ℕ ; zero ; suc)
 open import Cubical.Data.NatPlusOne
-open import Cubical.Data.Rationals as ℚ
+open import Cubical.Data.Rationals as ℚ hiding (_∼_)
 open import Cubical.Data.Rationals.Order as ℚ
 open import Cubical.Data.Sigma
 open import Cubical.Data.Sum
@@ -16,6 +16,7 @@ open import Cubical.Foundations.HLevels
 open import Cubical.Foundations.Prelude
 open import Cubical.HITs.PropositionalTruncation as PropositionalTruncation
 open import Cubical.HITs.SetQuotients as SetQuotients using ()
+open import Cubical.Homotopy.Base
 open import Cubical.Relation.Binary.Order
 open import Cubical.Relation.Nullary
 
@@ -1547,3 +1548,42 @@ negateMinNegateNegate≡max x y =
 
   ψ : - min (- x) (- y) ≡ max x y
   ψ = sym φ' ∙ cong₂ max (-Invol x) (-Invol y)
+
+clamp' :
+  (a b : ℚ)
+  (φ : a ≤ b) →
+  ℚ → ℚ
+clamp' a b φ x = ℚ.max a (ℚ.min x b)
+
+clamp'-inInterval :
+  (a b : ℚ)
+  (φ : a ≤ b) →
+  (x : ℚ) → (a ≤ clamp' a b φ x) × (clamp' a b φ x ≤ b)
+clamp'-inInterval a b φ x = ψ , ω
+  where
+  ψ : a ≤ clamp' a b φ x
+  ψ = ≤max a (min x b)
+
+  ω : clamp' a b φ x ≤ b
+  ω = maxLeastUpperBound {x = a} {y = ℚ.min x b} {z = b} φ (min≤' x b)
+
+clamp :
+  (a b : ℚ)
+  (φ : a ≤ b) →
+  ℚ → Σ ℚ (λ x → (a ≤ x) × (x ≤ b))
+clamp a b φ x = (clamp' a b φ x) , clamp'-inInterval a b φ x
+
+clampFstLeftInverse : 
+  (a b : ℚ)
+  (φ : a ≤ b) →
+  (clamp a b φ ∘ fst) ∼ idfun (Σ ℚ (λ x → (a ≤ x) × (x ≤ b)))
+clampFstLeftInverse a b φ (x , (ψ , ω)) =
+  Σ≡Prop (λ x → isProp× (isProp≤ a x) (isProp≤ x b)) χ
+  where
+  χ : clamp' a b φ x ≡ x
+  χ = max a (min x b)
+        ≡⟨ ≤→max a (min x b) $
+           minGreatestLowerBound {x = x} {y = b} {z = a} ψ φ ⟩
+      min x b
+        ≡⟨ ≤→min x b ω ⟩
+      x ∎

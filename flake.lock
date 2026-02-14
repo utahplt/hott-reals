@@ -8,17 +8,14 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1770340397,
-        "narHash": "sha256-tqrB7cp+2GUdhu70Y7y7vaSGsM5oUHPrDYdcNHEpFK8=",
-        "owner": "broughjt",
-        "repo": "agda-mcp",
-        "rev": "f460eb6ecf7660a7f8f36fdf7777034007e9dff3",
-        "type": "github"
+        "lastModified": 1770496523,
+        "narHash": "sha256-e9mKs5ZFvbHQvZs3/JxqqRqhno7VkOAibi8WYQVujuY=",
+        "path": "/home/jackson/repositories/agda-mcp",
+        "type": "path"
       },
       "original": {
-        "owner": "broughjt",
-        "repo": "agda-mcp",
-        "type": "github"
+        "path": "/home/jackson/repositories/agda-mcp",
+        "type": "path"
       }
     },
     "flake-parts": {
@@ -26,11 +23,11 @@
         "nixpkgs-lib": "nixpkgs-lib"
       },
       "locked": {
-        "lastModified": 1756770412,
-        "narHash": "sha256-+uWLQZccFHwqpGqr2Yt5VsW/PbeJVTn9Dk6SHWhNRPw=",
+        "lastModified": 1769996383,
+        "narHash": "sha256-AnYjnFWgS49RlqX7LrC4uA+sCCDBj0Ry/WOJ5XWAsa0=",
         "owner": "hercules-ci",
         "repo": "flake-parts",
-        "rev": "4524271976b625a4a605beefd893f270620fd751",
+        "rev": "57928607ea566b5db3ad13af0e57e921e6b12381",
         "type": "github"
       },
       "original": {
@@ -59,11 +56,11 @@
     },
     "haskell-flake": {
       "locked": {
-        "lastModified": 1758588849,
-        "narHash": "sha256-52Is8RAkC0moHMoLhCgatU0G+9dHdgboHY55fI04QjA=",
+        "lastModified": 1769989003,
+        "narHash": "sha256-Z7cC5jPmLYrEEzE+WNU/NIgwCLa5P4W5b9uXzx+HwkM=",
         "owner": "srid",
         "repo": "haskell-flake",
-        "rev": "c9782b539b75828df2c150d4b6c4cbe666f01c31",
+        "rev": "d5c7dfaa97dbb446a615923ad7e4d9efabe73c52",
         "type": "github"
       },
       "original": {
@@ -75,11 +72,11 @@
     "mcp-server-hs": {
       "flake": false,
       "locked": {
-        "lastModified": 1755071752,
-        "narHash": "sha256-DaSefoJKo6AJ9Gd8gwalVkkd5P7MVnstdeL6LV2izvY=",
+        "lastModified": 1769585862,
+        "narHash": "sha256-foQW2G3FWog4WOWkSwuf+7/ysfrnu7D94k1P1SVNylQ=",
         "owner": "drshade",
         "repo": "haskell-mcp-server",
-        "rev": "92c70a93446adca0c7cfced97a93eed23bfb5200",
+        "rev": "23a3dc2dc78bd9a67242668b5b36e0d0b3cc3642",
         "type": "github"
       },
       "original": {
@@ -106,11 +103,11 @@
     },
     "nixpkgs-lib": {
       "locked": {
-        "lastModified": 1754788789,
-        "narHash": "sha256-x2rJ+Ovzq0sCMpgfgGaaqgBSwY+LST+WbZ6TytnT9Rk=",
+        "lastModified": 1769909678,
+        "narHash": "sha256-cBEymOf4/o3FD5AZnzC3J9hLbiZ+QDT/KDuyHXVJOpM=",
         "owner": "nix-community",
         "repo": "nixpkgs.lib",
-        "rev": "a73b9c743612e4244d865a2fdee11865283c04e6",
+        "rev": "72716169fe93074c333e8d0173151350670b824c",
         "type": "github"
       },
       "original": {

@@ -23,7 +23,7 @@ open import HoTTReals.Logic
 
 data ℝ : Type
 
-data Close : (ε : ℚ) → (0 < ε) → ℝ → ℝ → Type
+data Close : (ε : ℚ) → (0 < ε) → ℝ → ℝ → Type ℓ-zero
 
 syntax Close ε p x y = x ∼[ ε , p ] y
 
@@ -31,7 +31,7 @@ syntax Close ε p x y = x ∼[ ε , p ] y
 CauchyApproximation : ((ε : ℚ) → 0 < ε → ℝ) → Type ℓ-zero
 CauchyApproximation x =
   ((δ ε : ℚ) (p : 0 < δ) (q : 0 < ε) →
-   (x δ p) ∼[ δ + ε , 0<+' {x = δ} {y = ε} p q ] (x ε q))
+   x δ p ∼[ δ + ε , 0<+' {x = δ} {y = ε} p q ] x ε q)
 
 data ℝ where
   rational : ℚ → ℝ

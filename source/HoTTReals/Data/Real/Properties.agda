@@ -419,6 +419,13 @@ identityLipschitzℝ = nonexpandingℝ→lipschitzℝ (idfun ℝ) identityNonexp
 identityContinuous : Continuous $ idfun ℝ
 identityContinuous u ε φ = ∣ ε , φ , (λ v → idfun _) ∣₁
 
+constantNonexpandingℝ : (c : ℝ) → Nonexpandingℝ (const c)
+constantNonexpandingℝ c u v ε φ ψ = closeReflexive c ε φ
+
+constantLipschitzℝ : (c : ℝ) → Lipschitzℝ (const c) 1 ℚ.0<1
+constantLipschitzℝ c =
+  nonexpandingℝ→lipschitzℝ (const c) (constantNonexpandingℝ c)
+
 constantContinuous : (u : ℝ) → Continuous $ const u
 constantContinuous u v ε φ = ∣ 1 , 0<1 , ψ ∣₁
   where
@@ -619,9 +626,3 @@ lipschitz₂-composeLipschitz₁-lipschitz {f} {g} {h}
          (isProp< 0 ((N₁ · L + N₂ · M) · ε) (fst μ) ξ')
          (snd μ)
 
-constantNonexpandingℝ : (c : ℝ) → Nonexpandingℝ (const c)
-constantNonexpandingℝ c u v ε φ ψ = closeReflexive c ε φ
-
-constantLipschitzℝ : (c : ℝ) → Lipschitzℝ (const c) 1 ℚ.0<1
-constantLipschitzℝ c =
-  nonexpandingℝ→lipschitzℝ (const c) (constantNonexpandingℝ c)

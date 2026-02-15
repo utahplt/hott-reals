@@ -84,7 +84,8 @@ open import HoTTReals.Data.Rationals.Properties
 
 -- TODO: Rename to -Dist≤
 ≤antitone- : {x y : ℚ} → x ≤ y → - y ≤ - x
-≤antitone- {x} {y} = SetQuotients.elimProp2 {P = λ x y → x ≤ y → (- y) ≤ (- x)} p q x y
+≤antitone- {x} {y} =
+  SetQuotients.elimProp2 {P = λ x y → x ≤ y → (- y) ≤ (- x)} p q x y
   where
   p : (x y : ℚ) → isProp (x ≤ y → (- y) ≤ (- x))
   p x y = isProp→ (isProp≤ (- y) (- x))
@@ -110,7 +111,8 @@ open import HoTTReals.Data.Rationals.Properties
     t = subst2 (λ ?x ?y → ?x ℤ.≤ ?y) (sym $ s c b) (sym $ s a d) r
 
 <antitone- : {x y : ℚ} → x < y → - y < - x
-<antitone- {x} {y} = SetQuotients.elimProp2 {P = λ x y → x < y → - y < - x} p q x y 
+<antitone- {x} {y} =
+  SetQuotients.elimProp2 {P = λ x y → x < y → - y < - x} p q x y 
   where
   p : (x y : ℚ) → isProp (x < y → (- y) < (- x))
   p x y = isProp→ (isProp< (- y) (- x))
@@ -357,6 +359,29 @@ open import HoTTReals.Data.Rationals.Properties
   ψ' : x ≤ z - y
   ψ' = subst (flip _≤_ $ z - y) (addSubtractRightCancel x y) ψ
 
++≤→≤-' : {x y z : ℚ} → x + y ≤ z → y ≤ z - x
++≤→≤-' {x} {y} {z} φ =
+  +≤→≤- {x = y} {y = x} {z = z} φ'
+  where
+  φ' : y + x ≤ z
+  φ' = subst (flip _≤_ z) (+Comm x y) φ
+
+≤-→+≤ : {x y z : ℚ} → x ≤ z - y → x + y ≤ z
+≤-→+≤ {x} {y} {z} φ = ψ'
+  where
+  ψ : x + y ≤ (z - y) + y
+  ψ = ≤-+o x (z - y) y φ
+
+  ψ' : x + y ≤ z
+  ψ' = subst (_≤_ $ x + y) (subtractAddRightCancel y z) ψ
+
+≤-→+≤' : {x y z : ℚ} → x ≤ z - y → y + x ≤ z
+≤-→+≤' {x} {y} {z} φ =
+  subst (flip _≤_ z) (+Comm x y) ψ
+  where
+  ψ : x + y ≤ z
+  ψ = ≤-→+≤ {x = x} {y = y} {z = z} φ
+
 ≤max' : (x y : ℚ) → y ≤ max x y
 ≤max' x y = subst (λ ?x → y ≤ ?x) (maxComm y x) (≤max y x)
 
@@ -575,6 +600,55 @@ minGreatestLowerBound< {x} {y} {z} p q =
   where
   ψ : x ≤ - x
   ψ = isTrans≤ x 0 (- x) φ (≤antitone- {x = x} {y = 0} φ)
+
+maxAddLeft :
+  (a x y : ℚ) → max (a + x) (a + y) ≡ a + max x y
+maxAddLeft a x y =
+  isAntisym≤ (max (a + x) (a + y)) (a + max x y) ω ρ'
+  where
+  φ : x ≤ max x y
+  φ = ≤max x y
+
+  ψ : y ≤ max x y
+  ψ = ≤max' x y
+
+  φ' : a + x ≤ a + max x y
+  φ' = ≤-o+ x (max x y) a φ
+
+  ψ' : a + y ≤ a + max x y
+  ψ' = ≤-o+ y (max x y) a ψ
+
+  ω : max (a + x) (a + y) ≤ a + max x y
+  ω = maxLeastUpperBound {x = a + x} {y = a + y} {z = a + max x y} φ' ψ'
+
+  χ : a + x ≤ max (a + x) (a + y)
+  χ = ≤max (a + x) (a + y)
+
+  π : a + y ≤ max (a + x) (a + y)
+  π = ≤max' (a + x) (a + y)
+
+  χ' : x ≤ max (a + x) (a + y) - a
+  χ' = +≤→≤-' {x = a} {y = x} {z = max (a + x) (a + y)} χ
+
+  π' : y ≤ max (a + x) (a + y) - a
+  π' = +≤→≤-' {x = a} {y = y} {z = max (a + x) (a + y)} π
+
+  ρ : max x y ≤ max (a + x) (a + y) - a
+  ρ = maxLeastUpperBound {x = x} {y = y} {z = max (a + x) (a + y) - a} χ' π'
+
+  ρ' : a + max x y ≤ max (a + x) (a + y)
+  ρ' = ≤-→+≤' {x = max x y} {y = a} {z = max (a + x) (a + y)} ρ
+
+maxAddRight :
+  (a x y : ℚ) → max (x + a) (y + a) ≡ max x y + a
+maxAddRight a x y =
+  max (x + a) (y + a)
+    ≡⟨ cong₂ max (+Comm x a) (+Comm y a) ⟩
+  max (a + x) (a + y)
+    ≡⟨ maxAddLeft a x y ⟩
+  a + max x y
+    ≡⟨ +Comm a (max x y) ⟩
+  max x y + a ∎
 
 maxMultiplyLeftNonnegative :
   (a x y : ℚ) →
@@ -1002,6 +1076,28 @@ self/2<self θ φ = ω
   distance (y + x) (z + x)
     ≡⟨ +distanceᵣ y z x ⟩
   distance y z ∎
+
+·distanceₗ : (a x y : ℚ) →
+            distance (a · x) (a · y) ≡ ∣ a ∣ · distance x y
+·distanceₗ a x y = 
+  distance (a · x) (a · y)
+    ≡⟨ cong (λ ?x → ∣ a · x + ?x ∣) (-·≡·- a y) ⟩
+  ∣ a · x + a · (- y) ∣
+    ≡⟨ cong ∣_∣ (sym $ ·DistL+ a x (- y)) ⟩
+  ∣ a · (x - y) ∣
+    ≡⟨ magnitudeMultiply≡multiplyMagnitude a (x - y) ⟩
+  ∣ a ∣ · distance x y ∎
+
+·distanceᵣ : (a x y : ℚ) →
+            distance (x · a) (y · a) ≡ distance x y · ∣ a ∣
+·distanceᵣ a x y =
+  distance (x · a) (y · a)
+    ≡⟨ cong₂ distance (·Comm x a) (·Comm y a) ⟩
+  distance (a · x) (a · y)
+    ≡⟨ ·distanceₗ a x y ⟩
+  ∣ a ∣ · distance x y
+    ≡⟨ ·Comm ∣ a ∣ (distance x y) ⟩
+  distance x y · ∣ a ∣ ∎
 
 ≤→distance≡LeftSubtractRight :
   (x y : ℚ) →

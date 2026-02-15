@@ -343,13 +343,14 @@ liftLipschitz :
   (ℝ → ℝ)
 liftLipschitz f L φ ψ = recursion (liftLipschitzRecursion f L φ ψ)
 
-liftLipschitzLipschitz :
-  (f : ℚ → ℝ)
-  (L : ℚ) (φ : 0 < L)
-  (ψ : Lipschitzℚ f L φ) →
-  Lipschitzℝ (liftLipschitz f L φ ψ) L φ
-liftLipschitzLipschitz f L φ ψ =
-  λ u v ε ω → recursion∼ (liftLipschitzRecursion f L φ ψ)
+abstract
+  liftLipschitzLipschitz :
+    (f : ℚ → ℝ)
+    (L : ℚ) (φ : 0 < L)
+    (ψ : Lipschitzℚ f L φ) →
+    Lipschitzℝ (liftLipschitz f L φ ψ) L φ
+  liftLipschitzLipschitz f L φ ψ =
+    λ u v ε ω → recursion∼ (liftLipschitzRecursion f L φ ψ)
 
 liftLipschitz≡rational :
   (f : ℚ → ℝ)

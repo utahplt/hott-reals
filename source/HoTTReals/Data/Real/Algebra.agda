@@ -319,6 +319,88 @@ isAbelianGroupℝ =
 -involutive : (x : ℝ) → - - x ≡ x
 -involutive = GroupTheory.invInv ℝGroup
 
+-- TODO: Remove the next n lemmas in favor of generalized versions
+
++≡0→≡- : {x y : ℝ} → x + y ≡ 0 → x ≡ - y
++≡0→≡- {x} {y} p =
+  x
+    ≡⟨ sym (+-unitʳ x) ⟩
+  x + 0
+    ≡⟨ cong (λ ?x → x + ?x) (sym $ +-inverseᵣ y) ⟩
+  x + (y + (- y))
+    ≡⟨ (sym $ +-associative x y (- y)) ⟩
+  (x + y) + (- y)
+    ≡⟨ cong (λ ?x → ?x + (- y)) p ⟩
+  0 + (- y)
+    ≡⟨ +-unitˡ (- y) ⟩
+  - y ∎
+
+negateAdd : (x y : ℝ) → - (x + y) ≡ - x + - y
+negateAdd x y = sym $ +≡0→≡- p
+  where
+  p = (- x + - y) + (x + y)
+        ≡⟨ sym $ +-associative (- x + - y) x y ⟩
+      ((- x + - y) + x) + y
+        ≡⟨ cong (flip _+_ y) (+-associative (- x) (- y) x) ⟩
+      (- x + (- y + x)) + y
+        ≡⟨ cong (λ ?x → (- x + ?x) + y) (+-commutative (- y) x) ⟩
+      (- x + (x + - y)) + y
+        ≡⟨ cong (flip _+_ y) (sym $ +-associative (- x) x (- y)) ⟩
+      ((- x + x) + - y) + y
+        ≡⟨ cong (λ ?x → (?x + - y) + y) (+-inverseₗ x) ⟩
+      (0 + - y) + y
+        ≡⟨ cong (flip _+_ y) (+-unitˡ $ - y) ⟩
+      - y + y
+        ≡⟨ +-inverseₗ y ⟩
+      0 ∎
+
+addLeftSwap : (x y z : ℝ) → (x + y) + z ≡ (x + z) + y
+addLeftSwap x y z = (x + y) + z
+                      ≡⟨ {!!} ⟩
+                    x + (y + z)
+                      ≡⟨ cong (_+_ x) {!!} ⟩
+                    x + (z + y)
+                      ≡⟨ {!!} ⟩
+                    (x + z) + y ∎
+
+addRightSwap : (x y z : ℝ) → x + (y + z) ≡ y + (x + z)
+addRightSwap x y z = x + (y + z)
+                       ≡⟨ {!!} ⟩
+                     (x + y) + z
+                       ≡⟨ cong (flip _+_ z) {!!} ⟩
+                     (y + x) + z
+                       ≡⟨ (sym $ {!!}) ⟩
+                     y + (x + z) ∎
+
+addSubtractLeftCancel : (x y : ℝ) → (x + y) - x ≡ y
+addSubtractLeftCancel x y = (x + y) - x
+                              ≡⟨ addLeftSwap x y (- x) ⟩
+                            (x + (- x)) + y
+                              ≡⟨ cong (flip _+_ y) {!!} ⟩
+                            0 + y
+                              ≡⟨ {!!} ⟩
+                            y ∎
+
+addSubtractRightCancel : (x y : ℝ) → (x + y) - y ≡ x
+addSubtractRightCancel x y = (x + y) - y
+                               ≡⟨ {!!} ⟩
+                             x + (y - y)
+                               ≡⟨ cong (_+_ x) {!!} ⟩
+                             x + 0
+                               ≡⟨ {!!} ⟩
+                             x ∎
+
+negateSubtract : (x y : ℝ) → - (x - y) ≡ - x + y
+negateSubtract x y =
+  - (x - y)
+    ≡⟨ negateAdd x (- y) ⟩
+  - x + (- - y)
+    ≡⟨ cong (_+_ $ - x) (-involutive y) ⟩
+  - x + y ∎
+
+negateSubtract' : (x y : ℝ) → - (x - y) ≡ y - x
+negateSubtract' x y = negateSubtract x y ∙ +-commutative (- x) y
+
 maxNonexpandingℚ₂ : Nonexpandingℚ₂ ℚ.max
 maxNonexpandingℚ₂ = φ , ψ
   where
@@ -2019,11 +2101,253 @@ distance<→close {x} {y} {ε} =
 
 maxAddLeft : (a x y : ℝ) →
   max (a + x) (a + y) ≡ a + max x y
-maxAddLeft = {!!}
+maxAddLeft =
+  continuousExtensionLaw₃ f g f' g' φ ψ ω χ π ρ σ τ υ
+  where
+  f : ℝ → ℝ → ℝ → ℝ
+  f a x y = max (a + x) (a + y)
 
--- TODO:
-+strictMonotoneₗ : {x y z : ℝ} → y < z → x + y < x + z
-+strictMonotoneₗ = {!!}
+  g : ℝ → ℝ → ℝ → ℝ
+  g a x y = a + max x y
+
+  f' : ℚ.ℚ → ℚ.ℚ → ℚ.ℚ → ℚ.ℚ
+  f' a x y = ℚ.max (a ℚ.+ x) (a ℚ.+ y)
+
+  g' : ℚ.ℚ → ℚ.ℚ → ℚ.ℚ → ℚ.ℚ
+  g' a x y = a ℚ.+ ℚ.max x y
+
+  α : (q r : ℚ.ℚ) → rational q + rational r ≡ rational (q ℚ.+ r)
+  α = liftNonexpanding₂≡rational ℚ._+_ +nonexpandingℚ₂
+
+  β : (q r : ℚ.ℚ) → max (rational q) (rational r) ≡ rational (ℚ.max q r)
+  β = liftNonexpanding₂≡rational ℚ.max maxNonexpandingℚ₂
+
+  φ : (a x y : ℚ.ℚ) →
+      f (rational a) (rational x) (rational y) ≡ rational (f' a x y)
+  φ a x y =
+    max (rational a + rational x) (rational a + rational y)
+      ≡⟨ cong₂ max (α a x) (α a y) ⟩
+    max (rational (a ℚ.+ x)) (rational (a ℚ.+ y))
+      ≡⟨ β (a ℚ.+ x) (a ℚ.+ y) ⟩
+    rational (ℚ.max (a ℚ.+ x) (a ℚ.+ y)) ∎
+
+  ψ : (a x y : ℚ.ℚ) →
+      g (rational a) (rational x) (rational y) ≡ rational (g' a x y)
+  ψ a x y =
+    rational a + max (rational x) (rational y)
+      ≡⟨ cong (rational a +_) (β x y) ⟩
+    rational a + rational (ℚ.max x y)
+      ≡⟨ α a (ℚ.max x y) ⟩
+    rational (a ℚ.+ ℚ.max x y) ∎
+
+  ω : (a x y : ℚ.ℚ) → f' a x y ≡ g' a x y
+  ω a x y = ℚ.maxAddLeft a x y
+
+  χ : (a x : ℝ) → Continuous (f a x)
+  χ a x = continuousCompose
+            (a +_) (max (a + x))
+            (+continuous₂ a) (maxContinuous₂ (a + x))
+
+  π : (a y : ℝ) → Continuous (λ x → f a x y)
+  π a y = continuousCompose
+            (a +_) (flip max (a + y))
+            (+continuous₂ a) (maxContinuous₁ (a + y))
+
+  ρ : (x y : ℝ) → Continuous (λ a → f a x y)
+  ρ x y = lipschitz→continuous (λ a → f a x y) 2 ℚ.0<2
+            (lipschitz₂-composeLipschitz₁-lipschitz
+              1 1 1 1 ℚ.0<1 ℚ.0<1 ℚ.0<1 ℚ.0<1
+              (+lipschitz₁ x) (+lipschitz₁ y) maxLipschitz₁ maxLipschitz₂)
+
+  σ : (a x : ℝ) → Continuous (g a x)
+  σ a x = continuousCompose
+            (max x) (a +_)
+            (maxContinuous₂ x) (+continuous₂ a)
+
+  τ : (a y : ℝ) → Continuous (λ x → g a x y)
+  τ a y = continuousCompose
+            (flip max y) (a +_)
+            (maxContinuous₁ y) (+continuous₂ a)
+
+  υ : (x y : ℝ) → Continuous (λ a → g a x y)
+  υ x y = +continuous₁ (max x y)
+
+maxAddRight :
+  (a x y : ℝ) → max (x + a) (y + a) ≡ max x y + a
+maxAddRight a x y =
+  max (x + a) (y + a)
+    ≡⟨ cong₂ max (+-commutative x a) (+-commutative y a) ⟩
+  max (a + x) (a + y)
+    ≡⟨ maxAddLeft a x y ⟩
+  a + max x y
+    ≡⟨ +-commutative a (max x y) ⟩
+  max x y + a ∎
+
+addLeftMonotone : {x y a : ℝ} → x ≤ y → a + x ≤ a + y
+addLeftMonotone {x} {y} {a} φ =
+  max (a + x) (a + y)
+    ≡⟨ maxAddLeft a x y ⟩
+  a + max x y
+    ≡⟨ cong (_+_ a) φ ⟩
+  a + y ∎
+
+addRightMonotone : {x y a : ℝ} → x ≤ y → x + a ≤ y + a
+addRightMonotone {x} {y} {a} φ =
+  max (x + a) (y + a)
+    ≡⟨ cong₂ max (+-commutative x a) (+-commutative y a) ⟩
+  max (a + x) (a + y)
+    ≡⟨ addLeftMonotone {x = x} {y = y} {a = a} φ ⟩
+  a + y
+    ≡⟨ +-commutative a y ⟩
+  y + a ∎
+
+<→∃+ε≤ : {x y : ℝ} → x < y → ∃ ℚ.ℚ (λ ε → (0 ℚ.< ε) × (x + rational ε ≤ y))
+<→∃+ε≤ {x} {y} φ = ∃-rec isPropPropTrunc ψ φ
+  where
+  ψ : (u : ℚ.ℚ × ℚ.ℚ) →
+      (x ≤ rational (fst u)) × (fst u ℚ.< snd u) × (rational (snd u) ≤ y) →
+      ∃ ℚ.ℚ (λ ε → (0 ℚ.< ε) × (x + rational ε ≤ y))
+  ψ (q , r) (χ , ω , π) = ∣ ε , (ρ , ξ) ∣₁
+    where
+    ε : ℚ.ℚ
+    ε = r ℚ.- q
+
+    ρ : 0 ℚ.< ε
+    ρ = ℚ.<→0<- {x = q} {y = r} ω
+
+    σ : (q r : ℚ.ℚ) → rational q + rational r ≡ rational (q ℚ.+ r)
+    σ = liftNonexpanding₂≡rational ℚ._+_ +nonexpandingℚ₂
+
+    τ : x + rational ε ≤ rational q + rational ε
+    τ = addRightMonotone {x = x} {y = rational q} {a = rational ε} χ
+
+    τ' : x + rational ε ≤ rational (q ℚ.+ ε)
+    τ' = subst (x + rational ε ≤_) (σ q ε) τ
+
+    υ : q ℚ.+ ε ≡ r
+    υ = ℚ.+Comm q ε ∙ ℚ.subtractAddRightCancel q r
+
+    τ'' : x + rational ε ≤ rational r
+    τ'' = subst (x + rational ε ≤_) (cong rational υ) τ'
+
+    ξ : x + rational ε ≤ y
+    ξ = ≤-transitive (x + rational ε) (rational r) y τ'' π
+
+≤+→-≤ : {x y z : ℝ} → x ≤ y + z → x - z ≤ y
+≤+→-≤ {x} {y} {z} φ = ψ'
+  where
+  ψ : x - z ≤ (y + z) - z
+  ψ = {!!} -- ≤-+o x (y + z) (- z) φ
+
+  ψ' : x - z ≤ y
+  ψ' = {!!} -- subst (_≤_ $ x - z) (addSubtractRightCancel y z) ψ
+
++≤→≤- : {x y z : ℝ} → x + y ≤ z → x ≤ z - y
++≤→≤- {x} {y} {z} φ = ψ'
+  where
+  ψ : (x + y) - y ≤ z - y
+  ψ = {!!} -- ≤-+o (x + y) z (- y) φ
+
+  ψ' : x ≤ z - y
+  ψ' = {!!} -- subst (flip _≤_ $ z - y) (addSubtractRightCancel x y) ψ
+
++≤→≤-' : {x y z : ℝ} → x + y ≤ z → y ≤ z - x
++≤→≤-' {x} {y} {z} φ =
+  +≤→≤- {x = y} {y = x} {z = z} φ'
+  where
+  φ' : y + x ≤ z
+  φ' = {!!} -- subst (flip _≤_ z) (+Comm x y) φ
+
+≤-→+≤ : {x y z : ℝ} → x ≤ z - y → x + y ≤ z
+≤-→+≤ {x} {y} {z} φ = ψ'
+  where
+  ψ : x + y ≤ (z - y) + y
+  ψ = {!!} -- ≤-+o x (z - y) y φ
+
+  ψ' : x + y ≤ z
+  ψ' = {!!} -- subst (_≤_ $ x + y) (subtractAddRightCancel y z) ψ
+
+≤-→+≤' : {x y z : ℝ} → x ≤ z - y → y + x ≤ z
+≤-→+≤' {x} {y} {z} φ =
+  subst (flip _≤_ z) {!!} ψ
+  where
+  ψ : x + y ≤ z
+  ψ = ≤-→+≤ {x = x} {y = y} {z = z} φ
+
+-- TODO: Next
+-- close→≤+ε :
+--   {x y : ℝ} {ε : ℚ.ℚ} (φ : 0 ℚ.< ε) →
+--   x ∼[ ε , φ ] y →
+--   y ≤ x + rational ε
+-- close→≤+ε {x} {y} {ε} φ ψ = {!!}
+--   where
+--   ω : - (x - y) ≤ ∣ x - y ∣
+--   ω = ≤-max₂ (x - y) (- (x - y))
+
+--   ω' : y - x ≤ ∣ x - y ∣
+--   ω' = subst (flip _≤_ ∣ x - y ∣) (negateSubtract' x y) ω 
+
+<→close→<+ε :
+  {x y z : ℝ} {ε : ℚ.ℚ} (φ : 0 ℚ.< ε) →
+  x < y →
+  x ∼[ ε , φ ] z → 
+  z < y + rational ε
+<→close→<+ε {x} {y} {z} {ε} φ ψ ω =
+  ∃-rec (<-isProp z (y + rational ε)) χ (<-archimedian x y ψ)
+  where
+  χ : (q : ℚ.ℚ) →
+      (x < rational q) × (rational q < y) →
+      z < y + rational ε
+  χ q (π , ρ) = τ
+    where
+    σ : z < rational (q ℚ.+ ε)
+    σ = <rational→close→<rational+ε φ π ω
+
+    σ' : z < rational q + rational ε
+    σ' = subst (z <_) (liftNonexpanding₂≡rational ℚ._+_ +nonexpandingℚ₂ q ε) σ
+
+    ρ' : rational q + rational ε ≤ y + rational ε
+    ρ' = addRightMonotone {x = rational q} {y = y} $
+         <→≤ {x = rational q} {y = y} ρ
+
+    τ : z < y + rational ε
+    τ = <→≤→< {x = z} {y = rational q + rational ε} {z = y + rational ε} σ' ρ'
+
+-- <+ε : (x : ℝ) (ε : ℚ.ℚ) →
+--       0 ℚ.< ε →
+--       x < x + rational ε
+-- <+ε x ε φ = {!!}
+
+-- +ε≤→< :
+--   {x y : ℝ} {ε : ℚ.ℚ} →
+--   0 ℚ.< ε →
+--   x + rational ε ≤ y →
+--   x < y
+-- +ε≤→< {x} {y} {ε} φ ψ = {!!}
+
+∃+ε≤→< :
+  {x y : ℝ} →
+  ∃ ℚ.ℚ (λ ε → (0 ℚ.< ε) × (x + rational ε ≤ y)) →
+  x < y
+∃+ε≤→< {x} {y} φ = ∃-rec (<-isProp x y) ψ φ
+  where
+  ψ : (ε : ℚ.ℚ) → (0 ℚ.< ε) × (x + rational ε ≤ y) → x < y
+  ψ ε (ω , χ) = +ε≤→< {x = x} {y = y} {ε = ε} ω χ
+
+<↔∃+ε≤ : {x y : ℝ} → (x < y) ↔ ∃ ℚ.ℚ (λ ε → (0 ℚ.< ε) × (x + rational ε ≤ y))
+<↔∃+ε≤ {x} {y} = ( <→∃+ε≤ {x = x} {y = y} , ∃+ε≤→< {x = x} {y = y} )
+
+-- addLeftStrictMonotone : {x y a : ℝ} → x < y → a + x < a + y
+-- addLeftStrictMonotone {x} {y} {a} φ = {!!}
+
+addRightStrictMonotone : {x y a : ℝ} → x < y → x + a < y + a
+addRightStrictMonotone {x} {y} {a} φ = ψ'
+  where
+  ψ : a + x < a + y
+  ψ = addLeftStrictMonotone {x} {y} {a} φ
+
+  ψ' : x + a < y + a
+  ψ' = subst2 _<_ (+-commutative a x) (+-commutative a y) ψ
 
 -- HoTT Exercise 11.8
 
@@ -2425,7 +2749,7 @@ realsBoundedByRationals x = ∃-rec isPropPropTrunc χ ω
   ψ : ∣ x ∣ < ∣ x ∣ + 1
   ψ = subst (λ y → y < ∣ x ∣ + 1)
             (+-unitʳ ∣ x ∣)
-            (+strictMonotoneₗ {x = ∣ x ∣} {y = 0} {z = 1} φ)
+            (addLeftStrictMonotone {x = 0} {y = 1} {a = ∣ x ∣} φ)
 
   ω : ∃ ℚ.ℚ (λ q → (∣ x ∣ < rational q) × (rational q < ∣ x ∣ + 1))
   ω = <-archimedian ∣ x ∣ (∣ x ∣ + 1) ψ

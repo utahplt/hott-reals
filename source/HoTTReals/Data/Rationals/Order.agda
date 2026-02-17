@@ -1683,3 +1683,105 @@ clampFstLeftInverse a b φ (x , (ψ , ω)) =
       min x b
         ≡⟨ ≤→min x b ω ⟩
       x ∎
+
+affineCombination≡start+time·distance :
+  (x y : ℚ) →
+  (t : ℚ) →
+  x ≤ y →
+  (1 - t) · x + t · y ≡ x + t · (y - x)
+affineCombination≡start+time·distance x y t φ =
+  (1 - t) · x + t · y
+    ≡⟨ cong (_+ t · y) (·DistR+ 1 (- t) x) ⟩
+  1 · x + (- t) · x + t · y
+    ≡⟨ cong (λ z → z + (- t) · x + t · y) (·IdL x) ⟩
+  x + (- t) · x + t · y
+    ≡⟨ cong (λ z → x + z + t · y) (sym (-·≡-· t x)) ⟩
+  x + (- (t · x)) + t · y
+    ≡⟨ sym (+Assoc x (- (t · x)) (t · y)) ⟩
+  x + ((- (t · x)) + t · y)
+    ≡⟨ cong (_+_ x) (+Comm (- (t · x)) (t · y)) ⟩
+  x + (t · y + (- (t · x)))
+    ≡⟨ cong (λ z → x + (t · y + z)) (-·≡·- t x) ⟩
+  x + (t · y + t · (- x))
+    ≡⟨ cong (_+_ x) (sym (·DistL+ t y (- x))) ⟩
+  x + t · (y + (- x)) ∎
+
+<→<affineCombination :
+  (x y : ℚ) →
+  (t : ℚ) →
+  x < y →
+  0 < t →
+  x < (1 - t) · x + t · y
+<→<affineCombination x y t φ ψ = π'
+  where
+  χ : 0 < y - x
+  χ = <→0<- {x = x} {y = y} φ
+
+  ω : 0 < t · (y - x)
+  ω = 0<· {x = t} {y = y - x} ψ χ
+
+  π : x + 0 < x + t · (y - x)
+  π = <-o+ 0 (t · (y - x)) x ω
+
+  ρ : (1 - t) · x + t · y ≡ x + t · (y - x) 
+  ρ = affineCombination≡start+time·distance x y t (<Weaken≤ x y φ)
+
+  π' : x < (1 - t) · x + t · y
+  π' = subst2 _<_ (+IdR x) (sym ρ) π
+
+<→affineCombination< :
+  (x y : ℚ) →
+  (t : ℚ) →
+  x < y →
+  t < 1 →
+  (1 - t) · x + t · y < y
+<→affineCombination< x y t φ ψ = π'
+  where
+  ω : 0 < y - x
+  ω = <→0<- {x = x} {y = y} φ
+
+  χ : t · (y - x) < 1 · (y - x)
+  χ = <-·o t 1 (y - x) ω ψ
+
+  π : x + t · (y - x) < x + 1 · (y - x)
+  π = <-o+ (t · (y - x)) (1 · (y - x)) x χ
+
+  σ : (1 - t) · x + t · y ≡ x + t · (y - x)
+  σ = affineCombination≡start+time·distance x y t (<Weaken≤ x y φ)
+
+  τ : x + 1 · (y - x) ≡ y
+  τ = x + 1 · (y - x)
+        ≡⟨ cong (x +_) (·IdL (y - x)) ⟩
+      x + (y - x)
+        ≡⟨ +Comm x (y - x) ⟩
+      (y - x) + x
+        ≡⟨ subtractAddRightCancel x y ⟩
+      y ∎
+
+  π' : (1 - t) · x + t · y < y
+  π' = subst2 _<_ (sym σ) τ π
+
+affineCombinationStrictMonotone :
+  (x y t₁ t₂ : ℚ) →
+  x < y →
+  t₁ < t₂ →
+  (1 - t₁) · x + t₁ · y < (1 - t₂) · x + t₂ · y
+affineCombinationStrictMonotone x y t₁ t₂ φ ψ = π'
+  where
+  ω : 0 < y - x
+  ω = <→0<- {x = x} {y = y} φ
+
+  χ : t₁ · (y - x) < t₂ · (y - x)
+  χ = <-·o t₁ t₂ (y - x) ω ψ
+
+  π : x + t₁ · (y - x) < x + t₂ · (y - x)
+  π = <-o+ (t₁ · (y - x)) (t₂ · (y - x)) x χ
+
+  ρ₁ : (1 - t₁) · x + t₁ · y ≡ x + t₁ · (y - x)
+  ρ₁ = affineCombination≡start+time·distance x y t₁ (<Weaken≤ x y φ)
+
+  ρ₂ : (1 - t₂) · x + t₂ · y ≡ x + t₂ · (y - x)
+  ρ₂ = affineCombination≡start+time·distance x y t₂ (<Weaken≤ x y φ)
+
+  π' : (1 - t₁) · x + t₁ · y < (1 - t₂) · x + t₂ · y
+  π' = subst2 _<_ (sym ρ₁) (sym ρ₂) π

@@ -2384,10 +2384,55 @@ close→≤+ε {x} {y} {ε} φ ψ = ρ
     (q r : ℚ.ℚ) →
     q ℚ.< r →
     (rational q < limit x φ) ⊔′ (limit x φ < rational r)
-  limitCase = {!!}
+  limitCase x φ ψ q r ω = {!!}
+    where
+    s : ℚ.ℚ
+    s = (1 ℚ.- (1 / 3 [ ℚ.3≠0 ])) ℚ.· q ℚ.+ (1 / 3 [ ℚ.3≠0 ]) ℚ.· r
 
-  pIsProp : {!!}
-  pIsProp = {!!}
+    t : ℚ.ℚ
+    t = (1 ℚ.- (2 / 3 [ ℚ.3≠0 ])) ℚ.· q ℚ.+ (2 / 3 [ ℚ.3≠0 ]) ℚ.· r
+
+    χ : 1 / 3 [ ℚ.3≠0 ] ℚ.< 2 / 3 [ ℚ.3≠0 ]
+    χ = Bool.toWitness {Q = ℚ.<Dec (1 / 3 [ ℚ.3≠0 ]) (2 / 3 [ ℚ.3≠0 ])} tt
+
+    π : q ℚ.< s
+    π = {!!}
+
+    ρ : s ℚ.< t
+    ρ = {!!}
+
+    σ : t ℚ.< r
+    σ = {!!}
+
+    δ₁ : ℚ.ℚ
+    δ₁ = s ℚ.- q
+
+    δ₂ : ℚ.ℚ
+    δ₂ = r ℚ.- t
+
+    τ₁ : 0 ℚ.< δ₁
+    τ₁ = {!!}
+
+    τ₂ : 0 ℚ.< δ₂
+    τ₂ = {!!}
+
+    δ : ℚ.ℚ
+    δ = (ℚ.min δ₁ δ₂) / 2 [ ℚ.2≠0 ]
+
+    υ : 0 ℚ.< ℚ.min δ₁ δ₂
+    υ = ℚ.minGreatestLowerBound< {x = δ₁} {y = δ₂} {z = 0} τ₁ τ₂
+
+    υ' : 0 ℚ.< δ
+    υ' = {!!}
+
+    ξ₁ : δ ℚ.< δ₁
+    ξ₁ = {!!}
+
+    ξ₂ : δ ℚ.< δ₂
+    ξ₂ = {!!}
+
+  pIsProp : (x : ℝ) → isProp $ P x
+  pIsProp x = isPropΠ3 (λ q r φ → isPropPropTrunc)
 
 <-isWeaklyLinear : isWeaklyLinear _<_
 <-isWeaklyLinear x y z = ∃-rec isPropPropTrunc φ 

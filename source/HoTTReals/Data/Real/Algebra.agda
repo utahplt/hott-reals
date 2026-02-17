@@ -9,9 +9,11 @@ open import Cubical.Algebra.Group.Properties
 open import Cubical.Data.Empty as Empty
 open import Cubical.Data.Nat.Literals public
 open import Cubical.Data.Sigma
+open import Cubical.Data.Sum as Sum
 open import Cubical.Foundations.Function
-open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.HLevels
+open import Cubical.Foundations.Prelude
+open import Cubical.Functions.Logic hiding (⊥)
 open import Cubical.HITs.PropositionalTruncation as PropositionalTruncation
 open import Cubical.Homotopy.Base
 open import Cubical.Relation.Binary
@@ -356,39 +358,48 @@ negateAdd x y = sym $ +≡0→≡- p
 
 addLeftSwap : (x y z : ℝ) → (x + y) + z ≡ (x + z) + y
 addLeftSwap x y z = (x + y) + z
-                      ≡⟨ {!!} ⟩
+                      ≡⟨ +-associative x y z ⟩
                     x + (y + z)
-                      ≡⟨ cong (_+_ x) {!!} ⟩
+                      ≡⟨ cong (_+_ x) (+-commutative y z) ⟩
                     x + (z + y)
-                      ≡⟨ {!!} ⟩
+                      ≡⟨ sym (+-associative x z y) ⟩
                     (x + z) + y ∎
 
 addRightSwap : (x y z : ℝ) → x + (y + z) ≡ y + (x + z)
 addRightSwap x y z = x + (y + z)
-                       ≡⟨ {!!} ⟩
+                       ≡⟨ sym (+-associative x y z) ⟩
                      (x + y) + z
-                       ≡⟨ cong (flip _+_ z) {!!} ⟩
+                       ≡⟨ cong (flip _+_ z) (+-commutative x y) ⟩
                      (y + x) + z
-                       ≡⟨ (sym $ {!!}) ⟩
+                       ≡⟨ +-associative y x z ⟩
                      y + (x + z) ∎
 
 addSubtractLeftCancel : (x y : ℝ) → (x + y) - x ≡ y
 addSubtractLeftCancel x y = (x + y) - x
                               ≡⟨ addLeftSwap x y (- x) ⟩
                             (x + (- x)) + y
-                              ≡⟨ cong (flip _+_ y) {!!} ⟩
+                              ≡⟨ cong (flip _+_ y) (+-inverseᵣ x) ⟩
                             0 + y
-                              ≡⟨ {!!} ⟩
+                              ≡⟨ +-unitˡ y ⟩
                             y ∎
 
 addSubtractRightCancel : (x y : ℝ) → (x + y) - y ≡ x
 addSubtractRightCancel x y = (x + y) - y
-                               ≡⟨ {!!} ⟩
+                               ≡⟨ +-associative x y (- y) ⟩
                              x + (y - y)
-                               ≡⟨ cong (_+_ x) {!!} ⟩
+                               ≡⟨ cong (_+_ x) (+-inverseᵣ y) ⟩
                              x + 0
-                               ≡⟨ {!!} ⟩
+                               ≡⟨ +-unitʳ x ⟩
                              x ∎
+
+subtractAddRightCancel : (x y : ℝ) → (y - x) + x ≡ y
+subtractAddRightCancel x y = (y - x) + x
+                               ≡⟨ +-associative y (- x) x ⟩
+                             y + ((- x) + x)
+                               ≡⟨ cong (_+_ y) (+-inverseₗ x) ⟩
+                             y + 0
+                               ≡⟨ +-unitʳ y ⟩
+                             y ∎
 
 negateSubtract : (x y : ℝ) → - (x - y) ≡ - x + y
 negateSubtract x y =
@@ -2237,55 +2248,78 @@ addRightMonotone {x} {y} {a} φ =
 ≤+→-≤ {x} {y} {z} φ = ψ'
   where
   ψ : x - z ≤ (y + z) - z
-  ψ = {!!} -- ≤-+o x (y + z) (- z) φ
+  ψ = addRightMonotone {x = x} {y = y + z} {a = - z} φ
 
   ψ' : x - z ≤ y
-  ψ' = {!!} -- subst (_≤_ $ x - z) (addSubtractRightCancel y z) ψ
+  ψ' = subst (x - z ≤_) (addSubtractRightCancel y z) ψ
 
 +≤→≤- : {x y z : ℝ} → x + y ≤ z → x ≤ z - y
 +≤→≤- {x} {y} {z} φ = ψ'
   where
   ψ : (x + y) - y ≤ z - y
-  ψ = {!!} -- ≤-+o (x + y) z (- y) φ
+  ψ = addRightMonotone {x = x + y} {y = z} {a = - y} φ
 
   ψ' : x ≤ z - y
-  ψ' = {!!} -- subst (flip _≤_ $ z - y) (addSubtractRightCancel x y) ψ
+  ψ' = subst (_≤ z - y) (addSubtractRightCancel x y) ψ
 
 +≤→≤-' : {x y z : ℝ} → x + y ≤ z → y ≤ z - x
 +≤→≤-' {x} {y} {z} φ =
   +≤→≤- {x = y} {y = x} {z = z} φ'
   where
   φ' : y + x ≤ z
-  φ' = {!!} -- subst (flip _≤_ z) (+Comm x y) φ
+  φ' = subst (_≤ z) (+-commutative x y) φ
 
 ≤-→+≤ : {x y z : ℝ} → x ≤ z - y → x + y ≤ z
 ≤-→+≤ {x} {y} {z} φ = ψ'
   where
   ψ : x + y ≤ (z - y) + y
-  ψ = {!!} -- ≤-+o x (z - y) y φ
+  ψ = addRightMonotone {x = x} {y = z - y} {a = y} φ
 
   ψ' : x + y ≤ z
-  ψ' = {!!} -- subst (_≤_ $ x + y) (subtractAddRightCancel y z) ψ
+  ψ' = subst (x + y ≤_) (subtractAddRightCancel y z) ψ
 
 ≤-→+≤' : {x y z : ℝ} → x ≤ z - y → y + x ≤ z
 ≤-→+≤' {x} {y} {z} φ =
-  subst (flip _≤_ z) {!!} ψ
+  subst (_≤ z) (+-commutative x y) ψ
   where
   ψ : x + y ≤ z
   ψ = ≤-→+≤ {x = x} {y = y} {z = z} φ
 
--- TODO: Next
--- close→≤+ε :
---   {x y : ℝ} {ε : ℚ.ℚ} (φ : 0 ℚ.< ε) →
---   x ∼[ ε , φ ] y →
---   y ≤ x + rational ε
--- close→≤+ε {x} {y} {ε} φ ψ = {!!}
---   where
---   ω : - (x - y) ≤ ∣ x - y ∣
---   ω = ≤-max₂ (x - y) (- (x - y))
+-≤→≤+ : {x y z : ℝ} → x - y ≤ z → x ≤ z + y
+-≤→≤+ {x} {y} {z} φ = ψ'
+  where
+  ψ : (x - y) + y ≤ z + y
+  ψ = addRightMonotone {x = x - y} {y = z} {a = y} φ
 
---   ω' : y - x ≤ ∣ x - y ∣
---   ω' = subst (flip _≤_ ∣ x - y ∣) (negateSubtract' x y) ω 
+  ψ' : x ≤ z + y
+  ψ' = subst (_≤ z + y) (subtractAddRightCancel y x) ψ
+
+-≤→≤+' : {x y z : ℝ} → x - y ≤ z → x ≤ y + z
+-≤→≤+' {x} {y} {z} φ = subst (x ≤_) (+-commutative z y) (-≤→≤+ {x} {y} {z} φ)
+
+close→≤+ε :
+  {x y : ℝ} {ε : ℚ.ℚ} (φ : 0 ℚ.< ε) →
+  x ∼[ ε , φ ] y →
+  y ≤ x + rational ε
+close→≤+ε {x} {y} {ε} φ ψ = ρ
+  where
+  ω : - (x - y) ≤ ∣ x - y ∣
+  ω = ≤-max₂ (x - y) (- (x - y))
+
+  ω' : y - x ≤ ∣ x - y ∣
+  ω' = subst (flip _≤_ ∣ x - y ∣) (negateSubtract' x y) ω 
+
+  χ : ∣ x - y ∣ < rational ε
+  χ = close→distance< φ ψ
+
+  χ' : ∣ x - y ∣ ≤ rational ε
+  χ' = <→≤ {x = ∣ x - y ∣} {y = rational ε} χ
+
+  π : y - x ≤ rational ε
+  π = ≤-transitive (y - x) ∣ x - y ∣ (rational ε) ω' χ'
+
+  ρ : y ≤ x + rational ε
+  ρ = -≤→≤+' {x = y} {y = x} {z = rational ε} π
 
 <→close→<+ε :
   {x y z : ℝ} {ε : ℚ.ℚ} (φ : 0 ℚ.< ε) →
@@ -2313,17 +2347,81 @@ addRightMonotone {x} {y} {a} φ =
     τ : z < y + rational ε
     τ = <→≤→< {x = z} {y = rational q + rational ε} {z = y + rational ε} σ' ρ'
 
--- <+ε : (x : ℝ) (ε : ℚ.ℚ) →
---       0 ℚ.< ε →
---       x < x + rational ε
--- <+ε x ε φ = {!!}
+<-located :
+  (q r : ℚ.ℚ) (x : ℝ) →
+  q ℚ.< r →
+  (rational q < x) ⊔′ (x < rational r)
+<-located q r x φ =
+  inductionProposition {A = P}
+    (rationalCase , limitCase , pIsProp)
+    x q r φ
+  where
+  P : ℝ → Type ℓ-zero
+  P x = (q r : ℚ.ℚ) → q ℚ.< r → (rational q < x) ⊔′ (x < rational r)
 
--- +ε≤→< :
---   {x y : ℝ} {ε : ℚ.ℚ} →
---   0 ℚ.< ε →
---   x + rational ε ≤ y →
---   x < y
--- +ε≤→< {x} {y} {ε} φ ψ = {!!}
+  rationalCase :
+    (s : ℚ.ℚ)
+    (q r : ℚ.ℚ) →
+    q ℚ.< r →
+    (rational q < rational s) ⊔′ (rational s < rational r)
+  rationalCase s q r φ = ψ'
+    where
+    ψ : (q ℚ.< s) ⊔′ (s ℚ.< r)
+    ψ = ℚ.isWeaklyLinear< q r s φ
+
+    ψ' : (rational q < rational s) ⊔′ (rational s < rational r)
+    ψ' = PropositionalTruncation.map
+           (Sum.map (rationalStrictMonotone {q = q} {r = s})
+                    (rationalStrictMonotone {q = s} {r = r}))
+           ψ
+
+  limitCase :
+    (x : (ε : ℚ.ℚ) → 0 ℚ.< ε → ℝ) (φ : CauchyApproximation x) →
+    ((ε : ℚ.ℚ) (ψ : 0 ℚ.< ε) →
+     (q r : ℚ.ℚ) →
+     q ℚ.< r →
+     (rational q < x ε ψ) ⊔′ (x ε ψ < rational r)) →
+    (q r : ℚ.ℚ) →
+    q ℚ.< r →
+    (rational q < limit x φ) ⊔′ (limit x φ < rational r)
+  limitCase = {!!}
+
+  pIsProp : {!!}
+  pIsProp = {!!}
+
+<-isWeaklyLinear : isWeaklyLinear _<_
+<-isWeaklyLinear x y z = ∃-rec isPropPropTrunc φ 
+  where
+  φ : (u : ℚ.ℚ × ℚ.ℚ) →
+      (x ≤ rational (fst u)) × ((fst u) ℚ.< (snd u)) × (rational (snd u) ≤ y) →
+      (x < z) ⊔′ (z < y)
+  φ (q , r) (ψ , ω , χ) = ρ
+    where
+    π : (rational q < z) ⊔′ (z < rational r)
+    π = <-located q r z ω
+
+    ρ : (x < z) ⊔′ (z < y)
+    ρ = PropositionalTruncation.map
+          (Sum.map (≤→<→< {x = x} ψ) (flip (<→≤→< {x = z}) χ))
+          π
+
+<+ε : (x : ℝ) (ε : ℚ.ℚ) →
+      0 ℚ.< ε →
+      x < x + rational ε
+<+ε x ε φ = {!!}
+
++ε≤→< :
+  {x y : ℝ} {ε : ℚ.ℚ} →
+  0 ℚ.< ε →
+  x + rational ε ≤ y →
+  x < y
++ε≤→< {x} {y} {ε} φ ψ = χ
+  where
+  ω : x < x + rational ε
+  ω = <+ε x ε φ
+
+  χ : x < y
+  χ = <→≤→< {x = x} {y = x + rational ε} {z = y} ω ψ
 
 ∃+ε≤→< :
   {x y : ℝ} →
@@ -2337,8 +2435,8 @@ addRightMonotone {x} {y} {a} φ =
 <↔∃+ε≤ : {x y : ℝ} → (x < y) ↔ ∃ ℚ.ℚ (λ ε → (0 ℚ.< ε) × (x + rational ε ≤ y))
 <↔∃+ε≤ {x} {y} = ( <→∃+ε≤ {x = x} {y = y} , ∃+ε≤→< {x = x} {y = y} )
 
--- addLeftStrictMonotone : {x y a : ℝ} → x < y → a + x < a + y
--- addLeftStrictMonotone {x} {y} {a} φ = {!!}
+addLeftStrictMonotone : {x y a : ℝ} → x < y → a + x < a + y
+addLeftStrictMonotone {x} {y} {a} φ = {!!}
 
 addRightStrictMonotone : {x y a : ℝ} → x < y → x + a < y + a
 addRightStrictMonotone {x} {y} {a} φ = ψ'
@@ -2739,9 +2837,9 @@ boundedMultiply L φ y ψ =
     (leftMultiplyRationalLipschitzℚ₁ L φ y ψ)
 
 -- Gilbert Lemma 4.13: Cauchy reals are bounded by rationals
-realsBoundedByRationals :
+∣∣<rational :
   (x : ℝ) → ∃ ℚ.ℚ (λ q → (0 ℚ.< q) × (∣ x ∣ < rational q))
-realsBoundedByRationals x = ∃-rec isPropPropTrunc χ ω
+∣∣<rational x = ∃-rec isPropPropTrunc χ ω
   where
   φ : 0 < 1
   φ = rationalStrictMonotone {q = 0} {r = 1} ℚ.0<1

@@ -2583,7 +2583,29 @@ close→≤+ε {x} {y} {ε} φ ψ = ρ
 <+ε : (x : ℝ) (ε : ℚ.ℚ) →
       0 ℚ.< ε →
       x < x + rational ε
-<+ε x ε φ = {!!}
+<+ε =
+  inductionProposition {A = P} (rationalCase , limitCase , pIsProp)
+  where
+  P : ℝ → Type ℓ-zero
+  P x = (ε : ℚ.ℚ) → 0 ℚ.< ε → x < x + rational ε
+
+  rationalCase :
+    (q : ℚ.ℚ) (ε : ℚ.ℚ) →
+    0 ℚ.< ε →
+    rational q < rational q + rational ε
+  rationalCase q ε φ = {!!}
+
+  limitCase :
+    (x : (ε : ℚ.ℚ) → 0 ℚ.< ε → ℝ) (φ : CauchyApproximation x) →
+    ((ε : ℚ.ℚ) (ψ : 0 ℚ.< ε)
+     (δ : ℚ.ℚ) → 0 ℚ.< δ →
+     x ε ψ < x ε ψ + rational δ) →
+    (ε : ℚ.ℚ) → 0 ℚ.< ε →
+    limit x φ < limit x φ + rational ε
+  limitCase = {!!}
+
+  pIsProp : (x : ℝ) → isProp (P x)
+  pIsProp x = isPropΠ2 (λ ε φ → <-isProp x (x + rational ε))
 
 +ε≤→< :
   {x y : ℝ} {ε : ℚ.ℚ} →

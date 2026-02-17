@@ -1455,6 +1455,23 @@ negateMinNegateNegate≡max x y = ψ
   π : max (- y) (- x) ≡ - x
   π = maxCommutative (- y) (- x) ∙ χ
 
+-antitone< : {x y : ℝ} → x < y → - y < - x
+-antitone< {x} {y} = ∃-rec (<-isProp (- y) (- x)) φ
+  where
+  φ : (u : ℚ.ℚ × ℚ.ℚ) →
+      (x ≤ rational (fst u)) × ((fst u) ℚ.< (snd u)) × (rational (snd u) ≤ y) →
+      - y < - x
+  φ (q , r) (ψ , ω , χ) = ∣ (ℚ.- r , ℚ.- q) , (χ' , ω' , ψ') ∣₁
+    where
+    χ' : - y ≤ rational (ℚ.- r)
+    χ' = -antitone≤ {x = rational r} {y = y} χ
+
+    ω' : ℚ.- r ℚ.< ℚ.- q
+    ω' = ℚ.<antitone- {x = q} {y = r} ω
+
+    ψ' : rational (ℚ.- q) ≤ - x
+    ψ' = -antitone≤ {x = x} {y = rational q} ψ
+
 magnitudeNegate≡magnitude : (x : ℝ) → ∣ - x ∣ ≡ ∣ x ∣
 magnitudeNegate≡magnitude x =
   max (- x) (- - x)
@@ -2347,6 +2364,38 @@ close→≤+ε {x} {y} {ε} φ ψ = ρ
     τ : z < y + rational ε
     τ = <→≤→< {x = z} {y = rational q + rational ε} {z = y + rational ε} σ' ρ'
 
+<→close→-ε< :
+  {x y z : ℝ} {ε : ℚ.ℚ} (φ : 0 ℚ.< ε) →
+  x < y →
+  y ∼[ ε , φ ] z →
+  x - rational ε < z
+<→close→-ε< {x} {y} {z} {ε} φ ψ ω = σ
+  where
+  φ' : - y < - x
+  φ' = -antitone< {x = x} {y = y} ψ
+
+  ψ' : (- y) ∼[ ε , φ ] (- z)
+  ψ' = -nonexpandingℝ y z ε φ ω
+
+  χ : - z < - x + rational ε
+  χ = <→close→<+ε {x = - y} {y = - x} {z = - z} φ φ' ψ'
+
+  χ' : - (- x + rational ε) < - (- z)
+  χ' = -antitone< {x = - z} {y = - x + rational ε} χ
+
+  π : - (- x + rational ε) ≡ x - rational ε
+  π = - (- x + rational ε)
+        ≡⟨ negateAdd (- x) (rational ε) ⟩
+      - - x + - rational ε
+        ≡⟨ cong (flip _+_ (- rational ε)) (-involutive x) ⟩
+      x - rational ε ∎
+
+  ρ : - - z ≡ z
+  ρ = -involutive z
+
+  σ : x - rational ε < z
+  σ = subst2 _<_ π ρ χ'
+
 <-located :
   (q r : ℚ.ℚ) (x : ℝ) →
   q ℚ.< r →
@@ -2384,7 +2433,7 @@ close→≤+ε {x} {y} {ε} φ ψ = ρ
     (q r : ℚ.ℚ) →
     q ℚ.< r →
     (rational q < limit x φ) ⊔′ (limit x φ < rational r)
-  limitCase x φ ψ q r ω = {!!}
+  limitCase x φ ψ q r ω = ζ
     where
     s : ℚ.ℚ
     s = (1 ℚ.- (1 / 3 [ ℚ.3≠0 ])) ℚ.· q ℚ.+ (1 / 3 [ ℚ.3≠0 ]) ℚ.· r
@@ -2405,7 +2454,8 @@ close→≤+ε {x} {y} {ε} φ ψ = ρ
     π = ℚ.<→<affineCombination q r (1 / 3 [ ℚ.3≠0 ]) ω χ'
 
     ρ : s ℚ.< t
-    ρ = ℚ.affineCombinationStrictMonotone q r (1 / 3 [ ℚ.3≠0 ]) (2 / 3 [ ℚ.3≠0 ]) ω χ
+    ρ = ℚ.affineCombinationStrictMonotone
+          q r (1 / 3 [ ℚ.3≠0 ]) (2 / 3 [ ℚ.3≠0 ]) ω χ
 
     σ : t ℚ.< r
     σ = ℚ.<→affineCombination< q r (2 / 3 [ ℚ.3≠0 ]) ω χ''
@@ -2417,10 +2467,10 @@ close→≤+ε {x} {y} {ε} φ ψ = ρ
     δ₂ = r ℚ.- t
 
     τ₁ : 0 ℚ.< δ₁
-    τ₁ = ℚ.<→0<- π
+    τ₁ = ℚ.<→0<- {x = q} {y = s} π
 
     τ₂ : 0 ℚ.< δ₂
-    τ₂ = ℚ.<→0<- σ
+    τ₂ = ℚ.<→0<- {x = t} {y = r} σ
 
     δ : ℚ.ℚ
     δ = (ℚ.min δ₁ δ₂) / 2 [ ℚ.2≠0 ]
@@ -2429,13 +2479,87 @@ close→≤+ε {x} {y} {ε} φ ψ = ρ
     υ = ℚ.minGreatestLowerBound< {x = δ₁} {y = δ₂} {z = 0} τ₁ τ₂
 
     υ' : 0 ℚ.< δ
-    υ' = ℚ.0</ υ ℚ.0<2
+    υ' = ℚ.0</ {x = ℚ.min δ₁ δ₂} {y = 2} υ ℚ.0<2
+
+    ο : δ ℚ.< ℚ.min δ₁ δ₂
+    ο = ℚ.self/2<self (ℚ.min δ₁ δ₂) υ
 
     ξ₁ : δ ℚ.< δ₁
-    ξ₁ = ℚ.isTrans<≤ δ (ℚ.min δ₁ δ₂) δ₁ (ℚ.self/2<self (ℚ.min δ₁ δ₂) υ) (ℚ.min≤ δ₁ δ₂)
+    ξ₁ = ℚ.isTrans<≤ δ (ℚ.min δ₁ δ₂) δ₁ ο (ℚ.min≤ δ₁ δ₂)
 
     ξ₂ : δ ℚ.< δ₂
-    ξ₂ = ℚ.isTrans<≤ δ (ℚ.min δ₁ δ₂) δ₂ (ℚ.self/2<self (ℚ.min δ₁ δ₂) υ) (ℚ.min≤' δ₁ δ₂)
+    ξ₂ = ℚ.isTrans<≤ δ (ℚ.min δ₁ δ₂) δ₂ ο (ℚ.min≤' δ₁ δ₂)
+
+    α : (rational s < x δ υ') ⊔′ (x δ υ' < rational t)
+    α = ψ δ υ' s t ρ
+
+    β : rational s < x δ υ' → rational q < limit x φ
+    β ζ = μ'
+      where
+      ξ₁' : 0 ℚ.< δ₁ ℚ.- δ
+      ξ₁' = ℚ.<→0<- {x = δ} {y = δ₁} ξ₁
+
+      ι : x δ υ' ∼[ (δ₁ ℚ.- δ) ℚ.+ δ , ℚ.0<+' {x = δ₁ ℚ.- δ} {y = δ} ξ₁' υ' ]
+          limit x φ
+      ι = closeLimit'' x φ δ (δ₁ ℚ.- δ) υ' ξ₁'
+
+      κ : (δ₁ ℚ.- δ) ℚ.+ δ ≡ δ₁
+      κ = ℚ.subtractAddRightCancel δ δ₁
+
+      ι' : Σ (0 ℚ.< δ₁) (λ ξ → Close δ₁ ξ (x δ υ') (limit x φ))
+      ι' = subst (λ ?x → Σ (0 ℚ.< ?x) (λ ξ → Close ?x ξ (x δ υ') (limit x φ)))
+                 κ
+                 (_ , ι)
+
+      ι'' : Close δ₁ (fst ι') (limit x φ) (x δ υ')
+      ι'' = closeSymmetric (x δ υ') (limit x φ) δ₁ (fst ι') (snd ι')
+
+      μ : rational s - rational δ₁ < limit x φ
+      μ = <→close→-ε< {x = rational s} {y = x δ υ'} {z = limit x φ}
+                      (fst ι') ζ (snd ι')
+
+      ν : rational s - rational δ₁ ≡ rational q
+      ν = cong rational (ℚ.leftSubtractSubtractCancel s q)
+
+      μ' : rational q < limit x φ
+      μ' = subst (_< limit x φ) ν μ
+
+    γ : x δ υ' < rational t → limit x φ < rational r
+    γ ζ = μ'
+      where
+      ξ₂' : 0 ℚ.< δ₂ ℚ.- δ
+      ξ₂' = ℚ.<→0<- {x = δ} {y = δ₂} ξ₂
+
+      ι : x δ υ' ∼[ (δ₂ ℚ.- δ) ℚ.+ δ , ℚ.0<+' {x = δ₂ ℚ.- δ} {y = δ} ξ₂' υ' ]
+          limit x φ
+      ι = closeLimit'' x φ δ (δ₂ ℚ.- δ) υ' ξ₂'
+
+      κ : (δ₂ ℚ.- δ) ℚ.+ δ ≡ δ₂
+      κ = ℚ.subtractAddRightCancel δ δ₂
+
+      ι' : Σ (0 ℚ.< δ₂) (λ ξ → Close δ₂ ξ (x δ υ') (limit x φ))
+      ι' = subst (λ ?x → Σ (0 ℚ.< ?x) (λ ξ → Close ?x ξ (x δ υ') (limit x φ)))
+                 κ
+                 (_ , ι)
+
+      μ : limit x φ < rational t + rational δ₂
+      μ = <→close→<+ε {x = x δ υ'} {y = rational t} {z = limit x φ}
+                      (fst ι') ζ (snd ι')
+
+      ν : rational t + rational δ₂ ≡ rational r
+      ν = rational t + rational δ₂
+            ≡⟨ liftNonexpanding₂≡rational ℚ._+_ +nonexpandingℚ₂ t δ₂ ⟩
+          rational (t ℚ.+ δ₂)
+            ≡⟨ cong rational (ℚ.+Comm t δ₂) ⟩
+          rational (δ₂ ℚ.+ t)
+            ≡⟨ cong rational (ℚ.subtractAddRightCancel t r) ⟩
+          rational r ∎
+
+      μ' : limit x φ < rational r
+      μ' = subst (_<_ $ limit x φ) ν μ
+
+    ζ : (rational q < limit x φ) ⊔′ (limit x φ < rational r)
+    ζ = PropositionalTruncation.map (Sum.map β γ) α
 
   pIsProp : (x : ℝ) → isProp $ P x
   pIsProp x = isPropΠ3 (λ q r φ → isPropPropTrunc)

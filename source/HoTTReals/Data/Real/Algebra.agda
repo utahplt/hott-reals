@@ -13,11 +13,12 @@ open import Cubical.Data.Sum as Sum
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.HLevels
 open import Cubical.Foundations.Prelude
-open import Cubical.Functions.Logic hiding (⊥)
+open import Cubical.Functions.Logic hiding (⊥; ¬_)
 open import Cubical.HITs.PropositionalTruncation as PropositionalTruncation
 open import Cubical.Homotopy.Base
 open import Cubical.Relation.Binary
 open import Cubical.Relation.Binary.Order
+open import Cubical.Relation.Nullary
 
 open BinaryRelation
 
@@ -2593,7 +2594,16 @@ close→≤+ε {x} {y} {ε} φ ψ = ρ
     (q : ℚ.ℚ) (ε : ℚ.ℚ) →
     0 ℚ.< ε →
     rational q < rational q + rational ε
-  rationalCase q ε φ = {!!}
+  rationalCase q ε φ = ψ''
+    where
+    ψ : q ℚ.+ 0 ℚ.< q ℚ.+ ε
+    ψ = ℚ.<-o+ 0 ε q φ
+
+    ψ' : q ℚ.< q ℚ.+ ε
+    ψ' = subst (flip ℚ._<_ $ q ℚ.+ ε) (ℚ.+IdR q) ψ
+
+    ψ'' : rational q < rational q + rational ε
+    ψ'' = rationalStrictMonotone {q = q} {r = q ℚ.+ ε} ψ'
 
   limitCase :
     (x : (ε : ℚ.ℚ) → 0 ℚ.< ε → ℝ) (φ : CauchyApproximation x) →
@@ -2602,7 +2612,35 @@ close→≤+ε {x} {y} {ε} φ ψ = ρ
      x ε ψ < x ε ψ + rational δ) →
     (ε : ℚ.ℚ) → 0 ℚ.< ε →
     limit x φ < limit x φ + rational ε
-  limitCase = {!!}
+  limitCase x φ ψ ε ω = {!!}
+    where
+    δ : ℚ.ℚ
+    δ = ε / 5 [ ℚ.5≠0 ]
+
+    χ : 0 ℚ.< δ
+    χ = {!!}
+
+    π : x δ χ < x δ χ + rational δ
+    π = {!!}
+
+    ρ : x δ χ ∼[ δ ℚ.+ δ , {ℚ.0<+' {x = ?} {y = ?} ? ?} ] limit x φ
+    ρ = {!!}
+
+    σ : limit x φ < x δ χ + rational (δ ℚ.+ δ ℚ.+ δ)
+    σ = {!!}
+
+    τ : (limit x φ < limit x φ + rational ε) ⊔′
+        (limit x φ + rational ε < x δ χ + rational (δ ℚ.+ δ ℚ.+ δ))
+    τ = {!!}
+
+    υ : ¬ (limit x φ + rational ε < x δ χ + rational (δ ℚ.+ δ ℚ.+ δ))
+    υ = {!!}
+
+    ο : limit x φ < limit x φ + rational ε
+    ο = PropositionalTruncation.rec
+          (<-isProp (limit x φ) (limit x φ + rational ε))
+          (Sum.rec (idfun _) (Empty.rec ∘ υ))
+          τ
 
   pIsProp : (x : ℝ) → isProp (P x)
   pIsProp x = isPropΠ2 (λ ε φ → <-isProp x (x + rational ε))

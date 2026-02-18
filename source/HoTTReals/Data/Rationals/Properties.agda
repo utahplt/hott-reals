@@ -20,6 +20,9 @@ open import HoTTReals.Algebra.Field.Instances.Rationals as ℚ
 4≠0 : ¬ 4 ≡ 0
 4≠0 = Bool.toWitnessFalse {Q = discreteℚ 4 0} tt
 
+5≠0 : ¬ 5 ≡ 0
+5≠0 = Bool.toWitnessFalse {Q = discreteℚ 5 0} tt
+
 8≠0 : ¬ 8 ≡ 0
 8≠0 = Bool.toWitnessFalse {Q = discreteℚ 8 0} tt
 

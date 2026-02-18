@@ -7,4 +7,5 @@ open import HoTTReals.Data.Real.Definitions public
 open import HoTTReals.Data.Real.Induction public
 open import HoTTReals.Data.Real.Lipschitz public
 open import HoTTReals.Data.Real.Nonexpanding public
+open import HoTTReals.Data.Real.Order public
 open import HoTTReals.Data.Real.Properties public

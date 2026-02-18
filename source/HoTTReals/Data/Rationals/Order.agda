@@ -48,6 +48,9 @@ open import HoTTReals.Data.Rationals.Properties
 0<4 : 0 ℚ.< 4
 0<4 = Bool.toWitness {Q = <Dec 0 4} tt
 
+0<5 : 0 ℚ.< 5
+0<5 = Bool.toWitness {Q = <Dec 0 5} tt
+
 0<8 : 0 ℚ.< 8
 0<8 = Bool.toWitness {Q = <Dec 0 8} tt
 

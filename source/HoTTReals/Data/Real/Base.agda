@@ -65,3 +65,15 @@ data Close where
     limit x φ ∼[ ε , θ ] limit y ψ
   squash :
     (ε : ℚ) (φ : 0 < ε) (u v : ℝ) → isProp $ u ∼[ ε , φ ] v
+
+instance
+  fromNatℝ : HasFromNat ℝ
+  fromNatℝ = record
+    { Constraint = λ _ → Unit ;
+      fromNat = λ n → rational $ fromNat n }
+
+instance
+  fromNegℝ : HasFromNeg ℝ
+  fromNegℝ = record
+    { Constraint = λ _ → Unit ;
+      fromNeg = λ n → rational $ fromNat n }

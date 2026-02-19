@@ -54,6 +54,18 @@ distanceNonexpandingℝ₂ = φ , ψ
           ∣_∣ (_-_ u)
           magnitudeNonexpandingℝ (snd -nonexpandingℝ₂ u)
 
+distanceLipschitz₁ : (v : ℝ) → Lipschitzℝ (flip distance v) 1 ℚ.0<1
+distanceLipschitz₁ = nonexpandingℝ₂→lipschitzℝ₁ distance distanceNonexpandingℝ₂
+
+distanceLipschitz₂ : (u : ℝ) → Lipschitzℝ (distance u) 1 ℚ.0<1
+distanceLipschitz₂ = nonexpandingℝ₂→lipschitzℝ₂ distance distanceNonexpandingℝ₂
+
+distanceContinuous₁ : (v : ℝ) → Continuous (flip distance v)
+distanceContinuous₁ v = lipschitz→continuous (flip distance v) 1 ℚ.0<1 (distanceLipschitz₁ v)
+
+distanceContinuous₂ : (u : ℝ) → Continuous (distance u)
+distanceContinuous₂ u = lipschitz→continuous (distance u) 1 ℚ.0<1 (distanceLipschitz₂ u)
+
 distanceExtendsRationalDistance : (q r : ℚ.ℚ) →
   distance (rational q) (rational r) ≡ rational (ℚ.distance q r)
 distanceExtendsRationalDistance q r =

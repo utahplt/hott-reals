@@ -703,6 +703,21 @@ maxMultiplyRightNonnegative a x y φ = ψ ∙ ω
   q : - ∣ x ∣ ≤ - - x
   q = ≤antitone- {x = - x} {y = ∣ x ∣} p
 
+maxMultiplyLeftMagnitude : (a x y : ℚ) →
+  max (∣ a ∣ · x) (∣ a ∣ · y) ≡ ∣ a ∣ · max x y
+maxMultiplyLeftMagnitude a x y = maxMultiplyLeftNonnegative ∣ a ∣ x y (0≤∣∣ a)
+
+maxMultiplyRightMagnitude : (a x y : ℚ) →
+  max (x · ∣ a ∣) (y · ∣ a ∣) ≡ max x y · ∣ a ∣
+maxMultiplyRightMagnitude a x y =
+  max (x · ∣ a ∣) (y · ∣ a ∣)
+    ≡⟨ cong₂ max (·Comm x ∣ a ∣) (·Comm y ∣ a ∣) ⟩
+  max (∣ a ∣ · x) (∣ a ∣ · y)
+    ≡⟨ maxMultiplyLeftMagnitude a x y ⟩
+  ∣ a ∣ · max x y
+    ≡⟨ ·Comm ∣ a ∣ (max x y) ⟩
+  max x y · ∣ a ∣ ∎
+
 subtract<→negate<subtract : (x y ε : ℚ) → x - y < ε → - ε < y - x
 subtract<→negate<subtract x y ε p =
   subst (_<_ (- ε)) (negateSubtract' x y) (<antitone- {x = x - y} {y = ε} p)

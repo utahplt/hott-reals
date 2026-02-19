@@ -6,6 +6,7 @@ open import Cubical.Algebra.AbGroup.Base
 open import Cubical.Algebra.Group.Base
 open import Cubical.Algebra.Group.Properties
 open import Cubical.Data.Nat.Literals public
+open import Cubical.Data.Sigma
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.Prelude
 open import Cubical.HITs.PropositionalTruncation as PropositionalTruncation
@@ -113,12 +114,12 @@ leftMultiplyRationalContinuous q =
     _
     (leftMultiplyRationalLipschitzℝ q)
 
-distanceLeftMultiplyRational≡leftMultiplyRationalDistance :
+distanceLeftMultiplyRational≡leftMultiplyRationalDistanceₗ :
   (q r : ℚ.ℚ)
   (y : ℝ) →
   distance (leftMultiplyRational q y) (leftMultiplyRational r y) ≡
   leftMultiplyRational (ℚ.distance q r) ∣ y ∣
-distanceLeftMultiplyRational≡leftMultiplyRationalDistance q r =
+distanceLeftMultiplyRational≡leftMultiplyRationalDistanceₗ q r =
   continuousExtensionLaw₁ f g f' g' φ ψ ω χ π
   where
   f : ℝ → ℝ
@@ -265,7 +266,7 @@ leftMultiplyRationalLipschitzℚ₁ L φ y ψ q r ε ω χ =
   where
   π : distance (leftMultiplyRational q y) (leftMultiplyRational r y) ≡
       leftMultiplyRational (ℚ.distance q r) ∣ y ∣
-  π = distanceLeftMultiplyRational≡leftMultiplyRationalDistance q r y
+  π = distanceLeftMultiplyRational≡leftMultiplyRationalDistanceₗ q r y
 
   ρ : leftMultiplyRational (ℚ.distance q r) ∣ y ∣ ≤
       leftMultiplyRational (ℚ.distance q r) (rational L)
@@ -304,11 +305,247 @@ boundedMultiply L φ y ψ =
     L φ
     (leftMultiplyRationalLipschitzℚ₁ L φ y ψ)
 
+boundedMultiplyLipschitz : 
+  (L : ℚ.ℚ) (φ : 0 ℚ.< L)
+  (y : ℝ) (ψ : ∣ y ∣ ≤ rational L) →
+  Lipschitzℝ (boundedMultiply L φ y ψ) L φ
+boundedMultiplyLipschitz L φ y ψ =
+  liftLipschitzLipschitz
+    (λ q → leftMultiplyRational q y)
+    L φ
+    (leftMultiplyRationalLipschitzℚ₁ L φ y ψ)
+
+boundedMultiplyContinuous :
+  (L : ℚ.ℚ) (φ : 0 ℚ.< L)
+  (y : ℝ) (ψ : ∣ y ∣ ≤ rational L) →
+  Continuous $ boundedMultiply L φ y ψ
+boundedMultiplyContinuous L φ y ψ =
+  lipschitz→continuous
+    (boundedMultiply L φ y ψ)
+    L φ
+    (boundedMultiplyLipschitz L φ y ψ)
+
+boundedMultiplyIs2Constant :
+  (L₁ L₂ : ℚ.ℚ) (φ₁ : 0 ℚ.< L₁) (φ₂ : 0 ℚ.< L₂)
+  (y : ℝ) (ψ₁ : ∣ y ∣ ≤ rational L₁) (ψ₂ : ∣ y ∣ ≤ rational L₂) →
+  (x : ℝ) →
+  boundedMultiply L₁ φ₁ y ψ₁ x ≡ boundedMultiply L₂ φ₂ y ψ₂ x
+boundedMultiplyIs2Constant L₁ L₂ φ₁ φ₂ y ψ₁ ψ₂ =
+  continuousExtensionUnique
+    (boundedMultiply L₁ φ₁ y ψ₁)
+    (boundedMultiply L₂ φ₂ y ψ₂)
+    (boundedMultiplyContinuous L₁ φ₁ y ψ₁)
+    (boundedMultiplyContinuous L₂ φ₂ y ψ₂)
+    (λ q → refl)
+
+boundedMultiplyCurried :
+  (x y : ℝ) →
+  Σ ℚ.ℚ (λ q → (0 ℚ.< q) × (∣ y ∣ ≤ rational q)) → ℝ
+boundedMultiplyCurried x y (L , φ , ψ) = boundedMultiply L φ y ψ x
+
+boundedMultiplyCurriedIs2Constant : 
+  (x y : ℝ) →
+  2-Constant $ boundedMultiplyCurried x y
+boundedMultiplyCurriedIs2Constant x y (L , φ , ψ) (M , ω , χ) =
+  boundedMultiplyIs2Constant L M φ ω y ψ χ x
+
 _·_ : ℝ → ℝ → ℝ
-x · y = PropositionalTruncation.SetElim.rec→Set ℝ-isSet
-           -- (λ (a₁ , φ₁ , ψ₁) (a₂ , φ₂ , ψ₂) → ...)  -- 2-Constant proof
-           (λ (a , φ , ψ) → boundedMultiply a φ y ψ x)
-           {!!}
-           (∣∣≤rational y)
+x · y =
+  PropositionalTruncation.SetElim.rec→Set
+    ℝ-isSet
+    (boundedMultiplyCurried x y)
+    (boundedMultiplyCurriedIs2Constant x y)
+    φ
+  where
+  φ : ∃ ℚ.ℚ (λ q → (0 ℚ.< q) × (∣ y ∣ ≤ rational q))
+  φ = ∣∣≤rational y
 
 infixl 7 _·_
+
+multiply≡boundedMultiply :
+  (L : ℚ.ℚ) (φ : 0 ℚ.< L) →
+  (x y : ℝ) (ψ : ∣ y ∣ ≤ rational L) →
+  x · y ≡ boundedMultiply L φ y ψ x
+multiply≡boundedMultiply L φ x y ψ =
+  SetElim.helper ℝ-isSet
+    (boundedMultiplyCurried x y)
+    (boundedMultiplyCurriedIs2Constant x y)
+    ω
+    χ
+  where
+  ω : ∃ ℚ.ℚ (λ q → (0 ℚ.< q) × (∣ y ∣ ≤ rational q))
+  ω = ∣∣≤rational y
+
+  χ : ∃ ℚ.ℚ (λ q → (0 ℚ.< q) × (∣ y ∣ ≤ rational q))
+  χ = ∣ L , φ , ψ ∣₁
+
+multiply≡boundedMultiply' :
+  (L : ℚ.ℚ) (φ : 0 ℚ.< L) →
+  (y : ℝ) (ψ : ∣ y ∣ ≤ rational L) →
+  (flip _·_ y) ∼ (boundedMultiply L φ y ψ)
+multiply≡boundedMultiply' L φ y ψ x = multiply≡boundedMultiply L φ x y ψ
+
+multiply≡boundedMultiply'' :
+  (L : ℚ.ℚ) (φ : 0 ℚ.< L) →
+  (y : ℝ) (ψ : ∣ y ∣ ≤ rational L) →
+  (flip _·_ y) ≡ (boundedMultiply L φ y ψ)
+multiply≡boundedMultiply'' L φ y ψ = funExt $ multiply≡boundedMultiply' L φ y ψ
+
+multiplyRational≡rationalMultiply : (q r : ℚ.ℚ) →
+  rational q · rational r ≡ rational (q ℚ.· r)
+multiplyRational≡rationalMultiply q r = refl
+
+·-leftRational≡leftMultiplyRational :
+  (q : ℚ.ℚ) (x : ℝ) →
+  rational q · x ≡ leftMultiplyRational q x
+·-leftRational≡leftMultiplyRational q x =
+  ∃-rec (ℝ-isSet (rational q · x) (leftMultiplyRational q x)) ψ φ
+  where
+  φ : ∃ ℚ.ℚ (λ q₁ → (0 ℚ.< q₁) × (∣ x ∣ ≤ rational q₁))
+  φ = ∣∣≤rational x
+
+  ψ : (L : ℚ.ℚ) →
+      (0 ℚ.< L) × (∣ x ∣ ≤ rational L) →
+      rational q · x ≡ leftMultiplyRational q x
+  ψ L (ω , χ) = rational q · x
+                  ≡⟨ multiply≡boundedMultiply L ω (rational q) x χ ⟩
+                boundedMultiply L ω x χ (rational q)
+                  ≡⟨ refl ⟩
+                leftMultiplyRational q x ∎
+
+multiplyLipscthiz₁ :
+  (L : ℚ.ℚ) (φ : 0 ℚ.< L)
+  (y : ℝ) (ψ : ∣ y ∣ ≤ rational L) →
+  Lipschitzℝ (λ x → x · y) L φ
+multiplyLipscthiz₁ L φ y ψ = ω'
+  where
+  ω : Lipschitzℝ (boundedMultiply L φ y ψ) L φ
+  ω = boundedMultiplyLipschitz L φ y ψ
+
+  ω' : Lipschitzℝ (λ x → x · y) L φ
+  ω' = subst (λ ?f → Lipschitzℝ ?f L φ)
+             (sym $ multiply≡boundedMultiply'' L φ y ψ)
+             ω
+
+multiplyContinuous₁ : (y : ℝ) → Continuous $ flip _·_ y
+multiplyContinuous₁ y = ∃-rec (continuousProposition $ flip _·_ y) ψ φ
+  where
+  φ : ∃ ℚ.ℚ (λ L → (0 ℚ.< L) × (∣ y ∣ ≤ rational L))
+  φ = ∣∣≤rational y
+
+  ψ : (L : ℚ.ℚ) →
+      (0 ℚ.< L) × (∣ y ∣ ≤ rational L) →
+      Continuous $ flip _·_ y
+  ψ L (ω , χ) = lipschitz→continuous
+                  (flip _·_ y)
+                  L ω
+                  (multiplyLipscthiz₁ L ω y χ)
+
+distanceLeftMultiplyRational≡leftMultiplyRationalDistanceᵣ :
+  (q : ℚ.ℚ) (x y : ℝ) →
+  distance (leftMultiplyRational q x) (leftMultiplyRational q y) ≡
+  leftMultiplyRational ℚ.∣ q ∣ (distance x y)
+distanceLeftMultiplyRational≡leftMultiplyRationalDistanceᵣ q =
+  continuousExtensionLaw₂ f g f' g' φ ψ ω π ρ σ τ
+  where
+  f : ℝ → ℝ → ℝ
+  f x y = distance (leftMultiplyRational q x) (leftMultiplyRational q y)
+
+  g : ℝ → ℝ → ℝ
+  g x y = leftMultiplyRational ℚ.∣ q ∣ (distance x y)
+
+  f' : ℚ.ℚ → ℚ.ℚ → ℚ.ℚ
+  f' s t = ℚ.distance (q ℚ.· s) (q ℚ.· t)
+
+  g' : ℚ.ℚ → ℚ.ℚ → ℚ.ℚ
+  g' s t = ℚ.∣ q ∣ ℚ.· ℚ.distance s t
+
+  φ : (s t : ℚ.ℚ) → f (rational s) (rational t) ≡ rational (f' s t)
+  φ s t = refl
+
+  ψ : (s t : ℚ.ℚ) → g (rational s) (rational t) ≡ rational (g' s t)
+  ψ s t = refl
+
+  ω : (s t : ℚ.ℚ) → f' s t ≡ g' s t
+  ω s t = ℚ.·distanceₗ q s t
+
+  π : (u : ℝ) → Continuous (f u)
+  π u = continuousCompose
+          (leftMultiplyRational q)
+          (distance (leftMultiplyRational q u))
+          (leftMultiplyRationalContinuous q)
+          (distanceContinuous₂ (leftMultiplyRational q u))
+
+  ρ : (v : ℝ) → Continuous (flip f v)
+  ρ v = continuousCompose
+          (leftMultiplyRational q)
+          (flip distance (leftMultiplyRational q v))
+          (leftMultiplyRationalContinuous q)
+          (distanceContinuous₁ (leftMultiplyRational q v))
+
+  σ : (u : ℝ) → Continuous (g u)
+  σ u = continuousCompose
+          (distance u)
+          (leftMultiplyRational ℚ.∣ q ∣)
+          (distanceContinuous₂ u)
+          (leftMultiplyRationalContinuous ℚ.∣ q ∣)
+
+  τ : (v : ℝ) → Continuous (flip g v)
+  τ v = continuousCompose
+          (flip distance v)
+          (leftMultiplyRational ℚ.∣ q ∣)
+          (distanceContinuous₁ v)
+          (leftMultiplyRationalContinuous ℚ.∣ q ∣)
+
+·distanceₗ : (a x y : ℝ) →
+            distance (a · x) (a · y) ≡ ∣ a ∣ · distance x y
+·distanceₗ a x y =
+  continuousExtensionUnique f g χ π ω a
+  where
+  f : ℝ → ℝ
+  f a = distance (a · x) (a · y)
+
+  g : ℝ → ℝ
+  g a = ∣ a ∣ · distance x y
+
+  -- TODO: Replace with where blocks making types of ∃-rec middle term explicit
+  χ : Continuous f
+  χ = ∃-rec (continuousProposition f)
+        (λ Lx (φx , ψx) → ∃-rec (continuousProposition f)
+          (λ Ly (φy , ψy) →
+            lipschitz→continuous f _ _
+              (lipschitz₂-composeLipschitz₁-lipschitz
+                Lx Ly 1 1 φx φy ℚ.0<1 ℚ.0<1
+                (multiplyLipscthiz₁ Lx φx x ψx)
+                (multiplyLipscthiz₁ Ly φy y ψy)
+                distanceLipschitz₁
+                distanceLipschitz₂))
+          (∣∣≤rational y))
+        (∣∣≤rational x)
+
+  π : Continuous g
+  π = continuousCompose
+        ∣_∣
+        (flip _·_ (distance x y))
+        magnitudeContinuous
+        (multiplyContinuous₁ (distance x y))
+
+  ω : (f ∘ rational) ∼ (g ∘ rational)
+  ω q =
+    distance (rational q · x) (rational q · y)
+      ≡⟨ cong₂ distance (·-leftRational≡leftMultiplyRational q x)
+                         (·-leftRational≡leftMultiplyRational q y) ⟩
+    distance (leftMultiplyRational q x) (leftMultiplyRational q y)
+      ≡⟨ distanceLeftMultiplyRational≡leftMultiplyRationalDistanceᵣ q x y ⟩
+    leftMultiplyRational ℚ.∣ q ∣ (distance x y)
+      ≡⟨ sym (·-leftRational≡leftMultiplyRational ℚ.∣ q ∣ (distance x y)) ⟩
+    rational ℚ.∣ q ∣ · distance x y
+      ≡⟨ cong (flip _·_ (distance x y))
+              (sym (magnitudeExtendsRationalMagnitude q)) ⟩
+    ∣ rational q ∣ · distance x y ∎
+
+magnitudeMultiply≤magnitudeMultiply :
+  {x y z w : ℝ} →
+  ∣ x ∣ ≤ ∣ z ∣ → ∣ y ∣ ≤ ∣ w ∣ →
+  ∣ x ∣ · ∣ y ∣ ≤ ∣ z ∣ · ∣ w ∣
+magnitudeMultiply≤magnitudeMultiply {x} {y} {z} {w} = {!!}

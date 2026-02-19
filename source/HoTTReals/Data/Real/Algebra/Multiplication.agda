@@ -186,13 +186,13 @@ distanceLeftMultiplyRational≡leftMultiplyRationalDistanceₗ q r =
           (leftMultiplyRationalLipschitzℝ (ℚ.distance q r))
           magnitudeLipschitzℝ
 
-maxLeftMultiplyRationalNonnegative :
+maxLeftMultiplyRationalNonnegativeₗ :
   (q : ℚ.ℚ)
   (φ : 0 ℚ.≤ q) →
   (x y : ℝ) →
   max (leftMultiplyRational q x) (leftMultiplyRational q y) ≡
   leftMultiplyRational q (max x y)
-maxLeftMultiplyRationalNonnegative q φ =
+maxLeftMultiplyRationalNonnegativeₗ q φ =
   continuousExtensionLaw₂ f g f' g' ψ ω χ π ρ σ τ
   where
   f : ℝ → ℝ → ℝ
@@ -251,7 +251,7 @@ leftMultiplyRationalNonnegativeMonotone :
   x ≤ y → leftMultiplyRational q x ≤ leftMultiplyRational q y
 leftMultiplyRationalNonnegativeMonotone q φ x y ψ =
   max (leftMultiplyRational q x) (leftMultiplyRational q y)
-    ≡⟨ maxLeftMultiplyRationalNonnegative q φ x y ⟩
+    ≡⟨ maxLeftMultiplyRationalNonnegativeₗ q φ x y ⟩
   leftMultiplyRational q (max x y)
     ≡⟨ cong (leftMultiplyRational q) ψ ⟩
   leftMultiplyRational q y ∎
@@ -508,20 +508,42 @@ distanceLeftMultiplyRational≡leftMultiplyRationalDistanceᵣ q =
   g : ℝ → ℝ
   g a = ∣ a ∣ · distance x y
 
-  -- TODO: Replace with where blocks making types of ∃-rec middle term explicit
   χ : Continuous f
-  χ = ∃-rec (continuousProposition f)
-        (λ Lx (φx , ψx) → ∃-rec (continuousProposition f)
-          (λ Ly (φy , ψy) →
-            lipschitz→continuous f _ _
-              (lipschitz₂-composeLipschitz₁-lipschitz
-                Lx Ly 1 1 φx φy ℚ.0<1 ℚ.0<1
-                (multiplyLipscthiz₁ Lx φx x ψx)
-                (multiplyLipscthiz₁ Ly φy y ψy)
-                distanceLipschitz₁
-                distanceLipschitz₂))
-          (∣∣≤rational y))
-        (∣∣≤rational x)
+  χ = γ
+    where
+    α : ∃ ℚ.ℚ (λ q → (0 ℚ.< q) × (∣ x ∣ ≤ rational q))
+    α = ∣∣≤rational x
+
+    β : ∃ ℚ.ℚ (λ q → (0 ℚ.< q) × (∣ y ∣ ≤ rational q))
+    β = ∣∣≤rational y
+
+    γ : Continuous f
+    γ = rec2 (continuousProposition f) γ' α β
+      where
+      γ' : Σ ℚ.ℚ (λ L → (0 ℚ.< L) × (∣ x ∣ ≤ rational L)) →
+           Σ ℚ.ℚ (λ M → (0 ℚ.< M) × (∣ y ∣ ≤ rational M)) →
+           Continuous f
+      γ' (L , ζ , ι) (M , ζ' , ι') = ν
+        where
+        ζ'' : 0 ℚ.< 1 ℚ.· L ℚ.+ 1 ℚ.· M
+        ζ'' = ℚ.0<+' {x = 1 ℚ.· L} {y = 1 ℚ.· M}
+                     (ℚ.0<· {x = 1} {y = L} ℚ.0<1 ζ)
+                     (ℚ.0<· {x = 1} {y = M} ℚ.0<1 ζ')
+
+        κ₁ : Lipschitzℝ (flip _·_ x) L ζ
+        κ₁ = multiplyLipscthiz₁ L ζ x ι
+
+        κ₂ : Lipschitzℝ (flip _·_ y) M ζ'
+        κ₂ = multiplyLipscthiz₁ M ζ' y ι'
+
+        μ : Lipschitzℝ f (1 ℚ.· L ℚ.+ 1 ℚ.· M) ζ''
+        μ = lipschitz₂-composeLipschitz₁-lipschitz
+              L M 1 1 ζ ζ' ℚ.0<1 ℚ.0<1 κ₁ κ₂
+              distanceLipschitz₁
+              distanceLipschitz₂
+
+        ν : Continuous f
+        ν = lipschitz→continuous f (1 ℚ.· L ℚ.+ 1 ℚ.· M) ζ'' μ
 
   π : Continuous g
   π = continuousCompose
@@ -544,8 +566,48 @@ distanceLeftMultiplyRational≡leftMultiplyRationalDistanceᵣ q =
               (sym (magnitudeExtendsRationalMagnitude q)) ⟩
     ∣ rational q ∣ · distance x y ∎
 
+maxMultiplyLeftMagnitude : (a x y : ℝ) →
+  max (∣ a ∣ · x) (∣ a ∣ · y) ≡ ∣ a ∣ · max x y
+maxMultiplyLeftMagnitude a x y = {!!}
+
+maxLeftMultiplyRationalᵣ :
+  (a : ℝ)
+  (q r : ℚ.ℚ) →
+  max (leftMultiplyRational q ∣ a ∣) (leftMultiplyRational r ∣ a ∣) ≡
+  leftMultiplyRational (ℚ.max q r) ∣ a ∣
+maxLeftMultiplyRationalᵣ a q r = {!!}
+
+maxMultiplyRightMagnitude : (a x y : ℝ) →
+  max (x · ∣ a ∣) (y · ∣ a ∣) ≡ max x y · ∣ a ∣
+maxMultiplyRightMagnitude a x y = {!!}
+
+multiplyMagnitudeLeftMonotone : (a x y : ℝ) →
+  x ≤ y → ∣ a ∣ · x ≤ ∣ a ∣ · y
+multiplyMagnitudeLeftMonotone a x y φ =
+  max (∣ a ∣ · x) (∣ a ∣ · y)
+    ≡⟨ maxMultiplyLeftMagnitude a x y ⟩
+  ∣ a ∣ · max x y
+    ≡⟨ cong (_·_ $ ∣ a ∣) φ ⟩
+  ∣ a ∣ · y ∎
+
+multiplyMagnitudeRightMonotone : (a x y : ℝ) →
+  x ≤ y → x · ∣ a ∣ ≤ y · ∣ a ∣
+multiplyMagnitudeRightMonotone a x y φ =
+  max (x · ∣ a ∣) (y · ∣ a ∣)
+    ≡⟨ maxMultiplyRightMagnitude a x y ⟩
+  max x y · ∣ a ∣
+    ≡⟨ cong (flip _·_ $ ∣ a ∣) φ ⟩
+  y · ∣ a ∣ ∎
+
 magnitudeMultiply≤magnitudeMultiply :
   {x y z w : ℝ} →
   ∣ x ∣ ≤ ∣ z ∣ → ∣ y ∣ ≤ ∣ w ∣ →
   ∣ x ∣ · ∣ y ∣ ≤ ∣ z ∣ · ∣ w ∣
-magnitudeMultiply≤magnitudeMultiply {x} {y} {z} {w} = {!!}
+magnitudeMultiply≤magnitudeMultiply {x} {y} {z} {w} φ ψ =
+  ≤-transitive (∣ x ∣ · ∣ y ∣) (∣ z ∣ · ∣ y ∣) (∣ z ∣ · ∣ w ∣) ω χ
+  where
+  ω : ∣ x ∣ · ∣ y ∣ ≤ ∣ z ∣ · ∣ y ∣
+  ω = multiplyMagnitudeRightMonotone y ∣ x ∣ ∣ z ∣ φ
+
+  χ : ∣ z ∣ · ∣ y ∣ ≤ ∣ z ∣ · ∣ w ∣
+  χ = multiplyMagnitudeLeftMonotone z ∣ y ∣ ∣ w ∣ ψ

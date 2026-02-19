@@ -10,7 +10,7 @@ open import Cubical.Foundations.HLevels
 open import Cubical.Foundations.Prelude
 open import Cubical.Functions.Embedding
 open import Cubical.Functions.Surjection
-open import Cubical.HITs.PropositionalTruncation
+open import Cubical.HITs.PropositionalTruncation as PropositionalTruncation
 open import Cubical.Homotopy.Base
 open import Cubical.Relation.Binary
 open import Cubical.Relation.Nullary
@@ -626,3 +626,77 @@ lipschitz₂-composeLipschitz₁-lipschitz {f} {g} {h}
          (isProp< 0 ((N₁ · L + N₂ · M) · ε) (fst μ) ξ')
          (snd μ)
 
+-- TODO: Think this will only actually work if the h function is uniformly continuous
+-- continuous₂-composeContinuous₁-continuous :
+--   {f g : ℝ → ℝ} {h : ℝ → ℝ → ℝ} →
+--   Continuous f →
+--   Continuous g →
+--   ((y : ℝ) → Continuous $ flip h y) →
+--   ((x : ℝ) → Continuous $ h x) →
+--   Continuous (λ x → h (f x) (g x))
+-- continuous₂-composeContinuous₁-continuous {f} {g} {h} φ ψ ω χ x ε π = {!!}
+--   where
+--   ρ : 0 < ε / 2 [ ℚ.2≠0 ]
+--   ρ = ℚ.0</ {x = ε} {y = 2} π ℚ.0<2
+
+--   σ : ∃ ℚ
+--       (λ δ₁ →
+--       Σ (0 ℚ.< δ₁)
+--       (λ ξ → (v : ℝ) →
+--       Close δ₁ ξ (f x) v →
+--       Close (ε / 2 [ ℚ.2≠0 ]) ρ (h (f x) (g x)) (h v (g x))))
+--   σ = ω (g x) (f x) (ε / 2 [ ℚ.2≠0 ]) ρ
+
+--   τ : ∃ ℚ
+--       (λ δ₂ → Σ (0 ℚ.< δ₂)
+--       (λ ξ → (v : ℝ) →
+--       Close δ₂ ξ (g x) v →
+--       Close (ε / 2 [ ℚ.2≠0 ]) ρ (h (f y) (g x)) (h v (g x))))
+--   τ = ψ (f y) x (ε / 2 [ ℚ.2≠0 ]) ρ
+
+--   υ : ∃ ℚ
+--       (λ δ →
+--       Σ (0 ℚ.< δ)
+--       (λ ξ → (y : ℝ) →
+--       Close δ ξ x y →
+--       Close (ε / 2 [ ℚ.2≠0 ]) ρ (h (f x) (g x)) (h (f y) (g y))))
+--   υ = PropositionalTruncation.map2 υ' σ τ
+--     where
+--     υ' : Σ ℚ
+--          (λ δ₁ →
+--          Σ (0 ℚ.< δ₁)
+--          (λ ξ → (v : ℝ) →
+--          Close δ₁ ξ (f x) v →
+--          Close (ε / 2 [ ℚ.2≠0 ]) ρ (h (f x) (g x)) (h v (g x)))) →
+--          Σ ℚ
+--          (λ δ₂ →
+--          Σ (0 < δ₂)
+--          (λ ξ →
+--          (y : ℝ) → Close δ₂ ξ x y →
+--                    Close (ε / 2 [ 2≠0 ]) ρ (g x) (g y))) →
+--          Σ ℚ
+--          (λ δ →
+--          Σ (0 < δ)
+--          (λ ξ →
+--          (y : ℝ) →
+--          Close δ ξ x y →
+--          Close (ε / 2 [ 2≠0 ]) ρ (h (f x) (g x)) (h (f y) (g y))))
+--     υ' (δ₁ , (α₁ , β₁)) (δ₂ , (α₂ , β₂)) = {!!}
+--       where
+--       δ : ℚ.ℚ
+--       δ = ℚ.min δ₁ δ₂
+
+--       α : 0 ℚ.< δ
+--       α = minGreatestLowerBound< {x = δ₁} {y = δ₂} {z = 0} α₁ α₂
+      
+--       γ₁ : ∃ ℚ (λ η₁ →
+--            Σ (0 ℚ.< η₁)
+--            (λ ξ → (y : ℝ) → Close η₁ ξ x y →
+--                             Close δ α (f x) (f y)))
+--       γ₁ = {!ψ !}
+
+--       γ₂ : ∃ ℚ (λ η₂ →
+--            Σ (0 ℚ.< η₂)
+--            (λ ξ → (y : ℝ) → Close η₂ ξ x y →
+--                             Close δ α (g x) (g y)))
+--       γ₂ = {!!}

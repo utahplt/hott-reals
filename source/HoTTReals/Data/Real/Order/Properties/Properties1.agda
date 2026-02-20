@@ -294,7 +294,7 @@ close→≤+ε {x} {y} {ε} φ ψ = ρ
     υ = ℚ.minGreatestLowerBound< {x = δ₁} {y = δ₂} {z = 0} τ₁ τ₂
 
     υ' : 0 ℚ.< δ
-    υ' = ℚ.0</ {x = ℚ.min δ₁ δ₂} {y = 2} υ ℚ.0<2
+    υ' = ℚ.0</' {x = ℚ.min δ₁ δ₂} {y = 2} υ ℚ.0<2
 
     ο : δ ℚ.< ℚ.min δ₁ δ₂
     ο = ℚ.self/2<self (ℚ.min δ₁ δ₂) υ
@@ -395,6 +395,33 @@ close→≤+ε {x} {y} {ε} φ ψ = ρ
           (Sum.map (≤→<→< {x = x} ψ) (flip (<→≤→< {x = z}) χ))
           π
 
+isStrictOrder< : IsStrictOrder _<_
+isStrictOrder< =
+  isstrictorder
+    ℝ-isSet
+    <-isProp
+    <-irreflexive
+    <-transitive
+    (isIrrefl×isTrans→isAsym _<_ (<-irreflexive , <-transitive))
+    <-isWeaklyLinear
+
+_#_ : ℝ → ℝ → Type ℓ-zero
+_#_ = SymClosure _<_
+
+isApartness# : IsApartness _#_
+isApartness# = isStrictOrder→isApartnessSymClosure isStrictOrder<
+
+#-irreflexive : isIrrefl _#_
+#-irreflexive = IsApartness.is-irrefl isApartness#
+
+#-cotransitive : isCotrans _#_
+#-cotransitive = IsApartness.is-cotrans isApartness#
+
+#-symmetric : isSym _#_
+#-symmetric = IsApartness.is-sym isApartness#
+
+infix 4 _#_ 
+
 <+ε : (x : ℝ) (ε : ℚ.ℚ) →
       0 ℚ.< ε →
       x < x + rational ε
@@ -432,7 +459,7 @@ close→≤+ε {x} {y} {ε} φ ψ = ρ
     δ = ε / 5 [ ℚ.5≠0 ]
 
     χ : 0 ℚ.< δ
-    χ = ℚ.0</ {x = ε} {y = 5} ω ℚ.0<5
+    χ = ℚ.0</' {x = ε} {y = 5} ω ℚ.0<5
 
     π : x δ χ < x δ χ + rational δ
     π = ψ δ χ δ χ

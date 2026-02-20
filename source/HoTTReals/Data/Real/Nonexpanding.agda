@@ -268,7 +268,7 @@ liftNonexpanding₂Recursion f (φ , ψ) =
         α' = Bool.toWitnessFalse {Q = discreteℚ 2 0} tt
 
         α'' : 0 < θ / 2 [ α' ]
-        α'' = 0</ {x = θ} {y = 2} υ α
+        α'' = 0</' {x = θ} {y = 2} υ α
 
         β : Close (ε - θ) ξ
                   (fLimit' f u (θ / 2 [ α' ]) α'')
@@ -391,10 +391,10 @@ liftNonexpanding₂Recursion f (φ , ψ) =
         θ'' = θ' / 1 [ η ]
 
         ζ'' : 0 < θ'
-        ζ'' = 0</ {x = θ} {y = 2} α ζ'
+        ζ'' = 0</' {x = θ} {y = 2} α ζ'
 
         η'' : 0 < θ''
-        η'' = 0</ {x = θ'} {y = 1} ζ'' η'
+        η'' = 0</' {x = θ'} {y = 1} ζ'' η'
 
         ι : θ' + θ' ≡ θ
         ι = self/2≡self θ ζ

@@ -144,23 +144,24 @@ open import HoTTReals.Data.Rationals.Properties
 <→≠ : {x y : ℚ} → x < y → ¬ x ≡ y
 <→≠ {x} {y} p q = isIrrefl< y (subst (λ ?z → ?z < y) q p)
 
-0<⁻¹ : {x : ℚ} (p : 0 < x) → 0 < x [ ≠-symmetric (<→≠ p) ]⁻¹
+0<⁻¹ : {x : ℚ} (p : 0 < x) (p' : ¬ x ≡ 0) → 0 < x [ p' ]⁻¹
 0<⁻¹ {x} =
   SetQuotients.elimProp
-    {P = λ x → (p : 0 < x) → 0 < x [ ≠-symmetric (<→≠ p) ]⁻¹}
-    (λ x → isPropΠ (λ p → isProp< 0 (x [ ≠-symmetric (<→≠ p) ]⁻¹)))
+    {P = λ x → (p : 0 < x) (p' : ¬ x ≡ 0) → 0 < x [ p' ]⁻¹}
+    (λ x → isPropΠ2 (λ p p' → isProp< 0 (x [ p' ]⁻¹)))
     q x
   where
-  q : (u : ℤ × ℕ₊₁) (p : 0 < [ u ]) → 0 < ([ u ] [ ≠-symmetric (<→≠ p) ]⁻¹)
-  q (ℤ.pos zero , (1+ m)) p = Empty.rec (isIrrefl< 0 r)
+  q : (u : ℤ × ℕ₊₁) (p : 0 < [ u ]) (p' : ¬ [ u ] ≡ 0) →
+      0 < ([ u ] [ p' ]⁻¹)
+  q (ℤ.pos zero , (1+ m)) p p' = Empty.rec (isIrrefl< 0 s)
     where
-    p' : 0 ℤ.· (ℕ₊₁→ℤ (1+ m)) ℤ.< 0 ℤ.· 1
-    p' = p
+    r : 0 ℤ.· (ℕ₊₁→ℤ (1+ m)) ℤ.< 0 ℤ.· 1
+    r = p
 
-    r : 0 < 0
+    s : 0 < 0
     -- TODO: Why are annihilator laws not working?
-    r = subst2 ℤ._≤_ refl refl p'
-  q (ℤ.pos (suc n) , (1+ m)) p = s
+    s = subst2 ℤ._≤_ refl refl r
+  q (ℤ.pos (suc n) , (1+ m)) p p' = s
     where
     r : 0 ℤ.< ℕ₊₁→ℤ (1+ m)
     r = m , s
@@ -187,7 +188,56 @@ open import HoTTReals.Data.Rationals.Properties
     r : ℤ.pos (suc 0) ℤ.≤ ℤ.negsuc n
     r = subst2 ℤ._≤_ refl (ℤ.·IdR (ℤ.negsuc n)) p' 
 
+0<⁻¹' : {x : ℚ} (p : 0 < x) → 0 < x [ ≠-symmetric (<→≠ p) ]⁻¹
+0<⁻¹' {x} p = 0<⁻¹ {x} p (≠-symmetric $ <→≠ p)
+
 ⁻¹-positiveAntitone :
+  {x y : ℚ} (p : 0 < x) (q : x ≤ y)
+  (r : ¬ x ≡ 0) (s : ¬ y ≡ 0) →
+  (y [ s ]⁻¹) ≤ (x [ r ]⁻¹)
+⁻¹-positiveAntitone {x} {y} p q r s = subst2 _≤_ β γ ζ
+  where
+  t : ¬ x ≡ 0
+  t = ≠-symmetric (<→≠ p)
+
+  u : ¬ y ≡ 0
+  u = ≠-symmetric (<→≠ (isTrans<≤ 0 x y p q))
+
+  v : 0 < x · y
+  v = 0<· {x = x} {y = y} p (isTrans<≤ 0 x y p q)
+
+  w : ¬ x · y ≡ 0
+  w = ≠-symmetric $ <→≠ v
+
+  α : 0 < ((x · y) [ w ]⁻¹)
+  α = 0<⁻¹ v w
+
+  β : x · ((x · y) [ w ]⁻¹) ≡ y [ s ]⁻¹
+  β = x · ((x · y) [ w ]⁻¹)
+         ≡⟨ cong (_·_ x) (·⁻¹' x y r s w) ⟩
+       x · ((x [ r ]⁻¹) · (y [ s ]⁻¹))
+         ≡⟨ ·Assoc x (x [ r ]⁻¹) (y [ s ]⁻¹) ⟩
+       (x · (x [ r ]⁻¹)) · (y [ s ]⁻¹)
+         ≡⟨ cong (flip _·_ (y [ s ]⁻¹)) (⁻¹-inverse x r) ⟩
+       1 · (y [ s ]⁻¹)
+         ≡⟨ ·IdL (y [ s ]⁻¹) ⟩
+       y [ s ]⁻¹ ∎
+
+  γ : y · ((x · y) [ w ]⁻¹) ≡ x [ r ]⁻¹ 
+  γ = y · ((x · y) [ w ]⁻¹)
+         ≡⟨ cong (_·_ y) (·⁻¹ x y r s w) ⟩
+       y · ((y [ s ]⁻¹) · (x [ r ]⁻¹))
+         ≡⟨ ·Assoc y (y [ s ]⁻¹) (x [ r ]⁻¹) ⟩
+       (y · (y [ s ]⁻¹)) · (x [ r ]⁻¹)
+         ≡⟨ cong (flip _·_ (x [ r ]⁻¹)) (⁻¹-inverse y s) ⟩
+       1 · (x [ r ]⁻¹)
+         ≡⟨ ·IdL (x [ r ]⁻¹) ⟩
+       x [ r ]⁻¹ ∎
+
+  ζ : x · ((x · y) [ w ]⁻¹) ≤ y · ((x · y) [ w ]⁻¹)
+  ζ = ≤-·o x y ((x · y) [ w ]⁻¹) (<Weaken≤ 0 ((x · y) [ w ]⁻¹) α) q
+
+⁻¹-positiveAntitone' :
   {x y : ℚ} (p : 0 < x) →
   (q : x ≤ y) →
   let r : ¬ x ≡ 0
@@ -196,7 +246,7 @@ open import HoTTReals.Data.Rationals.Properties
       s : ¬ y ≡ 0
       s = ≠-symmetric (<→≠ (isTrans<≤ 0 x y p q))
   in (y [ s ]⁻¹) ≤ (x [ r ]⁻¹)
-⁻¹-positiveAntitone {x} {y} p q = subst2 _≤_ w α β
+⁻¹-positiveAntitone' {x} {y} p q = ⁻¹-positiveAntitone {x} {y} p q r s
   where
   r : ¬ x ≡ 0
   r = ≠-symmetric (<→≠ p)
@@ -204,18 +254,31 @@ open import HoTTReals.Data.Rationals.Properties
   s : ¬ y ≡ 0
   s = ≠-symmetric (<→≠ (isTrans<≤ 0 x y p q))
 
-  t : 0 < x · y
-  t = 0<· {x = x} {y = y} p (isTrans<≤ 0 x y p q)
+⁻¹-positiveStrictAntitone :
+  {x y : ℚ}
+  (p : 0 < x) (q : x < y)
+  (r : ¬ x ≡ 0) (s : ¬ y ≡ 0) →
+  (y [ s ]⁻¹) < (x [ r ]⁻¹)
+⁻¹-positiveStrictAntitone {x} {y} p q r s = subst2 _<_ β γ ζ
+  where
+  t : ¬ x ≡ 0
+  t = ≠-symmetric (<→≠ p)
 
-  u : ¬ x · y ≡ 0
-  u = ≠-symmetric (<→≠ t)
+  u : ¬ y ≡ 0
+  u = ≠-symmetric (<→≠ ((isTrans< 0 x y p q)))
 
-  v : 0 < ((x · y) [ u ]⁻¹)
-  v = 0<⁻¹ {x = x · y} t
+  v : 0 < x · y
+  v = 0<· {x = x} {y = y} p ((isTrans< 0 x y p q))
 
-  w : x · ((x · y) [ u ]⁻¹) ≡ y [ s ]⁻¹
-  w = x · ((x · y) [ u ]⁻¹)
-         ≡⟨ cong (_·_ x) (·⁻¹' x y r s u) ⟩
+  w : ¬ x · y ≡ 0
+  w = ≠-symmetric $ <→≠ v
+
+  α : 0 < ((x · y) [ w ]⁻¹)
+  α = 0<⁻¹' {x = x · y} v
+
+  β : x · ((x · y) [ w ]⁻¹) ≡ y [ s ]⁻¹
+  β = x · ((x · y) [ w ]⁻¹)
+         ≡⟨ cong (_·_ x) (·⁻¹' x y r s w) ⟩
        x · ((x [ r ]⁻¹) · (y [ s ]⁻¹))
          ≡⟨ ·Assoc x (x [ r ]⁻¹) (y [ s ]⁻¹) ⟩
        (x · (x [ r ]⁻¹)) · (y [ s ]⁻¹)
@@ -224,9 +287,9 @@ open import HoTTReals.Data.Rationals.Properties
          ≡⟨ ·IdL (y [ s ]⁻¹) ⟩
        y [ s ]⁻¹ ∎
 
-  α : y · ((x · y) [ u ]⁻¹) ≡ x [ r ]⁻¹ 
-  α = y · ((x · y) [ u ]⁻¹)
-         ≡⟨ cong (_·_ y) (·⁻¹ x y r s u) ⟩
+  γ : y · ((x · y) [ w ]⁻¹) ≡ x [ r ]⁻¹ 
+  γ = y · ((x · y) [ w ]⁻¹)
+         ≡⟨ cong (_·_ y) (·⁻¹ x y r s w) ⟩
        y · ((y [ s ]⁻¹) · (x [ r ]⁻¹))
          ≡⟨ ·Assoc y (y [ s ]⁻¹) (x [ r ]⁻¹) ⟩
        (y · (y [ s ]⁻¹)) · (x [ r ]⁻¹)
@@ -235,10 +298,10 @@ open import HoTTReals.Data.Rationals.Properties
          ≡⟨ ·IdL (x [ r ]⁻¹) ⟩
        x [ r ]⁻¹ ∎
 
-  β : x · ((x · y) [ u ]⁻¹) ≤ y · ((x · y) [ u ]⁻¹)
-  β = ≤-·o x y ((x · y) [ u ]⁻¹) (<Weaken≤ 0 ((x · y) [ u ]⁻¹) v) q
+  ζ : x · ((x · y) [ w ]⁻¹) < y · ((x · y) [ w ]⁻¹)
+  ζ = <-·o x y ((x · y) [ w ]⁻¹) (0<⁻¹' {x = x · y} v) q
 
-⁻¹-positiveStrictAntitone :
+⁻¹-positiveStrictAntitone' :
   {x y : ℚ} (p : 0 < x) →
   (q : x < y) →
   let r : ¬ x ≡ 0
@@ -247,51 +310,23 @@ open import HoTTReals.Data.Rationals.Properties
       s : ¬ y ≡ 0
       s = ≠-symmetric (<→≠ (isTrans< 0 x y p q))
   in (y [ s ]⁻¹) < (x [ r ]⁻¹)
-⁻¹-positiveStrictAntitone {x} {y} p q = subst2 _<_ w α β
+⁻¹-positiveStrictAntitone' {x} {y} p q =
+  ⁻¹-positiveStrictAntitone {x} {y} p q r s
   where
   r : ¬ x ≡ 0
   r = ≠-symmetric (<→≠ p)
 
   s : ¬ y ≡ 0
-  s = ≠-symmetric (<→≠ ((isTrans< 0 x y p q)))
+  s = ≠-symmetric (<→≠ (isTrans< 0 x y p q))
 
-  t : 0 < x · y
-  t = 0<· {x = x} {y = y} p ((isTrans< 0 x y p q))
+0</ :
+  {x y : ℚ} (p : 0 < x) (q : 0 < y) (q' : ¬ y ≡ 0) →
+  0 < x / y [ q' ]
+0</ {x} {y} p q q' =
+  0<· {x = x} {y = y [ q' ]⁻¹} p (0<⁻¹ {x = y} q q')
 
-  u : ¬ x · y ≡ 0
-  u = ≠-symmetric (<→≠ t)
-
-  v : 0 < ((x · y) [ u ]⁻¹)
-  v = 0<⁻¹ {x = x · y} t
-
-  w : x · ((x · y) [ u ]⁻¹) ≡ y [ s ]⁻¹
-  w = x · ((x · y) [ u ]⁻¹)
-         ≡⟨ cong (_·_ x) (·⁻¹' x y r s u) ⟩
-       x · ((x [ r ]⁻¹) · (y [ s ]⁻¹))
-         ≡⟨ ·Assoc x (x [ r ]⁻¹) (y [ s ]⁻¹) ⟩
-       (x · (x [ r ]⁻¹)) · (y [ s ]⁻¹)
-         ≡⟨ cong (flip _·_ (y [ s ]⁻¹)) (⁻¹-inverse x r) ⟩
-       1 · (y [ s ]⁻¹)
-         ≡⟨ ·IdL (y [ s ]⁻¹) ⟩
-       y [ s ]⁻¹ ∎
-
-  α : y · ((x · y) [ u ]⁻¹) ≡ x [ r ]⁻¹ 
-  α = y · ((x · y) [ u ]⁻¹)
-         ≡⟨ cong (_·_ y) (·⁻¹ x y r s u) ⟩
-       y · ((y [ s ]⁻¹) · (x [ r ]⁻¹))
-         ≡⟨ ·Assoc y (y [ s ]⁻¹) (x [ r ]⁻¹) ⟩
-       (y · (y [ s ]⁻¹)) · (x [ r ]⁻¹)
-         ≡⟨ cong (flip _·_ (x [ r ]⁻¹)) (⁻¹-inverse y s) ⟩
-       1 · (x [ r ]⁻¹)
-         ≡⟨ ·IdL (x [ r ]⁻¹) ⟩
-       x [ r ]⁻¹ ∎
-
-  β : x · ((x · y) [ u ]⁻¹) < y · ((x · y) [ u ]⁻¹)
-  β = <-·o x y ((x · y) [ u ]⁻¹) (0<⁻¹ {x = x · y} t) q
-
-0</ : {x y : ℚ} (p : 0 < x) (q : 0 < y) → 0 < x / y [ ≠-symmetric $ <→≠ q ]
-0</ {x} {y} p q =
-  0<· {x = x} {y = y [ ≠-symmetric (<→≠ q) ]⁻¹} p (0<⁻¹ {x = y} q)
+0</' : {x y : ℚ} (p : 0 < x) (q : 0 < y) → 0 < x / y [ ≠-symmetric $ <→≠ q ]
+0</' {x} {y} p q = 0</ {x} {y} p q (≠-symmetric $ <→≠ q)
 
 <→0<- : {x y : ℚ} → x < y → 0 < y - x
 <→0<- {x} {y} p = subst (flip _<_ (y - x)) q r
@@ -1019,7 +1054,7 @@ self/2<self θ φ = ω
   χ = <→0<- {x = ∣ x ∣} {y = ε} ψ
   
   χ' : 0 < θ
-  χ' = 0</ {x = ε - ∣ x ∣} {y = 2} χ ω''
+  χ' = 0</' {x = ε - ∣ x ∣} {y = 2} χ ω''
   
   π : 2 [ ω ]⁻¹ · ∣ x ∣ + 2 [ ω ]⁻¹ · ∣ x ∣ ≡ ∣ x ∣
   π = 2⁻¹+≡self ∣ x ∣

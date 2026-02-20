@@ -26,7 +26,7 @@ liftLipschitzApproximation f L φ ε ψ =
     φ' = ≠-symmetric $ <→≠ φ
 
     ω : 0 < ε / L [ φ' ]
-    ω = 0</ {x = ε} {y = L} ψ φ
+    ω = 0</' {x = ε} {y = L} ψ φ
   in f (ε / L [ φ' ]) ω
 
 LiftLipschitzRelation :
@@ -55,14 +55,14 @@ liftLipschitzRelationSeparated L φ u v ψ = path u v ω
     φ' = ≠-symmetric $ <→≠ φ
 
     π : Close (L · (ε / L [ φ' ]))
-              (0<· {x = L} {y = ε / L [ φ' ]} φ (0</ {x = ε} {y = L} χ φ))
+              (0<· {x = L} {y = ε / L [ φ' ]} φ (0</' {x = ε} {y = L} χ φ))
               u v
-    π = ψ (ε / L [ φ' ]) (0</ {x = ε} {y = L} χ φ)
+    π = ψ (ε / L [ φ' ]) (0</' {x = ε} {y = L} χ φ)
 
     ρ : Σ (0 < ε) (λ σ → Close ε σ u v)
     ρ = subst (λ ?x → Σ (0 < ?x) (λ τ → Close ?x τ u v))
               (·/ ε L φ')
-              ((0<· {x = L} {y = ε / L [ φ' ]} φ (0</ {x = ε} {y = L} χ φ)) ,
+              ((0<· {x = L} {y = ε / L [ φ' ]} φ (0</' {x = ε} {y = L} χ φ)) ,
                π)
 
     σ : Close ε χ u v
@@ -80,13 +80,13 @@ liftLipschitzApproximationCauchy f L φ ψ ε δ ω χ =
   φ' = ≠-symmetric $ <→≠ φ
 
   π : LiftLipschitzRelation L φ
-        (f (ε / L [ φ' ]) (0</ {x = ε} {y = L} ω φ))
-        (f (δ / L [ φ' ]) (0</ {x = δ} {y = L} χ φ))
+        (f (ε / L [ φ' ]) (0</' {x = ε} {y = L} ω φ))
+        (f (δ / L [ φ' ]) (0</' {x = δ} {y = L} χ φ))
         ((ε / L [ φ' ]) + (δ / L [ φ' ]))
         (0<+' {x = ε / L [ φ' ]} {y = δ / L [ φ' ]}
-          (0</ {x = ε} {y = L} ω φ) (0</ {x = δ} {y = L} χ φ))
+          (0</' {x = ε} {y = L} ω φ) (0</' {x = δ} {y = L} χ φ))
   π = ψ (ε / L [ φ' ]) (δ / L [ φ' ])
-        (0</ {x = ε} {y = L} ω φ) (0</ {x = δ} {y = L} χ φ)
+        (0</' {x = ε} {y = L} ω φ) (0</' {x = δ} {y = L} χ φ)
 
   ρ : L · ((ε / L [ φ' ]) + (δ / L [ φ' ])) ≡ ε + δ
   ρ = L · ((ε / L [ φ' ]) + (δ / L [ φ' ]))
@@ -103,23 +103,23 @@ liftLipschitzApproximationCauchy f L φ ψ ε δ ω χ =
 
   σ : Σ (0 < ε + δ)
         (λ ξ → Close (ε + δ) ξ
-                     (f (ε / L [ φ' ]) (0</ {x = ε} {y = L} ω φ))
-                     (f (δ / L [ φ' ]) (0</ {x = δ} {y = L} χ φ)))
+                     (f (ε / L [ φ' ]) (0</' {x = ε} {y = L} ω φ))
+                     (f (δ / L [ φ' ]) (0</' {x = δ} {y = L} χ φ)))
   σ = subst (λ ?x → Σ (0 < ?x)
-              (λ ξ → Close ?x ξ (f (ε / L [ φ' ]) (0</ {x = ε} {y = L} ω φ))
-                                (f (δ / L [ φ' ]) (0</ {x = δ} {y = L} χ φ))))
+              (λ ξ → Close ?x ξ (f (ε / L [ φ' ]) (0</' {x = ε} {y = L} ω φ))
+                                (f (δ / L [ φ' ]) (0</' {x = δ} {y = L} χ φ))))
             ρ
             (0<· {x = L} {y = (ε / L [ φ' ]) + (δ / L [ φ' ])}
               φ (0<+' {x = ε / L [ φ' ]} {y = δ / L [ φ' ]}
-                  (0</ {x = ε} {y = L} ω φ) (0</ {x = δ} {y = L} χ φ)) ,
+                  (0</' {x = ε} {y = L} ω φ) (0</' {x = δ} {y = L} χ φ)) ,
              π)
 
   σ' : Close (ε + δ) (0<+' {x = ε} {y = δ} ω χ)
-             (f (ε / L [ φ' ]) (0</ {x = ε} {y = L} ω φ))
-             (f (δ / L [ φ' ]) (0</ {x = δ} {y = L} χ φ))
+             (f (ε / L [ φ' ]) (0</' {x = ε} {y = L} ω φ))
+             (f (δ / L [ φ' ]) (0</' {x = δ} {y = L} χ φ))
   σ' = subst (λ ?x → Close (ε + δ) ?x
-                (f (ε / L [ φ' ]) (0</ {x = ε} {y = L} ω φ))
-                (f (δ / L [ φ' ]) (0</ {x = δ} {y = L} χ φ)))
+                (f (ε / L [ φ' ]) (0</' {x = ε} {y = L} ω φ))
+                (f (δ / L [ φ' ]) (0</' {x = δ} {y = L} χ φ)))
              (isProp< 0 (ε + δ) (fst σ) (0<+' {x = ε} {y = δ} ω χ))
              (snd σ)
 
@@ -202,7 +202,7 @@ liftLipschitzRecursion f L φ ψ =
               (isProp→PathP
                 (λ i → isProp< 0 (·/' L δ φ' (~ i)))
                 χ
-                (0</ {x = L · δ} {y = L} (0<· {x = L} {y = δ} φ χ) φ))
+                (0</' {x = L · δ} {y = L} (0<· {x = L} {y = δ} φ χ) φ))
 
     ο' : Close
       ((L · ε) - (L · δ)) (fst ο)
@@ -260,7 +260,7 @@ liftLipschitzRecursion f L φ ψ =
               (isProp→PathP
                 (λ i → isProp< 0 (·/' L δ φ' (~ i)))
                 ρ
-                (0</ {x = L · δ} {y = L} (0<· {x = L} {y = δ} φ ρ) φ))
+                (0</' {x = L · δ} {y = L} (0<· {x = L} {y = δ} φ ρ) φ))
 
     ο' : Close ((L · ε) - (L · δ)) (fst ο)
                (liftLipschitzApproximation
@@ -318,7 +318,7 @@ liftLipschitzRecursion f L φ ψ =
                   -- TODO: What on earth is going on here?
                   (λ i → isProp< 0 (·/' L δ φ' (~ i)))
                   τ
-                  (0</ {x = L · δ} {y = L} (0<· {x = L} {y = δ} φ τ) φ))
+                  (0</' {x = L · δ} {y = L} (0<· {x = L} {y = δ} φ τ) φ))
 
       ι : g η υ ≡
           liftLipschitzApproximation g L φ (L · η) (0<· {x = L} {y = η} φ υ)
@@ -327,7 +327,7 @@ liftLipschitzRecursion f L φ ψ =
                 (isProp→PathP
                   (λ i → isProp< 0 (·/' L η φ' (~ i)))
                   υ
-                  (0</ {x = L · η} {y = L} (0<· {x = L} {y = η} φ υ) φ))
+                  (0</' {x = L · η} {y = L} (0<· {x = L} {y = η} φ υ) φ))
 
       κ : Close ((L · ε) - ((L · δ) + (L · η))) (fst γ)
                 (liftLipschitzApproximation f L φ (L · δ)
@@ -343,14 +343,13 @@ liftLipschitz :
   (ℝ → ℝ)
 liftLipschitz f L φ ψ = recursion (liftLipschitzRecursion f L φ ψ)
 
-abstract
-  liftLipschitzLipschitz :
-    (f : ℚ → ℝ)
-    (L : ℚ) (φ : 0 < L)
-    (ψ : Lipschitzℚ f L φ) →
-    Lipschitzℝ (liftLipschitz f L φ ψ) L φ
-  liftLipschitzLipschitz f L φ ψ =
-    λ u v ε ω → recursion∼ (liftLipschitzRecursion f L φ ψ)
+liftLipschitzLipschitz :
+  (f : ℚ → ℝ)
+  (L : ℚ) (φ : 0 < L)
+  (ψ : Lipschitzℚ f L φ) →
+  Lipschitzℝ (liftLipschitz f L φ ψ) L φ
+liftLipschitzLipschitz f L φ ψ =
+  λ u v ε ω → recursion∼ (liftLipschitzRecursion f L φ ψ)
 
 liftLipschitz≡rational :
   (f : ℚ → ℝ)

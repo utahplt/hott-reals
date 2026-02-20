@@ -382,7 +382,7 @@ rationalStrictReflective {q} {r} φ =
           where
           α = ≠-symmetric $ ℚ.<→≠ ℚ.0<1
 
-          β = ℚ.0</ {x = δ} {y = 1} ψ ℚ.0<1
+          β = ℚ.0</' {x = δ} {y = 1} ψ ℚ.0<1
 
           γ : Σ (0 ℚ.< δ / 1 [ α ])
                    (λ ?φ → max (rational $ q ℚ.+ ε) (x (δ / 1 [ α ]) ?φ) ≡

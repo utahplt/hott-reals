@@ -8,8 +8,8 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1771536782,
-        "narHash": "sha256-QPeWnBSWfJ96Tkci4ptYWalfxxKuQ1jXnhnWbXCIe88=",
+        "lastModified": 1771551511,
+        "narHash": "sha256-k+gD7XEV0L0bZt9N1SRHuWo1SooVqPgSGbglFwLs1m8=",
         "path": "/home/jackson/repositories/agda-mcp",
         "type": "path"
       },

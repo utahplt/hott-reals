@@ -2,9 +2,8 @@ module HoTTReals.Data.Real.Algebra.Multiplication where
 
 import Cubical.Data.Rationals as ℚ
 import Cubical.Data.Rationals.Order as ℚ
-open import Cubical.Algebra.AbGroup.Base
-open import Cubical.Algebra.Group.Base
-open import Cubical.Algebra.Group.Properties
+open import Cubical.Algebra.CommRing.Base
+open import Cubical.Algebra.Ring.Base
 open import Cubical.Data.Nat.Literals public
 open import Cubical.Data.Sigma
 open import Cubical.Foundations.Function
@@ -870,3 +869,229 @@ multiplyContinuous₂ x y ε φ = ω
 
         β' : Close ε φ (x · y) (x · z)
         β' = distance<→close φ β
+
+·-commutative : (x y : ℝ) → x · y ≡ y · x
+·-commutative =
+  continuousExtensionLaw₂
+    _·_ (flip _·_) ℚ._·_ (flip ℚ._·_)
+    φ (flip φ) ψ ω χ χ ω
+  where
+  φ : (q r : ℚ.ℚ) → rational q · rational r ≡ rational (q ℚ.· r)
+  φ q r = refl
+
+  ψ : (q r : ℚ.ℚ) → q ℚ.· r ≡ r ℚ.· q
+  ψ = ℚ.·Comm
+
+  ω : (u : ℝ) → Continuous (_·_ u)
+  ω = multiplyContinuous₂
+
+  χ : (v : ℝ) → Continuous $ flip _·_ v
+  χ = multiplyContinuous₁
+
+·-associative : (x y z : ℝ) → (x · y) · z ≡ x · (y · z)
+·-associative =
+  continuousExtensionLaw₃
+    associateℝₗ
+    associateℝᵣ
+    associateℚₗ
+    associateℚᵣ
+    ψ ω χ π ρ σ τ υ ξ
+  where
+  associateℝₗ : ℝ → ℝ → ℝ → ℝ
+  associateℝₗ x y z = (x · y) · z
+
+  associateℝᵣ : ℝ → ℝ → ℝ → ℝ
+  associateℝᵣ x y z = x · (y · z)
+
+  associateℚₗ : ℚ.ℚ → ℚ.ℚ → ℚ.ℚ → ℚ.ℚ
+  associateℚₗ x y z = (x ℚ.· y) ℚ.· z
+
+  associateℚᵣ : ℚ.ℚ → ℚ.ℚ → ℚ.ℚ → ℚ.ℚ
+  associateℚᵣ x y z = x ℚ.· (y ℚ.· z)
+
+  ψ : (q r s : ℚ.ℚ) →
+      associateℝₗ (rational q) (rational r) (rational s) ≡
+      rational (associateℚₗ q r s)
+  ψ q r s = refl
+
+  ω : (q r s : ℚ.ℚ) →
+      associateℝᵣ (rational q) (rational r) (rational s) ≡
+      rational (associateℚᵣ q r s)
+  ω q r s = refl
+
+  χ : (q r s : ℚ.ℚ) → associateℚₗ q r s ≡ associateℚᵣ q r s
+  χ q r s = sym $ ℚ.·Assoc q r s
+
+  π : (x y : ℝ) → Continuous (associateℝₗ x y)
+  π x y = multiplyContinuous₂ (x · y)
+
+  ρ : (x z : ℝ) → Continuous (λ y → associateℝₗ x y z)
+  ρ x z = continuousCompose (_·_ x) (flip _·_ z)
+                            (multiplyContinuous₂ x) (multiplyContinuous₁ z)
+
+  σ : (y z : ℝ) → Continuous (λ x → associateℝₗ x y z)
+  σ y z = continuousCompose (flip _·_ y) (flip _·_ z)
+                            (multiplyContinuous₁ y) (multiplyContinuous₁ z)
+
+  τ : (x y : ℝ) → Continuous (associateℝᵣ x y)
+  τ x y = continuousCompose (_·_ y) (_·_ x)
+                            (multiplyContinuous₂ y) (multiplyContinuous₂ x)
+
+  υ : (x z : ℝ) → Continuous (λ y → associateℝᵣ x y z)
+  υ x z = continuousCompose (flip _·_ z) (_·_ x)
+                            (multiplyContinuous₁ z) (multiplyContinuous₂ x)
+
+  ξ : (y z : ℝ) → Continuous (λ x → associateℝᵣ x y z)
+  ξ y z = multiplyContinuous₁ (y · z)
+
+·-associative' : (x y z : ℝ) → x · (y · z) ≡ (x · y) · z
+·-associative' x y z = sym $ ·-associative x y z
+
+·-unitˡ : (x : ℝ) → 1 · x ≡ x
+·-unitˡ =
+  continuousExtensionLaw₁
+    (_·_ 1) (idfun ℝ)
+    (ℚ._·_ 1) (idfun ℚ.ℚ)
+    H K L φ ψ
+  where
+  H : (_·_ 1 ∘ rational) ∼ (rational ∘ ℚ._·_ 1)
+  H q = refl
+
+  K : (idfun ℝ ∘ rational) ∼ (rational ∘ idfun ℚ.ℚ)
+  K q = refl
+
+  L : ℚ._·_ 1 ∼ idfun ℚ.ℚ
+  L = ℚ.·IdL
+
+  φ : Continuous (_·_ 1)
+  φ = multiplyContinuous₂ 1
+
+  ψ : Continuous (idfun ℝ)
+  ψ = identityContinuous
+
+·-unitʳ : (x : ℝ) → x · 1 ≡ x
+·-unitʳ x =
+  let
+    -- Agda, why are you like this?
+    φ = ·-commutative x 1
+
+    ψ : 1 · x ≡ x
+    ψ = ·-unitˡ x
+  in φ ∙ ψ
+
+·-distributesOver-+ˡ : (x y z : ℝ) → x · (y + z) ≡ x · y + x · z
+·-distributesOver-+ˡ =
+  continuousExtensionLaw₃
+    f g f' g'
+    ψ ω χ π ρ σ τ υ ξ
+  where
+  φ₊ : (q r : ℚ.ℚ) →
+      _+_ (rational q) (rational r) ≡ rational (q ℚ.+ r)
+  φ₊ = liftNonexpanding₂≡rational ℚ._+_ +nonexpandingℚ₂
+
+  f : ℝ → ℝ → ℝ → ℝ
+  f x y z = x · (y + z)
+
+  g : ℝ → ℝ → ℝ → ℝ
+  g x y z = x · y + x · z
+
+  f' : ℚ.ℚ → ℚ.ℚ → ℚ.ℚ → ℚ.ℚ
+  f' q r s = q ℚ.· (r ℚ.+ s)
+
+  g' : ℚ.ℚ → ℚ.ℚ → ℚ.ℚ → ℚ.ℚ
+  g' q r s = q ℚ.· r ℚ.+ q ℚ.· s
+
+  ψ : (q r s : ℚ.ℚ) →
+      f (rational q) (rational r) (rational s) ≡
+      rational (f' q r s)
+  ψ q r s = cong (_·_ (rational q)) (φ₊ r s)
+
+  ω : (q r s : ℚ.ℚ) →
+      g (rational q) (rational r) (rational s) ≡
+      rational (g' q r s)
+  ω q r s = φ₊ (q ℚ.· r) (q ℚ.· s)
+
+  χ : (q r s : ℚ.ℚ) → f' q r s ≡ g' q r s
+  χ = ℚ.·DistL+
+
+  π : (x y : ℝ) → Continuous (λ z → f x y z)
+  π x y = continuousCompose (_+_ y) (_·_ x)
+                            (+continuous₂ y) (multiplyContinuous₂ x)
+
+  ρ : (x z : ℝ) → Continuous (λ y → f x y z)
+  ρ x z = continuousCompose (flip _+_ z) (_·_ x)
+                            (+continuous₁ z) (multiplyContinuous₂ x)
+
+  σ : (y z : ℝ) → Continuous (λ x → f x y z)
+  σ y z = multiplyContinuous₁ (y + z)
+
+  τ : (x y : ℝ) → Continuous (λ z → g x y z)
+  τ x y = continuousCompose (_·_ x) (_+_ (x · y))
+                            (multiplyContinuous₂ x) (+continuous₂ (x · y))
+
+  υ : (x z : ℝ) → Continuous (λ y → g x y z)
+  υ x z = continuousCompose (_·_ x) (flip _+_ (x · z))
+                            (multiplyContinuous₂ x) (+continuous₁ (x · z))
+
+  ξ : (y z : ℝ) → Continuous (λ x → g x y z)
+  ξ y z = PropositionalTruncation.rec2
+            (continuousProposition (λ x → x · y + x · z)) γ α β
+    where
+    α : ∃ ℚ.ℚ (λ L → (0 ℚ.< L) × (∣ y ∣ ≤ rational L))
+    α = ∣∣≤rational y
+
+    β : ∃ ℚ.ℚ (λ M → (0 ℚ.< M) × (∣ z ∣ ≤ rational M))
+    β = ∣∣≤rational z
+
+    γ : Σ ℚ.ℚ (λ L → (0 ℚ.< L) × (∣ y ∣ ≤ rational L)) →
+        Σ ℚ.ℚ (λ M → (0 ℚ.< M) × (∣ z ∣ ≤ rational M)) →
+        Continuous (λ x → x · y + x · z)
+    γ (L , ζ , ι) (M , ζ' , ι') = ν
+      where
+      ζ'' : 0 ℚ.< 1 ℚ.· L ℚ.+ 1 ℚ.· M
+      ζ'' = ℚ.0<+' {x = 1 ℚ.· L} {y = 1 ℚ.· M}
+                   (ℚ.0<· {x = 1} {y = L} ℚ.0<1 ζ)
+                   (ℚ.0<· {x = 1} {y = M} ℚ.0<1 ζ')
+
+      μ : Lipschitzℝ (λ x → x · y + x · z) (1 ℚ.· L ℚ.+ 1 ℚ.· M) ζ''
+      μ = lipschitz₂-composeLipschitz₁-lipschitz
+            L M 1 1 ζ ζ' ℚ.0<1 ℚ.0<1
+            (multiplyLipscthiz₁ L ζ y ι)
+            (multiplyLipscthiz₁ M ζ' z ι')
+            +lipschitz₁ +lipschitz₂
+
+      ν : Continuous (λ x → x · y + x · z)
+      ν = lipschitz→continuous
+            (λ x → x · y + x · z) (1 ℚ.· L ℚ.+ 1 ℚ.· M) ζ'' μ
+
+·-distributesOver-+ʳ : (x y z : ℝ) → (y + z) · x ≡ y · x + z · x
+·-distributesOver-+ʳ x y z =
+  (y + z) · x
+    ≡⟨ ·-commutative (y + z) x ⟩
+  x · (y + z)
+    ≡⟨ ·-distributesOver-+ˡ x y z ⟩
+  x · y + x · z
+    ≡⟨ cong₂ _+_ (·-commutative x y) (·-commutative x z) ⟩
+  y · x + z · x ∎
+
+isCommutativeRingℝ : IsCommRing 0 1 _+_ _·_ (-_)
+isCommutativeRingℝ =
+  makeIsCommRing
+    ℝ-isSet
+    +-associative'
+    +-unitʳ
+    +-inverseᵣ
+    +-commutative
+    ·-associative'
+    ·-unitʳ
+    ·-distributesOver-+ˡ
+    ·-commutative
+
+ℝCommutativeRing : CommRing ℓ-zero
+ℝCommutativeRing = ℝ , (commringstr 0 1 _+_ _·_ -_ isCommutativeRingℝ)
+
+ℝRing : Ring ℓ-zero
+ℝRing = CommRing→Ring ℝCommutativeRing
+
+isRingℝ : IsRing 0 1 _+_ _·_ (-_)
+isRingℝ = IsCommRing.isRing isCommutativeRingℝ

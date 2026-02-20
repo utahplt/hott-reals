@@ -11,6 +11,7 @@ open import Cubical.Foundations.Function
 open import Cubical.Foundations.Prelude
 open import Cubical.HITs.PropositionalTruncation as PropositionalTruncation
 open import Cubical.Homotopy.Base
+open import Cubical.Relation.Nullary
 
 open import HoTTReals.Data.Real.Base
 open import HoTTReals.Data.Real.Close
@@ -21,6 +22,7 @@ open import HoTTReals.Data.Real.Nonexpanding
 open import HoTTReals.Data.Real.Properties
 
 open import HoTTReals.Data.Real.Algebra.Negation
+open import HoTTReals.Data.Real.Algebra.Addition
 open import HoTTReals.Data.Real.Algebra.Lattice
 
 open import HoTTReals.Data.Real.Order.Base
@@ -518,7 +520,7 @@ distanceLeftMultiplyRational≡leftMultiplyRationalDistanceᵣ q =
     β = ∣∣≤rational y
 
     γ : Continuous f
-    γ = rec2 (continuousProposition f) γ' α β
+    γ = PropositionalTruncation.rec2 (continuousProposition f) γ' α β
       where
       γ' : Σ ℚ.ℚ (λ L → (0 ℚ.< L) × (∣ x ∣ ≤ rational L)) →
            Σ ℚ.ℚ (λ M → (0 ℚ.< M) × (∣ y ∣ ≤ rational M)) →
@@ -568,18 +570,189 @@ distanceLeftMultiplyRational≡leftMultiplyRationalDistanceᵣ q =
 
 maxMultiplyLeftMagnitude : (a x y : ℝ) →
   max (∣ a ∣ · x) (∣ a ∣ · y) ≡ ∣ a ∣ · max x y
-maxMultiplyLeftMagnitude a x y = {!!}
+maxMultiplyLeftMagnitude a x y =
+  continuousExtensionUnique f g φ ψ ω a
+  where
+  f : ℝ → ℝ
+  f a = max (∣ a ∣ · x) (∣ a ∣ · y)
+
+  g : ℝ → ℝ
+  g a = ∣ a ∣ · max x y
+
+  φ : Continuous f
+  φ = continuousCompose ∣_∣ h magnitudeContinuous φ'
+    where
+    h : ℝ → ℝ
+    h b = max (b · x) (b · y)
+
+    φ' : Continuous h
+    φ' = PropositionalTruncation.rec2 (continuousProposition h) γ' α β
+      where
+      α : ∃ ℚ.ℚ (λ L → (0 ℚ.< L) × (∣ x ∣ ≤ rational L))
+      α = ∣∣≤rational x
+  
+      β : ∃ ℚ.ℚ (λ M → (0 ℚ.< M) × (∣ y ∣ ≤ rational M))
+      β = ∣∣≤rational y
+
+      γ' : Σ ℚ.ℚ (λ L → (0 ℚ.< L) × (∣ x ∣ ≤ rational L)) →
+           Σ ℚ.ℚ (λ M → (0 ℚ.< M) × (∣ y ∣ ≤ rational M)) →
+           Continuous h
+      γ' (L , ζ , ι) (M , ζ' , ι') = ν
+        where
+        ζ'' : 0 ℚ.< 1 ℚ.· L ℚ.+ 1 ℚ.· M
+        ζ'' = ℚ.0<+' {x = 1 ℚ.· L} {y = 1 ℚ.· M}
+                     (ℚ.0<· {x = 1} {y = L} ℚ.0<1 ζ)
+                     (ℚ.0<· {x = 1} {y = M} ℚ.0<1 ζ')
+
+        κ₁ : Lipschitzℝ (flip _·_ x) L ζ
+        κ₁ = multiplyLipscthiz₁ L ζ x ι
+
+        κ₂ : Lipschitzℝ (flip _·_ y) M ζ'
+        κ₂ = multiplyLipscthiz₁ M ζ' y ι'
+
+        μ : Lipschitzℝ h (1 ℚ.· L ℚ.+ 1 ℚ.· M) ζ''
+        μ = lipschitz₂-composeLipschitz₁-lipschitz
+              L M 1 1 ζ ζ' ℚ.0<1 ℚ.0<1
+              κ₁ κ₂ maxLipschitz₁ maxLipschitz₂
+
+        ν : Continuous h
+        ν = lipschitz→continuous h (1 ℚ.· L ℚ.+ 1 ℚ.· M) ζ'' μ
+
+  ψ : Continuous g
+  ψ = continuousCompose
+        ∣_∣ (flip _·_ (max x y))
+        magnitudeContinuous (multiplyContinuous₁ (max x y))
+
+  ω : (f ∘ rational) ∼ (g ∘ rational)
+  ω q =
+    max (∣ rational q ∣ · x) (∣ rational q ∣ · y)
+      ≡⟨ cong (λ c → max (c · x) (c · y))
+              (magnitudeExtendsRationalMagnitude q) ⟩
+    max (rational ℚ.∣ q ∣ · x) (rational ℚ.∣ q ∣ · y)
+      ≡⟨ cong₂ max (·-leftRational≡leftMultiplyRational ℚ.∣ q ∣ x)
+                     (·-leftRational≡leftMultiplyRational ℚ.∣ q ∣ y) ⟩
+    max (leftMultiplyRational ℚ.∣ q ∣ x) (leftMultiplyRational ℚ.∣ q ∣ y)
+      ≡⟨ maxLeftMultiplyRationalNonnegativeₗ ℚ.∣ q ∣ (ℚ.0≤∣∣ q) x y ⟩
+    leftMultiplyRational ℚ.∣ q ∣ (max x y)
+      ≡⟨ sym (·-leftRational≡leftMultiplyRational ℚ.∣ q ∣ (max x y)) ⟩
+    rational ℚ.∣ q ∣ · max x y
+      ≡⟨ cong (flip _·_ (max x y))
+              (sym (magnitudeExtendsRationalMagnitude q)) ⟩
+    ∣ rational q ∣ · max x y ∎
 
 maxLeftMultiplyRationalᵣ :
   (a : ℝ)
   (q r : ℚ.ℚ) →
   max (leftMultiplyRational q ∣ a ∣) (leftMultiplyRational r ∣ a ∣) ≡
   leftMultiplyRational (ℚ.max q r) ∣ a ∣
-maxLeftMultiplyRationalᵣ a q r = {!!}
+maxLeftMultiplyRationalᵣ a q r =
+  continuousExtensionUnique f g φ ψ ω a
+  where
+  f : ℝ → ℝ
+  f a = max (leftMultiplyRational q ∣ a ∣) (leftMultiplyRational r ∣ a ∣)
+
+  g : ℝ → ℝ
+  g a = leftMultiplyRational (ℚ.max q r) ∣ a ∣
+
+  φ : Continuous f
+  φ = continuousCompose ∣_∣ h magnitudeContinuous φ'
+    where
+    h : ℝ → ℝ
+    h b = max (leftMultiplyRational q b) (leftMultiplyRational r b)
+
+    φ' : Continuous h
+    φ' = lipschitz→continuous
+           h (1 ℚ.· ℚ.max ℚ.∣ q ∣ 1 ℚ.+ 1 ℚ.· ℚ.max ℚ.∣ r ∣ 1) _ φ''
+      where
+      φ'' : Lipschitzℝ
+             h
+             (1 ℚ.· ℚ.max ℚ.∣ q ∣ 1 ℚ.+ 1 ℚ.· ℚ.max ℚ.∣ r ∣ 1)
+             _
+      φ'' = lipschitz₂-composeLipschitz₁-lipschitz
+              (ℚ.max ℚ.∣ q ∣ 1) (ℚ.max ℚ.∣ r ∣ 1) 1 1
+              (ℚ.isTrans<≤ 0 1 (ℚ.max ℚ.∣ q ∣ 1) ℚ.0<1 (ℚ.≤max' ℚ.∣ q ∣ 1))
+              (ℚ.isTrans<≤ 0 1 (ℚ.max ℚ.∣ r ∣ 1) ℚ.0<1 (ℚ.≤max' ℚ.∣ r ∣ 1))
+              ℚ.0<1 ℚ.0<1
+              (leftMultiplyRationalLipschitzℝ q)
+              (leftMultiplyRationalLipschitzℝ r)
+              maxLipschitz₁
+              maxLipschitz₂
+
+  ψ : Continuous g
+  ψ = lipschitz→continuous g (ℚ.max ℚ.∣ ℚ.max q r ∣ 1 ℚ.· 2) _ ψ'
+    where
+    ψ' : Lipschitzℝ g (ℚ.max ℚ.∣ ℚ.max q r ∣ 1 ℚ.· 2) _
+    ψ' = lipschitzCompose
+          (leftMultiplyRational (ℚ.max q r))
+          ∣_∣
+          (ℚ.max ℚ.∣ ℚ.max q r ∣ 1) 2
+          (ℚ.isTrans<≤ 0 1 (ℚ.max ℚ.∣ ℚ.max q r ∣ 1)
+            ℚ.0<1 (ℚ.≤max' ℚ.∣ ℚ.max q r ∣ 1))
+          ℚ.0<2
+          (leftMultiplyRationalLipschitzℝ (ℚ.max q r))
+          magnitudeLipschitzℝ
+
+  ω : (f ∘ rational) ∼ (g ∘ rational)
+  ω s =
+    max (leftMultiplyRational q ∣ rational s ∣)
+        (leftMultiplyRational r ∣ rational s ∣)
+      ≡⟨ cong (λ c → max (leftMultiplyRational q c) (leftMultiplyRational r c))
+              (magnitudeExtendsRationalMagnitude s) ⟩
+    max (rational (q ℚ.· ℚ.∣ s ∣)) (rational (r ℚ.· ℚ.∣ s ∣))
+      ≡⟨ liftNonexpanding₂≡rational ℚ.max maxNonexpandingℚ₂
+           (q ℚ.· ℚ.∣ s ∣) (r ℚ.· ℚ.∣ s ∣) ⟩
+    rational (ℚ.max (q ℚ.· ℚ.∣ s ∣) (r ℚ.· ℚ.∣ s ∣))
+      ≡⟨ cong rational
+              (ℚ.maxMultiplyRightNonnegative ℚ.∣ s ∣ q r (ℚ.0≤∣∣ s)
+               ∙ ℚ.·Comm ℚ.∣ s ∣ (ℚ.max q r)) ⟩
+    rational (ℚ.max q r ℚ.· ℚ.∣ s ∣)
+      ≡⟨ cong (leftMultiplyRational (ℚ.max q r))
+              (sym (magnitudeExtendsRationalMagnitude s)) ⟩
+    leftMultiplyRational (ℚ.max q r) ∣ rational s ∣ ∎
 
 maxMultiplyRightMagnitude : (a x y : ℝ) →
   max (x · ∣ a ∣) (y · ∣ a ∣) ≡ max x y · ∣ a ∣
-maxMultiplyRightMagnitude a x y = {!!}
+maxMultiplyRightMagnitude a =
+  continuousExtensionUnique₂ f g φ ψ ω χ π
+  where
+  f : ℝ → ℝ → ℝ
+  f x y = max (x · ∣ a ∣) (y · ∣ a ∣)
+
+  g : ℝ → ℝ → ℝ
+  g x y = max x y · ∣ a ∣
+
+  φ : (x : ℝ) → Continuous $ f x
+  φ x = continuousCompose
+          (flip _·_ $ ∣ a ∣) (max (x · ∣ a ∣))
+          (multiplyContinuous₁ ∣ a ∣) (maxContinuous₂ $ x · ∣ a ∣)
+
+  ψ : (x : ℝ) → Continuous $ g x
+  ψ x = continuousCompose
+          (max x) (flip _·_ ∣ a ∣)
+          (maxContinuous₂ x) (multiplyContinuous₁ ∣ a ∣)
+
+  ω : (y : ℝ) → Continuous $ flip f y
+  ω y = continuousCompose
+          (flip _·_ ∣ a ∣) (flip max $ y · ∣ a ∣)
+          (multiplyContinuous₁ ∣ a ∣) (maxContinuous₁ $ y · ∣ a ∣)
+
+  χ : (y : ℝ) → Continuous $ flip g y
+  χ y = continuousCompose
+          (flip max y) (flip _·_ ∣ a ∣)
+          (maxContinuous₁ y) (multiplyContinuous₁ ∣ a ∣)
+
+  π : (q r : ℚ.ℚ) →
+      f (rational q) (rational r) ≡ g (rational q) (rational r)
+  π q r = max (rational q · ∣ a ∣) (rational r · ∣ a ∣)
+            ≡⟨ cong₂ max (·-leftRational≡leftMultiplyRational q ∣ a ∣)
+                         (·-leftRational≡leftMultiplyRational r ∣ a ∣) ⟩
+          max (leftMultiplyRational q ∣ a ∣) (leftMultiplyRational r ∣ a ∣)
+            ≡⟨ maxLeftMultiplyRationalᵣ a q r ⟩
+          leftMultiplyRational (ℚ.max q r) ∣ a ∣
+            ≡⟨ (sym $ ·-leftRational≡leftMultiplyRational (ℚ.max q r) ∣ a ∣) ⟩
+          rational (ℚ.max q r) · ∣ a ∣
+            ≡⟨ refl ⟩
+          max (rational q) (rational r) · ∣ a ∣ ∎
 
 multiplyMagnitudeLeftMonotone : (a x y : ℝ) →
   x ≤ y → ∣ a ∣ · x ≤ ∣ a ∣ · y
@@ -599,15 +772,101 @@ multiplyMagnitudeRightMonotone a x y φ =
     ≡⟨ cong (flip _·_ $ ∣ a ∣) φ ⟩
   y · ∣ a ∣ ∎
 
-magnitudeMultiply≤magnitudeMultiply :
-  {x y z w : ℝ} →
-  ∣ x ∣ ≤ ∣ z ∣ → ∣ y ∣ ≤ ∣ w ∣ →
-  ∣ x ∣ · ∣ y ∣ ≤ ∣ z ∣ · ∣ w ∣
-magnitudeMultiply≤magnitudeMultiply {x} {y} {z} {w} φ ψ =
-  ≤-transitive (∣ x ∣ · ∣ y ∣) (∣ z ∣ · ∣ y ∣) (∣ z ∣ · ∣ w ∣) ω χ
+multiplyNonnegativeLeftMonotone : (a x y : ℝ) →
+  0 ≤ a →
+  x ≤ y → a · x ≤ a · y
+multiplyNonnegativeLeftMonotone a x y φ ψ = ω'
   where
-  ω : ∣ x ∣ · ∣ y ∣ ≤ ∣ z ∣ · ∣ y ∣
-  ω = multiplyMagnitudeRightMonotone y ∣ x ∣ ∣ z ∣ φ
+  ω : ∣ a ∣ · x ≤ ∣ a ∣ · y
+  ω = multiplyMagnitudeLeftMonotone a x y ψ
 
-  χ : ∣ z ∣ · ∣ y ∣ ≤ ∣ z ∣ · ∣ w ∣
-  χ = multiplyMagnitudeLeftMonotone z ∣ y ∣ ∣ w ∣ ψ
+  ω' : a · x ≤ a · y
+  ω' = subst (λ ?a → ?a · x ≤ ?a · y) (0≤→∣∣≡self a φ) ω
+
+multiplyNonnegativeRightMonotone : (a x y : ℝ) →
+  0 ≤ a →
+  x ≤ y → x · a ≤ y · a
+multiplyNonnegativeRightMonotone a x y φ ψ = ω'
+  where
+  ω : x · ∣ a ∣ ≤ y · ∣ a ∣
+  ω = multiplyMagnitudeRightMonotone a x y ψ
+
+  ω' : x · a ≤ y · a
+  ω' = subst (λ ?a → x · ?a ≤ y · ?a) (0≤→∣∣≡self a φ) ω
+
+·≤· : {x y z w : ℝ} →
+  x ≤ z → y ≤ w →
+  0 ≤ z → 0 ≤ y →
+  x · y ≤ z · w
+·≤· {x} {y} {z} {w} p q r s =
+  ≤-transitive
+    (x · y) (z · y) (z · w)
+    (multiplyNonnegativeRightMonotone y x z s p)
+    (multiplyNonnegativeLeftMonotone z y w r q)
+
+multiplyContinuous₂ : (x : ℝ) → Continuous $ _·_ x
+multiplyContinuous₂ x y ε φ = ω
+  where
+  ψ : ∃ ℚ.ℚ (λ η → (0 ℚ.< η) × (∣ x ∣ ≤ rational η))
+  ψ = ∣∣≤rational x
+
+  ω : ∃ ℚ.ℚ
+      (λ δ →
+      Σ (0 ℚ.< δ)
+      (λ ζ → (z : ℝ) → Close δ ζ y z → Close ε φ (x · y) (x · z)))
+  ω = PropositionalTruncation.map ω' ψ
+    where
+    ω' : Σ ℚ.ℚ (λ η → (0 ℚ.< η) × (∣ x ∣ ≤ rational η)) →
+         Σ ℚ.ℚ
+         (λ δ →
+         Σ (0 ℚ.< δ)
+         (λ ζ → (z : ℝ) → Close δ ζ y z → Close ε φ (x · y) (x · z)))
+    ω' (η , χ , π) = δ , (σ , τ)
+      where
+      χ' : ¬ η ≡ 0
+      χ' = ≠-symmetric $ ℚ.<→≠ χ
+
+      δ : ℚ.ℚ
+      δ = η [ χ' ]⁻¹ ℚ.· (ε / 2 [ ℚ.2≠0 ])
+
+      σ : 0 ℚ.< δ
+      σ = ℚ.0<· {x = η [ χ' ]⁻¹} {y = ε / 2 [ ℚ.2≠0 ]}
+                (ℚ.0<⁻¹ {x = η} χ) (ℚ.0</ {x = ε} {y = 2} φ ℚ.0<2)
+
+      τ : (z : ℝ) → Close δ σ y z → Close ε φ (x · y) (x · z)
+      τ z υ = β'
+        where
+        υ' : distance y z < rational δ
+        υ' = close→distance< σ υ
+
+        ξ : distance (x · y) (x · z) ≡ ∣ x ∣ · distance y z
+        ξ = ·distanceₗ x y z
+
+        ο : ∣ x ∣ · distance y z ≤ rational (η ℚ.· δ)
+        ο = ·≤· {x = ∣ x ∣} {y = distance y z}
+                {z = rational η} {w = rational δ}
+                π
+                (<→≤ {x = distance y z} {y = rational δ} υ')
+                (<→≤ {x = 0} $ rationalStrictMonotone {q = 0} {r = η} χ)
+                (0≤distance y z) 
+
+        α : η ℚ.· δ ≡ ε / 2 [ ℚ.2≠0 ]
+        α = η ℚ.· (η [ χ' ]⁻¹ ℚ.· (ε / 2 [ ℚ.2≠0 ]))
+              ≡⟨ ℚ.·Assoc η (η [ χ' ]⁻¹) (ε / 2 [ ℚ.2≠0 ]) ⟩
+            (η ℚ.· η [ χ' ]⁻¹) ℚ.· (ε / 2 [ ℚ.2≠0 ])
+              ≡⟨ cong (λ z → z ℚ.· (ε / 2 [ ℚ.2≠0 ])) (ℚ.⁻¹-inverse η χ') ⟩
+            1 ℚ.· (ε / 2 [ ℚ.2≠0 ])
+              ≡⟨ (ℚ.·IdL $ (ε / 2 [ ℚ.2≠0 ])) ⟩
+            ε / 2 [ ℚ.2≠0 ] ∎
+
+        ο' : distance (x · y) (x · z) ≤ rational (ε / 2 [ ℚ.2≠0 ])
+        ο' = subst2 _≤_ (sym ξ) (cong rational α) ο
+
+        β : distance (x · y) (x · z) < rational ε
+        β = ≤→<→< {x = distance (x · y) (x · z)}
+                  ο'
+                  (rationalStrictMonotone {q = ε / 2 [ ℚ.2≠0 ]} $
+                   ℚ.self/2<self ε φ)
+
+        β' : Close ε φ (x · y) (x · z)
+        β' = distance<→close φ β

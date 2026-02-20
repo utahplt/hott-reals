@@ -249,6 +249,15 @@ rationalStrictReflective {q} {r} φ =
     ∣ ((q , r) ,
       (χ , π , ≤-transitive (rational r) y z ρ ψ)) ∣₁
 
+≡→≤ : {x y : ℝ} → x ≡ y → x ≤ y
+≡→≤ {x} {y} φ = ψ'
+  where
+  ψ : max y y ≡ y
+  ψ = maxIdempotent y
+
+  ψ' : max x y ≡ y
+  ψ' = cong (flip max y) φ ∙ ψ
+
 ≤rational→close→≤rational+ε :
   {q : ℚ.ℚ} {x y : ℝ} {ε : ℚ.ℚ}
   (φ : 0 ℚ.< ε) →

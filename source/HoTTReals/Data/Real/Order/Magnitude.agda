@@ -219,3 +219,38 @@ magnitudeMagnitude≡magnitude x = χ
 
   ψ : Continuous g
   ψ = magnitudeContinuous
+
+0≤→∣∣≡self : (x : ℝ) → 0 ≤ x → ∣ x ∣ ≡ x
+0≤→∣∣≡self x φ = ω
+  where
+  ψ : - x ≤ x
+  ψ = ≤-transitive (- x) 0 x (-antitone≤ {x = 0} {y = x} φ) φ
+
+  ω : ∣ x ∣ ≡ x
+  ω = max x (- x)
+        ≡⟨ maxCommutative x (- x) ⟩
+      max (- x) x
+        ≡⟨ ψ ⟩
+      x ∎
+
+0≤-→∣∣≡negateSelf : (x : ℝ) → 0 ≤ - x → ∣ x ∣ ≡ - x
+0≤-→∣∣≡negateSelf x φ = ψ
+  where
+  ψ : x ≤ - x
+  ψ = ≤-transitive x 0 (- x)
+        (≤-transitive x (- - x) 0
+          (≡→≤ $ sym $ -involutive x)
+          (-antitone≤ {x = 0} {y = - x} φ))
+        φ
+
+≤0→∣∣≡negateSelf : (x : ℝ) → x ≤ 0 → ∣ x ∣ ≡ - x
+≤0→∣∣≡negateSelf x φ = ω
+  where
+  ψ : - 0 ≤ - x
+  ψ = -antitone≤ {x = x} {y = 0} φ
+
+  ψ' : 0 ≤ - x
+  ψ' = subst {x = - 0} {y = 0} (λ ?x → ?x ≤ - x) refl ψ
+
+  ω : x ≤ - x
+  ω = ≤-transitive x 0 (- x) φ ψ'

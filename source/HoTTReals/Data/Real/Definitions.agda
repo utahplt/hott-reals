@@ -141,6 +141,11 @@ ContinuousAt f u =
 Continuous : (ℝ → ℝ) → Type
 Continuous f = (u : ℝ) → ContinuousAt f u
 
+ContinuousOn :
+  {i : Level} →
+  (f : ℝ → ℝ) (A : ℝ → Type i) → ((x : ℝ) → isProp $ A x) → Type i
+ContinuousOn f A _ = (u : ℝ) → A u → ContinuousAt f u
+
 EventuallyConstantAt :
   (θ : ℚ) →
   0 < θ →

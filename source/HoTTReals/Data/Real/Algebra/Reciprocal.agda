@@ -422,6 +422,30 @@ reciprocalPositive≡boundedReciprocalPositive δ φ x ψ ω =
   π : ∃ ℚ.ℚ (λ δ → (0 ℚ.< δ) × (rational δ ≤ x))
   π = ∣ δ , (φ , ψ) ∣₁
 
+-- Bespoke continuity argument for the needed expression because I'm lazy right
+-- now and don't want to do it the proper way
+maxMultiplyBoundedReciprocalPositiveContinuous :
+  (δ : ℚ.ℚ) (φ : 0 ℚ.< δ) →
+  Continuous $ (λ x → max x (rational δ) · boundedReciprocalPositive δ φ x)
+maxMultiplyBoundedReciprocalPositiveContinuous δ φ x ε ψ = {!!}
+  where
+  ψ' : 0 ℚ.< ε ℚ./ 2 [ ℚ.2≠0 ]
+  ψ' = ℚ.0</' {ε} {2} ψ ℚ.0<2
+
+  ω : ∃ ℚ.ℚ
+      (λ η₁ →
+      Σ (0 ℚ.< η₁)
+      (λ ζ →
+      (y : ℝ) →
+      Close η₁ ζ x y →
+      Close (ε ℚ./ 2 [ ℚ.2≠0 ]) ψ'
+            (max x (rational δ) · boundedReciprocalPositive δ φ x)
+            (max y (rational δ) · boundedReciprocalPositive δ φ x)))
+  ω = continuousCompose
+        (flip max (rational δ)) (flip _·_ $ boundedReciprocalPositive δ φ x)
+        (maxContinuous₁ $ rational δ) {!!}
+        {!!} {!!} {!!}
+
 boundedReciprocalPositive-inverseₗ :
   (δ : ℚ.ℚ) (φ : 0 ℚ.< δ)
   (x : ℝ) →
@@ -449,12 +473,14 @@ boundedReciprocalPositive-inverseₗ δ φ =
       rational (ℚ.max q δ ℚ.· boundedReciprocalPositiveRational δ φ q)
   ψ q = max (rational q) (rational δ) ·
           boundedReciprocalPositive δ φ (rational q) 
-          ≡⟨ {!!} ⟩
+          ≡⟨ cong (flip _·_ $ boundedReciprocalPositive δ φ (rational q))
+                  (maxRational q δ) ⟩
         rational (ℚ.max q δ) · boundedReciprocalPositive δ φ (rational q) 
-          ≡⟨ {!!} ⟩
+          ≡⟨ cong (_·_ $ rational (ℚ.max q δ))
+                  (boundedReciprocalPositveRational≡boundedReciprocalPositiveRational δ φ q) ⟩
         rational (ℚ.max q δ) ·
           rational (boundedReciprocalPositiveRational δ φ q)
-          ≡⟨ {!!} ⟩
+          ≡⟨ multiplyRational (ℚ.max q δ) _ ⟩
         rational (ℚ.max q δ ℚ.· boundedReciprocalPositiveRational δ φ q) ∎
 
   ω : (q : ℚ.ℚ) → 1 ≡ 1
@@ -465,7 +491,7 @@ boundedReciprocalPositive-inverseₗ δ φ =
   χ q = ℚ.⁻¹-inverse (ℚ.max q δ) _
 
   π : Continuous f
-  π = {!!}
+  π = maxMultiplyBoundedReciprocalPositiveContinuous δ φ
 
   ρ : Continuous g
-  ρ = {!!}
+  ρ = constantContinuous 1

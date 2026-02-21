@@ -52,12 +52,12 @@ reciprocalMaxLipschitzℚ :
   in 
   Lipschitzℚ
     (λ q →
-      let ω : 0 ℚ.< ℚ.max q δ
-          ω = ℚ.isTrans<≤ 0 δ (ℚ.max q δ) φ (ℚ.≤max' q δ)
+       let ω : 0 ℚ.< ℚ.max q δ
+           ω = ℚ.isTrans<≤ 0 δ (ℚ.max q δ) φ (ℚ.≤max' q δ)
 
-          ω' : ¬ ℚ.max q δ ≡ 0
-          ω' = ≠-symmetric $ ℚ.<→≠ ω
-      in rational $ (ℚ.max q δ) ℚ.[ ω' ]⁻¹) ((δ ℚ.· δ) ℚ.[ ψ' ]⁻¹) φ''
+           ω' : ¬ ℚ.max q δ ≡ 0
+           ω' = ≠-symmetric $ ℚ.<→≠ ω
+       in rational $ (ℚ.max q δ) ℚ.[ ω' ]⁻¹) ((δ ℚ.· δ) ℚ.[ ψ' ]⁻¹) φ''
 reciprocalMaxLipschitzℚ δ φ q r ε χ π = γ''
   where
   ψ : ¬ δ ≡ 0
@@ -100,12 +100,12 @@ reciprocalMaxLipschitzℚ δ φ q r ε χ π = γ''
 
   υ' : ((ℚ.max q δ ℚ.· ℚ.max r δ) ℚ.[ τ' ]⁻¹) ℚ.≤ ((δ ℚ.· δ) ℚ.[ ψ' ]⁻¹)
   υ' = ℚ.⁻¹-positiveAntitone
-         {x = δ ℚ.· δ} {y = (ℚ.max q δ) ℚ.· (ℚ.max r δ)}
-         φ' υ ψ' τ'
+       {x = δ ℚ.· δ} {y = (ℚ.max q δ) ℚ.· (ℚ.max r δ)}
+          φ' υ ψ' τ'
 
   α : Close ε χ (rational (ℚ.max q δ)) (rational (ℚ.max r δ))
   α = fst maxNonexpandingℝ₂
-        (rational δ) (rational q) (rational r)
+      (rational δ) (rational q) (rational r)
         ε χ
         (close'→close (rational q) (rational r) ε χ π)
 
@@ -116,63 +116,63 @@ reciprocalMaxLipschitzℚ δ φ q r ε χ π = γ''
   α'' = rationalStrictReflective {q = ℚ.∣ ℚ.max q δ ℚ.- ℚ.max r δ ∣} {r = ε} α'
 
   β : ℚ.∣ ((ℚ.max q δ) ℚ.[ ω' ]⁻¹) ℚ.- ((ℚ.max r δ) ℚ.[ σ' ]⁻¹) ∣ ≡
-        (ℚ.max q δ ℚ.· ℚ.max r δ) ℚ.[ τ' ]⁻¹ ℚ.· ℚ.∣ ℚ.max q δ ℚ.- ℚ.max r δ ∣
+      (ℚ.max q δ ℚ.· ℚ.max r δ) ℚ.[ τ' ]⁻¹ ℚ.· ℚ.∣ ℚ.max q δ ℚ.- ℚ.max r δ ∣
   β = ℚ.∣ ((ℚ.max q δ) ℚ.[ ω' ]⁻¹) ℚ.- ((ℚ.max r δ) ℚ.[ σ' ]⁻¹) ∣
-        ≡⟨ cong (λ ?x → ℚ.∣ ?x ℚ.- ((ℚ.max r δ) ℚ.[ σ' ]⁻¹) ∣)
-                (sym $ ℚ.·IdR $ (ℚ.max q δ) ℚ.[ ω' ]⁻¹) ⟩
+      ≡⟨ cong (λ ?x → ℚ.∣ ?x ℚ.- ((ℚ.max r δ) ℚ.[ σ' ]⁻¹) ∣)
+                 (sym $ ℚ.·IdR $ (ℚ.max q δ) ℚ.[ ω' ]⁻¹) ⟩
       ℚ.∣ (((ℚ.max q δ) ℚ.[ ω' ]⁻¹) ℚ.· 1) ℚ.- ((ℚ.max r δ) ℚ.[ σ' ]⁻¹) ∣
         ≡⟨ cong (λ ?x → ℚ.∣ (((ℚ.max q δ) ℚ.[ ω' ]⁻¹) ℚ.· ?x) ℚ.-
                             ((ℚ.max r δ) ℚ.[ σ' ]⁻¹) ∣)
                 (sym $ ℚ.⁻¹-inverse' (ℚ.max r δ) σ') ⟩
       ℚ.∣ (((ℚ.max q δ) ℚ.[ ω' ]⁻¹) ℚ.·
-           (((ℚ.max r δ) ℚ.[ σ' ]⁻¹) ℚ.· (ℚ.max r δ))) ℚ.-
+          (((ℚ.max r δ) ℚ.[ σ' ]⁻¹) ℚ.· (ℚ.max r δ))) ℚ.-
           ((ℚ.max r δ) ℚ.[ σ' ]⁻¹) ∣
-        ≡⟨ cong (λ ?x → ℚ.∣ ?x ℚ.- ((ℚ.max r δ) ℚ.[ σ' ]⁻¹) ∣)
-                (ℚ.·Assoc ((ℚ.max q δ) ℚ.[ ω' ]⁻¹)
-                          (ℚ.max r δ ℚ.[ σ' ]⁻¹)
-                          (ℚ.max r δ)) ⟩
+      ≡⟨ cong (λ ?x → ℚ.∣ ?x ℚ.- ((ℚ.max r δ) ℚ.[ σ' ]⁻¹) ∣)
+                 (ℚ.·Assoc ((ℚ.max q δ) ℚ.[ ω' ]⁻¹)
+                           (ℚ.max r δ ℚ.[ σ' ]⁻¹)
+                           (ℚ.max r δ)) ⟩
       ℚ.∣ ((((ℚ.max q δ) ℚ.[ ω' ]⁻¹) ℚ.· ((ℚ.max r δ) ℚ.[ σ' ]⁻¹)) ℚ.·
-           (ℚ.max r δ)) ℚ.-
+          (ℚ.max r δ)) ℚ.-
           ((ℚ.max r δ) ℚ.[ σ' ]⁻¹) ∣
-        ≡⟨ cong (λ ?x → ℚ.∣ ((((ℚ.max q δ) ℚ.[ ω' ]⁻¹) ℚ.·
-                              ((ℚ.max r δ) ℚ.[ σ' ]⁻¹)) ℚ.·
-                             (ℚ.max r δ)) ℚ.- ?x ∣)
-                (sym $ ℚ.·IdR $ (ℚ.max r δ) ℚ.[ σ' ]⁻¹) ⟩
+      ≡⟨ cong (λ ?x → ℚ.∣ ((((ℚ.max q δ) ℚ.[ ω' ]⁻¹) ℚ.·
+                          ((ℚ.max r δ) ℚ.[ σ' ]⁻¹)) ℚ.·
+                            (ℚ.max r δ)) ℚ.- ?x ∣)
+                 (sym $ ℚ.·IdR $ (ℚ.max r δ) ℚ.[ σ' ]⁻¹) ⟩
       ℚ.∣ ((((ℚ.max q δ) ℚ.[ ω' ]⁻¹) ℚ.· ((ℚ.max r δ) ℚ.[ σ' ]⁻¹)) ℚ.·
-           (ℚ.max r δ)) ℚ.-
+          (ℚ.max r δ)) ℚ.-
           (((ℚ.max r δ) ℚ.[ σ' ]⁻¹) ℚ.· 1) ∣
-        ≡⟨ cong (λ ?x → ℚ.∣ ((((ℚ.max q δ) ℚ.[ ω' ]⁻¹) ℚ.·
-                              ((ℚ.max r δ) ℚ.[ σ' ]⁻¹)) ℚ.·
-                             (ℚ.max r δ)) ℚ.-
+      ≡⟨ cong (λ ?x → ℚ.∣ ((((ℚ.max q δ) ℚ.[ ω' ]⁻¹) ℚ.·
+                          ((ℚ.max r δ) ℚ.[ σ' ]⁻¹)) ℚ.·
+                            (ℚ.max r δ)) ℚ.-
                             (((ℚ.max r δ) ℚ.[ σ' ]⁻¹) ℚ.· ?x) ∣)
-                (sym $ ℚ.⁻¹-inverse' (ℚ.max q δ) ω') ⟩
+                 (sym $ ℚ.⁻¹-inverse' (ℚ.max q δ) ω') ⟩
       ℚ.∣ ((((ℚ.max q δ) ℚ.[ ω' ]⁻¹) ℚ.· ((ℚ.max r δ) ℚ.[ σ' ]⁻¹)) ℚ.·
-           (ℚ.max r δ)) ℚ.-
+          (ℚ.max r δ)) ℚ.-
           (((ℚ.max r δ) ℚ.[ σ' ]⁻¹) ℚ.·
-           (((ℚ.max q δ) ℚ.[ ω' ]⁻¹) ℚ.· (ℚ.max q δ))) ∣
-        ≡⟨ cong (λ ?x → ℚ.∣ ((((ℚ.max q δ) ℚ.[ ω' ]⁻¹) ℚ.·
-                              ((ℚ.max r δ) ℚ.[ σ' ]⁻¹)) ℚ.·
-                             (ℚ.max r δ)) ℚ.-
+            (((ℚ.max q δ) ℚ.[ ω' ]⁻¹) ℚ.· (ℚ.max q δ))) ∣
+      ≡⟨ cong (λ ?x → ℚ.∣ ((((ℚ.max q δ) ℚ.[ ω' ]⁻¹) ℚ.·
+                          ((ℚ.max r δ) ℚ.[ σ' ]⁻¹)) ℚ.·
+                            (ℚ.max r δ)) ℚ.-
                             ?x ∣)
-                (ℚ.·Assoc (((ℚ.max r δ) ℚ.[ σ' ]⁻¹))
-                          (ℚ.max q δ ℚ.[ ω' ]⁻¹)
-                          (ℚ.max q δ)) ⟩
+                 (ℚ.·Assoc (((ℚ.max r δ) ℚ.[ σ' ]⁻¹))
+                           (ℚ.max q δ ℚ.[ ω' ]⁻¹)
+                           (ℚ.max q δ)) ⟩
       ℚ.∣ ((((ℚ.max q δ) ℚ.[ ω' ]⁻¹) ℚ.· ((ℚ.max r δ) ℚ.[ σ' ]⁻¹)) ℚ.·
-           (ℚ.max r δ)) ℚ.-
+          (ℚ.max r δ)) ℚ.-
           ((((ℚ.max r δ) ℚ.[ σ' ]⁻¹) ℚ.· ((ℚ.max q δ) ℚ.[ ω' ]⁻¹)) ℚ.·
-           (ℚ.max q δ)) ∣
-        ≡⟨ cong (λ ?x → ℚ.∣ ((((ℚ.max q δ) ℚ.[ ω' ]⁻¹) ℚ.·
-                              ((ℚ.max r δ) ℚ.[ σ' ]⁻¹)) ℚ.·
-                             (ℚ.max r δ)) ℚ.-
+            (ℚ.max q δ)) ∣
+      ≡⟨ cong (λ ?x → ℚ.∣ ((((ℚ.max q δ) ℚ.[ ω' ]⁻¹) ℚ.·
+                          ((ℚ.max r δ) ℚ.[ σ' ]⁻¹)) ℚ.·
+                            (ℚ.max r δ)) ℚ.-
                             (?x ℚ.· (ℚ.max q δ)) ∣)
-                (ℚ.·Comm (ℚ.max r δ ℚ.[ σ' ]⁻¹)
-                         (ℚ.max q δ ℚ.[ ω' ]⁻¹)) ⟩
+                 (ℚ.·Comm (ℚ.max r δ ℚ.[ σ' ]⁻¹)
+                          (ℚ.max q δ ℚ.[ ω' ]⁻¹)) ⟩
       ℚ.∣ ((((ℚ.max q δ) ℚ.[ ω' ]⁻¹) ℚ.· ((ℚ.max r δ) ℚ.[ σ' ]⁻¹)) ℚ.·
-           (ℚ.max r δ)) ℚ.-
+          (ℚ.max r δ)) ℚ.-
           ((((ℚ.max q δ) ℚ.[ ω' ]⁻¹) ℚ.· ((ℚ.max r δ) ℚ.[ σ' ]⁻¹)) ℚ.·
-           (ℚ.max q δ)) ∣
-        ≡⟨ ℚ.·distanceₗ (((ℚ.max q δ) ℚ.[ ω' ]⁻¹) ℚ.· ((ℚ.max r δ) ℚ.[ σ' ]⁻¹))
-                        (ℚ.max r δ)
+            (ℚ.max q δ)) ∣
+      ≡⟨ ℚ.·distanceₗ (((ℚ.max q δ) ℚ.[ ω' ]⁻¹) ℚ.· ((ℚ.max r δ) ℚ.[ σ' ]⁻¹))
+                      (ℚ.max r δ)
                         (ℚ.max q δ) ⟩
       ℚ.∣ (((ℚ.max q δ) ℚ.[ ω' ]⁻¹) ℚ.· ((ℚ.max r δ) ℚ.[ σ' ]⁻¹)) ∣ ℚ.·
       ℚ.∣ (ℚ.max r δ) ℚ.- (ℚ.max q δ) ∣
@@ -193,13 +193,13 @@ reciprocalMaxLipschitzℚ δ φ q r ε χ π = γ''
   γ : (ℚ.max q δ ℚ.· ℚ.max r δ) ℚ.[ τ' ]⁻¹ ℚ.· ℚ.∣ ℚ.max q δ ℚ.- ℚ.max r δ ∣ ℚ.<
       ((δ ℚ.· δ) ℚ.[ ψ' ]⁻¹) ℚ.· ε
   γ = ℚ.≤→<→·<·
-        {x = (ℚ.max q δ ℚ.· ℚ.max r δ) ℚ.[ τ' ]⁻¹}
-        {y = ℚ.∣ ℚ.max q δ ℚ.- ℚ.max r δ ∣}
-        {z = (δ ℚ.· δ) ℚ.[ ψ' ]⁻¹}
-        {w = ε}
-        υ' α''
-        φ''
-        (ℚ.0≤∣∣ $ ℚ.max q δ ℚ.- ℚ.max r δ)
+      {x = (ℚ.max q δ ℚ.· ℚ.max r δ) ℚ.[ τ' ]⁻¹}
+         {y = ℚ.∣ ℚ.max q δ ℚ.- ℚ.max r δ ∣}
+         {z = (δ ℚ.· δ) ℚ.[ ψ' ]⁻¹}
+         {w = ε}
+         υ' α''
+         φ''
+         (ℚ.0≤∣∣ $ ℚ.max q δ ℚ.- ℚ.max r δ)
 
   γ' : ℚ.∣ ((ℚ.max q δ) ℚ.[ ω' ]⁻¹) ℚ.- ((ℚ.max r δ) ℚ.[ σ' ]⁻¹) ∣ ℚ.<
        ((δ ℚ.· δ) ℚ.[ ψ' ]⁻¹) ℚ.· ε
@@ -208,99 +208,64 @@ reciprocalMaxLipschitzℚ δ φ q r ε χ π = γ''
              γ
 
   γ'' : Close
-          (((δ ℚ.· δ) ℚ.[ ψ' ]⁻¹) ℚ.· ε)
+        (((δ ℚ.· δ) ℚ.[ ψ' ]⁻¹) ℚ.· ε)
           (ℚ.0<· {x = (δ ℚ.· δ) ℚ.[ ψ' ]⁻¹} {y = ε} φ'' χ)
           (rational ((ℚ.max q δ) ℚ.[ ω' ]⁻¹))
           (rational ((ℚ.max r δ) ℚ.[ σ' ]⁻¹))
   γ'' = distance<→close
-          _
+        _
           (rationalStrictMonotone
             {q = ℚ.∣ ((ℚ.max q δ) ℚ.[ ω' ]⁻¹) ℚ.- ((ℚ.max r δ) ℚ.[ σ' ]⁻¹) ∣}
             {r = ((δ ℚ.· δ) ℚ.[ ψ' ]⁻¹) ℚ.· ε}
             γ')
 
-boundedReciprocalPositive :
-  (δ : ℚ.ℚ) (φ : 0 ℚ.< δ) →
-  ℝ → ℝ
-boundedReciprocalPositive δ φ =
-  liftLipschitz
-    (λ q →
-       let ω : 0 ℚ.< ℚ.max q δ
-           ω = ℚ.isTrans<≤ 0 δ (ℚ.max q δ) φ (ℚ.≤max' q δ)
-                                                        
-           ω' : ¬ ℚ.max q δ ≡ 0
-           ω' = ≠-symmetric $ ℚ.<→≠ ω
-       in rational $ (ℚ.max q δ) ℚ.[ ω' ]⁻¹)
-    ((δ ℚ.· δ) ℚ.[ ψ' ]⁻¹) φ''
-    (reciprocalMaxLipschitzℚ δ φ)
-  where
-  ψ : ¬ δ ≡ 0
-  ψ = ≠-symmetric $ ℚ.<→≠ φ
+-- TODO: This is a hack to get Agda to type check
+-- `boundedReciprocalPositiveLipschitz` without stalling. With my previous code,
+-- Agda had to use normalization to check whether the arguments to
+-- liftLipschitzLipschitz were definitionally equal and it hung forever trying
+-- to do this
+module BoundedReciprocalPositive (δ : ℚ.ℚ) (φ : 0 ℚ.< δ) where
+  private
+    ψ : ¬ δ ≡ 0
+    ψ = ≠-symmetric $ ℚ.<→≠ φ
 
-  φ' : 0 ℚ.< δ ℚ.· δ
-  φ' = ℚ.0<· {x = δ} {y = δ} φ φ
+    φ' : 0 ℚ.< δ ℚ.· δ
+    φ' = ℚ.0<· {x = δ} {y = δ} φ φ
 
-  ψ' : ¬ δ ℚ.· δ ≡ 0
-  ψ' = ≠-symmetric $ ℚ.<→≠ φ'
+    ψ' : ¬ δ ℚ.· δ ≡ 0
+    ψ' = ≠-symmetric $ ℚ.<→≠ φ'
 
-  φ'' : 0 ℚ.< (δ ℚ.· δ) ℚ.[ ψ' ]⁻¹
-  φ'' = ℚ.0<⁻¹' {x = δ ℚ.· δ} φ'
+    L : ℚ.ℚ
+    L = (δ ℚ.· δ) ℚ.[ ψ' ]⁻¹
 
-boundedReciprocalPositiveLipschitz :
-  (δ : ℚ.ℚ) (φ : 0 ℚ.< δ) →
-  let ψ : ¬ δ ≡ 0
-      ψ = ≠-symmetric $ ℚ.<→≠ φ
+    φ'' : 0 ℚ.< L
+    φ'' = ℚ.0<⁻¹' {x = δ ℚ.· δ} φ'
 
-      φ' : 0 ℚ.< δ ℚ.· δ
-      φ' = ℚ.0<· {x = δ} {y = δ} φ φ
+    f : ℚ.ℚ → ℝ
+    f q =
+      let ω : 0 ℚ.< ℚ.max q δ
+          ω = ℚ.isTrans<≤ 0 δ (ℚ.max q δ) φ (ℚ.≤max' q δ)
 
-      ψ' : ¬ δ ℚ.· δ ≡ 0
-      ψ' = ≠-symmetric $ ℚ.<→≠ φ'
+          ω' : ¬ ℚ.max q δ ≡ 0
+          ω' = ≠-symmetric $ ℚ.<→≠ ω
+      in rational $ (ℚ.max q δ) ℚ.[ ω' ]⁻¹
 
-      φ'' : 0 ℚ.< (δ ℚ.· δ) ℚ.[ ψ' ]⁻¹
-      φ'' = ℚ.0<⁻¹' {x = δ ℚ.· δ} φ'
-  in Lipschitzℝ (boundedReciprocalPositive δ φ) ((δ ℚ.· δ) ℚ.[ ψ' ]⁻¹) φ''
-boundedReciprocalPositiveLipschitz δ φ = {!!}
-  -- let
-    -- foo : Lipschitzℝ _ ((δ ℚ.· δ) ℚ.[ {!!} ]⁻¹) {!!}
-    -- foo = liftLipschitzLipschitz
-          -- liftLipschitzLipschitz
-            -- (λ q →
-            --   -- let ω : 0 ℚ.< ℚ.max q δ
-            --   --     ω = ℚ.isTrans<≤ 0 δ (ℚ.max q δ) φ (ℚ.≤max' q δ)
-          
-            --   --     ω' : ¬ ℚ.max q δ ≡ 0
-            --   --     ω' = ≠-symmetric $ ℚ.<→≠ ω
-            --   -- in
-            --   rational $ (ℚ.max q δ) ℚ.[ ≠-symmetric $ ℚ.<→≠ $ ℚ.isTrans<≤ 0 δ (ℚ.max q δ) φ (ℚ.≤max' q δ) ]⁻¹)
-            -- ((δ ℚ.· δ) ℚ.[ ≠-symmetric $ ℚ.<→≠ $ ℚ.0<· {x = δ} {y = δ} φ φ ]⁻¹)
-            -- _
-            -- ((δ ℚ.· δ) ℚ.[ _ ]⁻¹)
-            -- (ℚ.0<⁻¹' {x = δ ℚ.· δ} (ℚ.0<· {x = δ} {y = δ} φ φ))
-            -- (reciprocalMaxLipschitzℚ δ φ)
+  boundedReciprocalPositive : ℝ → ℝ
+  boundedReciprocalPositive =
+    liftLipschitz f L φ'' (reciprocalMaxLipschitzℚ δ φ)
 
-    -- bar : (boundedReciprocalPositive δ φ) ≡
-    --       (liftLipschitz (λ q → rational (ℚ.max q δ ℚ.[ ≠-symmetric (ℚ.<→≠ (ℚ.isTrans<≤ 0 δ (ℚ.max q δ) φ (ℚ.≤max' q δ))) ]⁻¹)) ((δ ℚ.· δ) ℚ.[ ≠-symmetric (ℚ.<→≠ (ℚ.0<· {x = δ} {y = δ} φ φ)) ]⁻¹) (ℚ.0<⁻¹' {x = δ ℚ.· δ} (ℚ.0<· {x = δ} {y = δ} φ φ)) (reciprocalMaxLipschitzℚ δ φ))
-    -- bar = refl
-          
-  -- in 
-  -- where
-  -- ψ : ¬ δ ≡ 0
-  -- ψ = ≠-symmetric $ ℚ.<→≠ φ
+  boundedReciprocalPositiveLipschitz :
+    Lipschitzℝ boundedReciprocalPositive L φ''
+  boundedReciprocalPositiveLipschitz =
+    liftLipschitzLipschitz f L φ'' (reciprocalMaxLipschitzℚ δ φ)
 
-  -- φ' : 0 ℚ.< δ ℚ.· δ
-  -- φ' = ℚ.0<· {x = δ} {y = δ} φ φ
+  boundedReciprocalPositiveContinuous :
+    Continuous boundedReciprocalPositive
+  boundedReciprocalPositiveContinuous =
+    lipschitz→continuous boundedReciprocalPositive L φ''
+      boundedReciprocalPositiveLipschitz
 
-  -- ψ' : ¬ δ ℚ.· δ ≡ 0
-  -- ψ' = ≠-symmetric $ ℚ.<→≠ φ'
-
-  -- φ'' : 0 ℚ.< (δ ℚ.· δ) ℚ.[ ψ' ]⁻¹
-  -- φ'' = ℚ.0<⁻¹' {x = δ ℚ.· δ} φ'
-
-boundedReciprocalPositiveContinuous :
-  (δ : ℚ.ℚ) (φ : 0 ℚ.< δ) →
-  Continuous (boundedReciprocalPositive δ φ)
-boundedReciprocalPositiveContinuous = {!!}
+open BoundedReciprocalPositive public
 
 boundedReciprocalPositive≤→≡ :
   (δ₁ δ₂ : ℚ.ℚ) (φ₁ : 0 ℚ.< δ₁) (φ₂ : 0 ℚ.< δ₂) →
@@ -342,16 +307,24 @@ boundedReciprocalPositive≤→≡ δ₁ δ₂ φ₁ φ₂ ψ =
   ω q = {!!}
 
   χ : (g ∘ rational) ∼ (rational ∘ g')
-  χ = {!!}
+  χ q = refl
 
   π : f' ∼ g'
-  π = {!!}
+  π q = (ℚ.max (ℚ.max q δ₂) δ₁) ℚ.[ {!!} ]⁻¹
+          ≡⟨ cong (λ ?x → ?x ℚ.[ {!!} ]⁻¹) (sym $ ℚ.maxAssoc q δ₂ δ₁) ⟩
+        (ℚ.max q (ℚ.max δ₂ δ₁)) ℚ.[ {!!} ]⁻¹
+          ≡⟨ {!!} ⟩
+        (ℚ.max q δ₂) ℚ.[ _ ]⁻¹ ∎
 
   ρ : Continuous f
-  ρ = {!!}
+  ρ = continuousCompose
+        (flip max (rational δ₂))
+        (boundedReciprocalPositive δ₁ φ₁)
+        (maxContinuous₁ (rational δ₂))
+        (boundedReciprocalPositiveContinuous δ₁ φ₁)
 
   σ : Continuous g
-  σ = {!!}
+  σ = boundedReciprocalPositiveContinuous δ₂ φ₂
 
 boundedReciprocalPositiveCurried :
   (x : ℝ) →

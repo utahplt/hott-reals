@@ -51,3 +51,7 @@ infix  8 -_
 
 -continuous : Continuous -_
 -continuous = lipschitz→continuous -_ 1 ℚ.0<1 -lipschitzℝ
+
+-rational : (q : ℚ.ℚ) →
+  - rational q ≡ rational (ℚ.- q)
+-rational = liftLipschitz≡rational (rational ∘ ℚ.-_) 1 ℚ.0<1 -lipschitzℚ

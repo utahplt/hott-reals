@@ -59,6 +59,10 @@ infixl 6 _+_
 +continuous₂ : (u : ℝ) → Continuous (_+_ u)
 +continuous₂ u = lipschitz→continuous (_+_ u) 1 ℚ.0<1 (+lipschitz₂ u)
 
++rational : (q r : ℚ.ℚ) →
+  rational q + rational r ≡ rational (q ℚ.+ r)
++rational = liftNonexpanding₂≡rational ℚ._+_ +nonexpandingℚ₂
+
 -- Need this lame lemma for additive inverse law below.
 -- -+lipschitz : Lipschitzℝ (λ u → - u + u) 2 ℚ.0<2
 -+lipschitz : Lipschitzℝ (λ u → - u + u) 2 ℚ.0<2

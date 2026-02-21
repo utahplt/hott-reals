@@ -47,6 +47,10 @@ maxContinuous₁ v = lipschitz→continuous (flip max v) 1 ℚ.0<1 (maxLipschitz
 maxContinuous₂ : (u : ℝ) → Continuous (max u)
 maxContinuous₂ u = lipschitz→continuous (max u) 1 ℚ.0<1 (maxLipschitz₂ u)
 
+maxRational : (q r : ℚ.ℚ) →
+  max (rational q) (rational r) ≡ rational (ℚ.max q r)
+maxRational = liftNonexpanding₂≡rational ℚ.max maxNonexpandingℚ₂
+
 -- Same deal as x + (- x), see comment above
 maxMaxLipschitz : Lipschitzℝ (λ u → max u u) 2 ℚ.0<2
 maxMaxLipschitz =
@@ -76,7 +80,7 @@ maxAssociative =
   φ : (q r : ℚ.ℚ) →
       liftNonexpanding₂ ℚ.max maxNonexpandingℚ₂ (rational q) (rational r) ≡
       rational (ℚ.max q r)
-  φ = liftNonexpanding₂≡rational ℚ.max maxNonexpandingℚ₂ 
+  φ = maxRational
 
   ψ : (q r s : ℚ.ℚ) →
       associateℝₗ (rational q) (rational r) (rational s) ≡
@@ -133,9 +137,9 @@ maxCommutative =
     φ (flip φ) ψ ω χ χ ω
   where
   φ : (q r : ℚ.ℚ) →
-      liftNonexpanding₂ ℚ.max maxNonexpandingℚ₂ (rational q) (rational r) ≡
+      max (rational q) (rational r) ≡
       rational (ℚ.max q r)
-  φ = liftNonexpanding₂≡rational ℚ.max maxNonexpandingℚ₂ 
+  φ = maxRational
 
   ψ : (x y : ℚ.ℚ) → ℚ.max x y ≡ ℚ.max y x
   ψ = ℚ.maxComm
@@ -154,9 +158,9 @@ maxIdempotent =
     ψ ω χ π ρ
   where
   φ : (q r : ℚ.ℚ) →
-      liftNonexpanding₂ ℚ.max maxNonexpandingℚ₂ (rational q) (rational r) ≡
+      max (rational q) (rational r) ≡
       rational (ℚ.max q r)
-  φ = liftNonexpanding₂≡rational ℚ.max maxNonexpandingℚ₂ 
+  φ = maxRational
 
   ψ : ((λ x → max x x) ∘ rational) ∼ (rational ∘ (λ q → ℚ.max q q))
   ψ q = φ q q
@@ -200,6 +204,10 @@ minContinuous₁ v = lipschitz→continuous (flip min v) 1 ℚ.0<1 (minLipschitz
 minContinuous₂ : (u : ℝ) → Continuous (min u)
 minContinuous₂ u = lipschitz→continuous (min u) 1 ℚ.0<1 (minLipschitz₂ u)
 
+minRational : (q r : ℚ.ℚ) →
+  min (rational q) (rational r) ≡ rational (ℚ.min q r)
+minRational = liftNonexpanding₂≡rational ℚ.min minNonexpandingℚ₂
+
 -- Same deal as x + (- x), see comment above
 minMinLipschitz : Lipschitzℝ (λ u → min u u) 2 ℚ.0<2
 minMinLipschitz =
@@ -207,8 +215,6 @@ minMinLipschitz =
     1 1 1 1
     ℚ.0<1 ℚ.0<1 ℚ.0<1 ℚ.0<1
     identityLipschitzℝ identityLipschitzℝ minLipschitz₁ minLipschitz₂
-
-
 
 minAssociative : (x y z : ℝ) → min (min x y) z ≡ min x (min y z)
 minAssociative =
@@ -229,9 +235,9 @@ minAssociative =
   associateℚᵣ q r s = ℚ.min q (ℚ.min r s)
 
   φ : (q r : ℚ.ℚ) →
-      liftNonexpanding₂ ℚ.min minNonexpandingℚ₂ (rational q) (rational r) ≡
+      min (rational q) (rational r) ≡
       rational (ℚ.min q r)
-  φ = liftNonexpanding₂≡rational ℚ.min minNonexpandingℚ₂ 
+  φ = minRational
 
   ψ : (q r s : ℚ.ℚ) →
       associateℝₗ (rational q) (rational r) (rational s) ≡
@@ -288,9 +294,9 @@ minCommutative =
     φ (flip φ) ψ ω χ χ ω
   where
   φ : (q r : ℚ.ℚ) →
-      liftNonexpanding₂ ℚ.min minNonexpandingℚ₂ (rational q) (rational r) ≡
+      min (rational q) (rational r) ≡
       rational (ℚ.min q r)
-  φ = liftNonexpanding₂≡rational ℚ.min minNonexpandingℚ₂ 
+  φ = minRational
 
   ψ : (x y : ℚ.ℚ) → ℚ.min x y ≡ ℚ.min y x
   ψ = ℚ.minComm
@@ -316,9 +322,9 @@ minAbsorbMaxLeft =
   φ q r =
     min (rational q) (max (rational q) (rational r))
       ≡⟨ cong (min $ rational q)
-              (liftNonexpanding₂≡rational ℚ.max maxNonexpandingℚ₂ q r) ⟩
+              (maxRational q r) ⟩
     min (rational q) (rational (ℚ.max q r))
-      ≡⟨ liftNonexpanding₂≡rational ℚ.min minNonexpandingℚ₂ q (ℚ.max q r) ⟩
+      ≡⟨ minRational q (ℚ.max q r) ⟩
     rational (ℚ.min q (ℚ.max q r)) ∎
 
   ψ : (q r : ℚ.ℚ) → rational q ≡ rational q
@@ -359,9 +365,9 @@ maxAbsorbMinLeft =
   φ q r =
     max (rational q) (min (rational q) (rational r))
       ≡⟨ cong (max $ rational q)
-              (liftNonexpanding₂≡rational ℚ.min minNonexpandingℚ₂ q r) ⟩
+              (minRational q r) ⟩
     max (rational q) (rational (ℚ.min q r))
-      ≡⟨ liftNonexpanding₂≡rational ℚ.max maxNonexpandingℚ₂ q (ℚ.min q r) ⟩
+      ≡⟨ maxRational q (ℚ.min q r) ⟩
     rational (ℚ.max q (ℚ.min q r)) ∎
 
   ψ : (q r : ℚ.ℚ) → rational q ≡ rational q

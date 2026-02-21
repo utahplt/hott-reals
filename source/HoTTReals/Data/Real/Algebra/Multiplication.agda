@@ -392,9 +392,9 @@ multiply≡boundedMultiply'' :
   (flip _·_ y) ≡ (boundedMultiply L φ y ψ)
 multiply≡boundedMultiply'' L φ y ψ = funExt $ multiply≡boundedMultiply' L φ y ψ
 
-multiplyRational≡rationalMultiply : (q r : ℚ.ℚ) →
+multiplyRational : (q r : ℚ.ℚ) →
   rational q · rational r ≡ rational (q ℚ.· r)
-multiplyRational≡rationalMultiply q r = refl
+multiplyRational q r = refl
 
 ·-leftRational≡leftMultiplyRational :
   (q : ℚ.ℚ) (x : ℝ) →
@@ -1095,3 +1095,15 @@ isCommutativeRingℝ =
 
 isRingℝ : IsRing 0 1 _+_ _·_ (-_)
 isRingℝ = IsCommRing.isRing isCommutativeRingℝ
+
+multiplyLipscthiz₂ :
+  (L : ℚ.ℚ) (φ : 0 ℚ.< L)
+  (x : ℝ) (ψ : ∣ x ∣ ≤ rational L) →
+  Lipschitzℝ (λ y → x · y) L φ
+multiplyLipscthiz₂ L φ x ψ = ω'
+  where
+  ω : Lipschitzℝ (λ y → y · x) L φ
+  ω = multiplyLipscthiz₁ L φ x ψ
+
+  ω' : Lipschitzℝ (λ y → x · y) L φ
+  ω' = subst (λ ?f → Lipschitzℝ ?f L φ) (funExt (flip ·-commutative x)) ω

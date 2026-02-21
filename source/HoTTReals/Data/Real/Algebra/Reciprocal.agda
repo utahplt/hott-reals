@@ -304,17 +304,28 @@ boundedReciprocalPositive≤→≡ δ₁ δ₂ φ₁ φ₂ ψ =
     in (ℚ.max q δ₂) ℚ.[ ω' ]⁻¹
 
   ω : (f ∘ rational) ∼ (rational ∘ f')
-  ω q = {!!}
+  ω q = refl
 
   χ : (g ∘ rational) ∼ (rational ∘ g')
   χ q = refl
 
   π : f' ∼ g'
-  π q = (ℚ.max (ℚ.max q δ₂) δ₁) ℚ.[ {!!} ]⁻¹
-          ≡⟨ cong (λ ?x → ?x ℚ.[ {!!} ]⁻¹) (sym $ ℚ.maxAssoc q δ₂ δ₁) ⟩
-        (ℚ.max q (ℚ.max δ₂ δ₁)) ℚ.[ {!!} ]⁻¹
-          ≡⟨ {!!} ⟩
-        (ℚ.max q δ₂) ℚ.[ _ ]⁻¹ ∎
+  π q = τ
+    where
+    ω'₁ : ¬ ℚ.max (ℚ.max q δ₂) δ₁ ≡ 0
+    ω'₁ = ≠-symmetric $ ℚ.<→≠ $
+      ℚ.isTrans<≤ 0 δ₁ (ℚ.max (ℚ.max q δ₂) δ₁) φ₁ (ℚ.≤max' (ℚ.max q δ₂) δ₁)
+
+    ω'₂ : ¬ ℚ.max q δ₂ ≡ 0
+    ω'₂ = ≠-symmetric $ ℚ.<→≠ $
+      ℚ.isTrans<≤ 0 δ₂ (ℚ.max q δ₂) φ₂ (ℚ.≤max' q δ₂)
+
+    σ : ℚ.max (ℚ.max q δ₂) δ₁ ≡ ℚ.max q δ₂
+    σ = ℚ.≤→max' {x = ℚ.max q δ₂} {y = δ₁}
+          (ℚ.isTrans≤ δ₁ δ₂ (ℚ.max q δ₂) ψ (ℚ.≤max' q δ₂))
+
+    τ : f' q ≡ g' q
+    τ = λ i → σ i ℚ.[ isProp→PathP (λ i → isProp¬ (σ i ≡ 0)) ω'₁ ω'₂ i ]⁻¹
 
   ρ : Continuous f
   ρ = continuousCompose
@@ -397,7 +408,16 @@ boundedReciprocalPositiveCurriedIs2Constant x (δ₁ , φ₁ , ψ₁) (δ₂ , �
 
 0<→existsPositiveRational≤ :
   {x : ℝ} → 0 < x → ∃ ℚ.ℚ (λ δ → (0 ℚ.< δ) × (rational δ ≤ x))
-0<→existsPositiveRational≤ {x} ε = {!!}
+0<→existsPositiveRational≤ {x} φ =
+  PropositionalTruncation.map ψ ω
+  where
+  ψ : Σ ℚ.ℚ (λ δ → (0 < rational δ) × (rational δ < x)) →
+      Σ ℚ.ℚ (λ δ → (0 ℚ.< δ) × (rational δ ≤ x))
+  ψ (δ , (ω , χ)) = δ , (rationalStrictReflective {q = 0} {r = δ} ω ,
+                         <→≤ {x = rational δ} {y = x} χ)
+
+  ω : ∃ ℚ.ℚ (λ q → (0 < rational q) × (rational q < x))
+  ω = <-archimedian 0 x φ
 
 reciprocalPositive : (x : ℝ) → 0 < x → ℝ
 reciprocalPositive x φ =

@@ -1028,8 +1028,8 @@ self/2<self θ φ = ω
   ω : θ / 2 [ 2≠0 ] < θ
   ω = subst (λ ?x → ?x / 2 [ 2≠0 ] < θ) (+IdL θ) ψ
 
--- TODO: Probably use these new midpoint lemmas above but I don't want to write
--- this
+-- TODO: Probably use these new midpoint lemmas above but I don't want to
+-- rewrite this
 ∣∣<-open :
   (x : ℚ) (ε : ℚ) (φ : 0 < ε) →
   ∣ x ∣ < ε →

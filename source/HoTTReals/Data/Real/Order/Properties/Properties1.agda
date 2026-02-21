@@ -411,6 +411,9 @@ _#_ = SymClosure _<_
 isApartness# : IsApartness _#_
 isApartness# = isStrictOrder→isApartnessSymClosure isStrictOrder<
 
+#-isProp : isPropValued _#_
+#-isProp = IsApartness.is-prop-valued isApartness#
+
 #-irreflexive : isIrrefl _#_
 #-irreflexive = IsApartness.is-irrefl isApartness#
 

@@ -300,3 +300,109 @@ minCommutative =
 
   χ : (v : ℝ) → Continuous $ flip min v
   χ = minContinuous₁
+
+minAbsorbMaxLeft : (x y : ℝ) → min x (max x y) ≡ x
+minAbsorbMaxLeft =
+  continuousExtensionLaw₂
+    (λ x y → min x (max x y))
+    const
+    (λ q r → ℚ.min q (ℚ.max q r))
+    const
+    φ ψ ω χ π ρ σ
+  where
+  φ : (q r : ℚ.ℚ) →
+      min (rational q) (max (rational q) (rational r)) ≡
+      rational (ℚ.min q (ℚ.max q r))
+  φ q r =
+    min (rational q) (max (rational q) (rational r))
+      ≡⟨ cong (min $ rational q)
+              (liftNonexpanding₂≡rational ℚ.max maxNonexpandingℚ₂ q r) ⟩
+    min (rational q) (rational (ℚ.max q r))
+      ≡⟨ liftNonexpanding₂≡rational ℚ.min minNonexpandingℚ₂ q (ℚ.max q r) ⟩
+    rational (ℚ.min q (ℚ.max q r)) ∎
+
+  ψ : (q r : ℚ.ℚ) → rational q ≡ rational q
+  ψ q r = refl
+
+  ω : (q r : ℚ.ℚ) → ℚ.min q (ℚ.max q r) ≡ q
+  ω = ℚ.minAbsorbLMax
+
+  χ : (x : ℝ) → Continuous $ (λ y → min x (max x y))
+  χ x = continuousCompose (max x) (min x) (maxContinuous₂ x) (minContinuous₂ x)
+
+  π : (y : ℝ) → Continuous $ (λ x → min x (max x y))
+  π y = lipschitz→continuous
+          (λ x → min x (max x y)) 2 ℚ.0<2
+          (lipschitz₂-composeLipschitz₁-lipschitz
+            1 1 1 1
+            ℚ.0<1 ℚ.0<1 ℚ.0<1 ℚ.0<1
+            identityLipschitzℝ (maxLipschitz₁ y) minLipschitz₁ minLipschitz₂)
+
+  ρ : (x : ℝ) → Continuous $ const x
+  ρ = constantContinuous
+
+  σ : (y : ℝ) → Continuous $ idfun ℝ
+  σ y = identityContinuous
+
+maxAbsorbMinLeft : (x y : ℝ) → max x (min x y) ≡ x
+maxAbsorbMinLeft =
+  continuousExtensionLaw₂
+    (λ x y → max x (min x y))
+    const
+    (λ q r → ℚ.max q (ℚ.min q r))
+    const
+    φ ψ ω χ π ρ σ
+  where
+  φ : (q r : ℚ.ℚ) →
+      max (rational q) (min (rational q) (rational r)) ≡
+      rational (ℚ.max q (ℚ.min q r))
+  φ q r =
+    max (rational q) (min (rational q) (rational r))
+      ≡⟨ cong (max $ rational q)
+              (liftNonexpanding₂≡rational ℚ.min minNonexpandingℚ₂ q r) ⟩
+    max (rational q) (rational (ℚ.min q r))
+      ≡⟨ liftNonexpanding₂≡rational ℚ.max maxNonexpandingℚ₂ q (ℚ.min q r) ⟩
+    rational (ℚ.max q (ℚ.min q r)) ∎
+
+  ψ : (q r : ℚ.ℚ) → rational q ≡ rational q
+  ψ q r = refl
+
+  ω : (q r : ℚ.ℚ) → ℚ.max q (ℚ.min q r) ≡ q
+  ω = ℚ.maxAbsorbLMin
+
+  χ : (x : ℝ) → Continuous (λ y → max x (min x y))
+  χ x = continuousCompose (min x) (max x) (minContinuous₂ x) (maxContinuous₂ x)
+
+  π : (y : ℝ) → Continuous (λ x → max x (min x y))
+  π y = lipschitz→continuous
+    (λ x → max x (min x y)) 2 ℚ.0<2
+    (lipschitz₂-composeLipschitz₁-lipschitz
+      1 1 1 1
+      ℚ.0<1 ℚ.0<1 ℚ.0<1 ℚ.0<1
+      identityLipschitzℝ (minLipschitz₁ y) maxLipschitz₁ maxLipschitz₂)
+
+  ρ : (x : ℝ) → Continuous $ const x
+  ρ = constantContinuous
+
+  σ : (y : ℝ) → Continuous $ idfun ℝ
+  σ y = identityContinuous
+
+minAbsorbMaxRight : (x y : ℝ) → min (max x y) y ≡ y
+minAbsorbMaxRight x y =
+  min (max x y) y
+    ≡⟨ minCommutative (max x y) y ⟩
+  min y (max x y)
+    ≡⟨ cong (min y) (maxCommutative x y) ⟩
+  min y (max y x)
+    ≡⟨ minAbsorbMaxLeft y x ⟩
+  y ∎
+
+maxAbsorbMinRight : (x y : ℝ) → max (min x y) y ≡ y
+maxAbsorbMinRight x y =
+  max (min x y) y
+    ≡⟨ maxCommutative (min x y) y ⟩
+  max y (min x y)
+    ≡⟨ cong (max y) (minCommutative x y) ⟩
+  max y (min y x)
+    ≡⟨ maxAbsorbMinLeft y x ⟩
+  y ∎

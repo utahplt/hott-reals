@@ -94,6 +94,17 @@ infix 4 _≤_
     ≡⟨ maxCommutative y x ⟩
   max x y ∎
 
+min-≤₁ : (x y : ℝ) → min x y ≤ x
+min-≤₁ x y =
+  max (min x y) x
+    ≡⟨ cong (flip max x) (minCommutative x y) ⟩
+  max (min y x) x
+    ≡⟨ maxAbsorbMinRight y x ⟩
+  x ∎
+
+min-≤₂ : (x y : ℝ) → min x y ≤ y
+min-≤₂ = maxAbsorbMinRight
+
 _<_ : ℝ → ℝ → Type ℓ-zero
 _<_ x y = ∃ (ℚ.ℚ × ℚ.ℚ)
             (λ where (q , r) → (x ≤ rational q) × (q ℚ.< r) × (rational r ≤ y))
@@ -104,7 +115,8 @@ infix 4 _<_
 <-isProp x y = isPropPropTrunc
 
 -- TODO: I think there is an IsIsotone definition and we should probably use
--- that, but honestly a lot of the cubical library seems half baked
+-- that, but eh honestly a lot of the cubical library Algebra stuff seems half
+-- baked
 rationalMonotone :
   {q r : ℚ.ℚ} → q ℚ.≤ r → rational q ≤ rational r
 rationalMonotone {q} {r} φ =

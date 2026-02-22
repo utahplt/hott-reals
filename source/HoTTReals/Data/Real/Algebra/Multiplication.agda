@@ -1107,3 +1107,52 @@ multiplyLipscthiz₂ L φ x ψ = ω'
 
   ω' : Lipschitzℝ (λ y → x · y) L φ
   ω' = subst (λ ?f → Lipschitzℝ ?f L φ) (funExt (flip ·-commutative x)) ω
+
+multiplyNegateLeft :
+  (x y : ℝ) → (- x) · y ≡ - (x · y)
+multiplyNegateLeft =
+  continuousExtensionLaw₂ f g f' g' H K L φ ψ ω χ
+  where
+  f : ℝ → ℝ → ℝ
+  f x y = (- x) · y
+
+  g : ℝ → ℝ → ℝ
+  g x y = - (x · y)
+
+  f' : ℚ.ℚ → ℚ.ℚ → ℚ.ℚ
+  f' q r = (ℚ.- q) ℚ.· r
+
+  g' : ℚ.ℚ → ℚ.ℚ → ℚ.ℚ
+  g' q r = ℚ.- (q ℚ.· r)
+
+  H : (q r : ℚ.ℚ) → f (rational q) (rational r) ≡ rational (f' q r)
+  H q r = cong (flip _·_ (rational r)) (-rational q)
+
+  K : (q r : ℚ.ℚ) → g (rational q) (rational r) ≡ rational (g' q r)
+  K q r = -rational (q ℚ.· r)
+
+  L : (q r : ℚ.ℚ) → f' q r ≡ g' q r
+  L q r = sym (ℚ.-·≡-· q r)
+
+  φ : (u : ℝ) → Continuous (f u)
+  φ u = multiplyContinuous₂ (- u)
+
+  ψ : (v : ℝ) → Continuous (flip f v)
+  ψ v = continuousCompose -_ (flip _·_ v) -continuous (multiplyContinuous₁ v)
+
+  ω : (u : ℝ) → Continuous (g u)
+  ω u = continuousCompose (_·_ u) -_ (multiplyContinuous₂ u) -continuous
+
+  χ : (v : ℝ) → Continuous (flip g v)
+  χ v = continuousCompose (flip _·_ v) -_ (multiplyContinuous₁ v) -continuous
+
+multiplyNegateRight :
+  (x y : ℝ) → x · (- y) ≡ - (x · y)
+multiplyNegateRight x y =
+  x · (- y)
+    ≡⟨ ·-commutative x (- y) ⟩
+  (- y) · x
+    ≡⟨ multiplyNegateLeft y x ⟩
+  - (y · x)
+    ≡⟨ cong -_ (·-commutative y x) ⟩
+  - (x · y) ∎

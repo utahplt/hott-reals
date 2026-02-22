@@ -3,6 +3,7 @@ module HoTTReals.Data.Real.Algebra.Reciprocal where
 import Cubical.Data.Rationals as ℚ
 import Cubical.Data.Rationals.Order as ℚ
 open import Cubical.Data.Nat.Literals public
+open import Cubical.Algebra.Ring.Properties
 open import Cubical.Data.Sigma
 open import Cubical.Data.Sum as Sum
 open import Cubical.Foundations.Function
@@ -36,6 +37,8 @@ import HoTTReals.Data.Rationals.Order as ℚ
 import HoTTReals.Data.Rationals.Properties as ℚ
 import HoTTReals.Algebra.Field.Instances.Rationals as ℚ
 open import HoTTReals.Logic
+
+open RingTheory ℝRing
 
 -- TODO: This is a hack to get Agda to type check
 -- `boundedReciprocalPositiveLipschitz` without stalling. With my previous code,
@@ -797,9 +800,38 @@ reciprocalPositiveInverseᵣ x φ =
       ≡⟨ boundedReciprocalPositiveInverseₗ δ χ x ⟩
     1 ∎
 
-negateReciprocalPositive :
-  (x : ℝ) (φ : (- x) # 0) →
-  (- x) [ φ ]⁻¹ ≡ - (x [ negateApart→apart φ ]⁻¹)
-negateReciprocalPositive x (inl φ) =
-  {!!}
-negateReciprocalPositive x (inr φ) = {!!}
+reciprocalInl :
+  (x : ℝ) (φ : x < 0) →
+  x [ inl φ ]⁻¹ ≡ - reciprocalPositive (- x) (-antitone< {x} {0} φ)
+reciprocalInl x φ = refl
+                    
+reciprocalInr :
+  (x : ℝ) (φ : 0 < x) →
+  x [ inr φ ]⁻¹ ≡ reciprocalPositive x φ
+reciprocalInr x φ = refl
+
+⁻¹-inverseᵣ : (x : ℝ) (φ : x # 0) → x · x [ φ ]⁻¹ ≡ 1
+⁻¹-inverseᵣ x (inl φ) =
+  cong (_·_ x) (reciprocalInl x φ) ∙ ψ
+  where
+  ψ = x · (- reciprocalPositive (- x) (-antitone< {x} {0} φ))
+        ≡⟨ multiplyNegateRight
+             x
+             (reciprocalPositive (- x) (-antitone< {x} {0} φ)) ⟩
+      - (x · (reciprocalPositive (- x) (-antitone< {x} {0} φ)))
+        ≡⟨ (sym $ multiplyNegateLeft
+                    x
+                    (reciprocalPositive (- x) (-antitone< {x} {0} φ))) ⟩
+      (- x) · (reciprocalPositive (- x) (-antitone< {x} {0} φ))
+        ≡⟨ reciprocalPositiveInverseᵣ (- x) (-antitone< {x} {0} φ) ⟩
+      1 ∎
+⁻¹-inverseᵣ x (inr φ) =
+  cong (_·_ x) (reciprocalInr x φ) ∙ reciprocalPositiveInverseᵣ x φ
+
+⁻¹-inverseₗ : (x : ℝ) (φ : x # 0) → x [ φ ]⁻¹ · x ≡ 1
+⁻¹-inverseₗ x φ =
+  x [ φ ]⁻¹ · x
+    ≡⟨ ·-commutative (x [ φ ]⁻¹) x ⟩
+  x · x [ φ ]⁻¹
+    ≡⟨ ⁻¹-inverseᵣ x φ ⟩
+  1 ∎

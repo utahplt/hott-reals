@@ -80,10 +80,9 @@ open import HoTTReals.Logic
       Σ ℚ.ℚ (λ q → (0 ℚ.< q) × (∣ x ∣ ≤ rational q))
   φ (ε , (ψ , ω)) = ε , (ψ , (<→≤ {x = ∣ x ∣} {y = rational ε} ω))
 
--- TODO:
--- approximateBelowCauchy :
---   (x : ℝ) → CauchyApproximation (λ ε φ → x - rational ε)
--- approximateBelowCauchy x ε δ φ ψ = {!!}
+approximateBelowCauchy :
+  (x : ℝ) → CauchyApproximation (λ ε φ → x - rational ε)
+approximateBelowCauchy x ε δ φ ψ = {!!}
 
 ≤→¬< : {x y : ℝ} → x ≤ y → ¬ y < x
 ≤→¬< {x} {y} φ ψ = <-irreflexive x ω 
@@ -91,8 +90,8 @@ open import HoTTReals.Logic
   ω : x < x
   ω = ≤→<→< {x} {y} {x} φ ψ
 
-¬<→≤ : {x y : ℝ} → ¬ x < y → y ≤ x
-¬<→≤ {x} {y} = {!!}
+-- ¬<→≤ : {x y : ℝ} → ¬ x < y → y ≤ x
+-- ¬<→≤ {x} {y} = {!!}
 
-≤↔¬< : (x y : ℝ) → (x ≤ y) ↔ (¬ y < x)
-≤↔¬< x y = ≤→¬< {x} {y} , ¬<→≤ {y} {x}
+-- ≤↔¬< : (x y : ℝ) → (x ≤ y) ↔ (¬ y < x)
+-- ≤↔¬< x y = ≤→¬< {x} {y} , ¬<→≤ {y} {x}

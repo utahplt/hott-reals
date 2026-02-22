@@ -564,7 +564,7 @@ distanceLeftMultiplyRational≡leftMultiplyRationalDistanceᵣ q =
       ≡⟨ sym (·-leftRational≡leftMultiplyRational ℚ.∣ q ∣ (distance x y)) ⟩
     rational ℚ.∣ q ∣ · distance x y
       ≡⟨ cong (flip _·_ (distance x y))
-              (sym (magnitudeExtendsRationalMagnitude q)) ⟩
+              (sym (magnitudeRational q)) ⟩
     ∣ rational q ∣ · distance x y ∎
 
 maxMultiplyLeftMagnitude : (a x y : ℝ) →
@@ -626,7 +626,7 @@ maxMultiplyLeftMagnitude a x y =
   ω q =
     max (∣ rational q ∣ · x) (∣ rational q ∣ · y)
       ≡⟨ cong (λ c → max (c · x) (c · y))
-              (magnitudeExtendsRationalMagnitude q) ⟩
+              (magnitudeRational q) ⟩
     max (rational ℚ.∣ q ∣ · x) (rational ℚ.∣ q ∣ · y)
       ≡⟨ cong₂ max (·-leftRational≡leftMultiplyRational ℚ.∣ q ∣ x)
                      (·-leftRational≡leftMultiplyRational ℚ.∣ q ∣ y) ⟩
@@ -636,7 +636,7 @@ maxMultiplyLeftMagnitude a x y =
       ≡⟨ sym (·-leftRational≡leftMultiplyRational ℚ.∣ q ∣ (max x y)) ⟩
     rational ℚ.∣ q ∣ · max x y
       ≡⟨ cong (flip _·_ (max x y))
-              (sym (magnitudeExtendsRationalMagnitude q)) ⟩
+              (sym (magnitudeRational q)) ⟩
     ∣ rational q ∣ · max x y ∎
 
 maxLeftMultiplyRationalᵣ :
@@ -696,7 +696,7 @@ maxLeftMultiplyRationalᵣ a q r =
     max (leftMultiplyRational q ∣ rational s ∣)
         (leftMultiplyRational r ∣ rational s ∣)
       ≡⟨ cong (λ c → max (leftMultiplyRational q c) (leftMultiplyRational r c))
-              (magnitudeExtendsRationalMagnitude s) ⟩
+              (magnitudeRational s) ⟩
     max (rational (q ℚ.· ℚ.∣ s ∣)) (rational (r ℚ.· ℚ.∣ s ∣))
       ≡⟨ liftNonexpanding₂≡rational ℚ.max maxNonexpandingℚ₂
            (q ℚ.· ℚ.∣ s ∣) (r ℚ.· ℚ.∣ s ∣) ⟩
@@ -706,7 +706,7 @@ maxLeftMultiplyRationalᵣ a q r =
                ∙ ℚ.·Comm ℚ.∣ s ∣ (ℚ.max q r)) ⟩
     rational (ℚ.max q r ℚ.· ℚ.∣ s ∣)
       ≡⟨ cong (leftMultiplyRational (ℚ.max q r))
-              (sym (magnitudeExtendsRationalMagnitude s)) ⟩
+              (sym (magnitudeRational s)) ⟩
     leftMultiplyRational (ℚ.max q r) ∣ rational s ∣ ∎
 
 maxMultiplyRightMagnitude : (a x y : ℝ) →

@@ -100,7 +100,7 @@ close-0→magnitude< {x} {ε} =
 
     τ' : ∣ rational q ∣ < rational ε
     τ' = subst (_< rational ε)
-               (sym $ magnitudeExtendsRationalMagnitude q)
+               (sym $ magnitudeRational q)
                τ
 
   ψ : (x : (ε : ℚ.ℚ) → 0 ℚ.< ε → ℝ) (ω : CauchyApproximation x) →
@@ -616,3 +616,14 @@ distance<→close {x} {y} {ε} =
 
   pProposition : (x y : ℝ) → isProp (P x y)
   pProposition x y = isPropΠ3 (λ ε φ ψ → squash ε φ x y)
+
+distanceCommutative :
+  (x y : ℝ) → distance x y ≡ distance y x
+distanceCommutative x y =
+  distance x y
+    ≡⟨ sym $ magnitudeNegate≡magnitude (x - y) ⟩
+  ∣ - (x - y) ∣
+    ≡⟨ cong ∣_∣ (negateSubtract' x y) ⟩
+  ∣ y - x ∣
+    ≡⟨ refl ⟩
+  distance y x ∎

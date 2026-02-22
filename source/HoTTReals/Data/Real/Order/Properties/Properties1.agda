@@ -597,4 +597,3 @@ negateApart→apart {x} (inr φ) = inl ψ'
 
 <↔∃+ε≤ : {x y : ℝ} → (x < y) ↔ ∃ ℚ.ℚ (λ ε → (0 ℚ.< ε) × (x + rational ε ≤ y))
 <↔∃+ε≤ {x} {y} = ( <→∃+ε≤ {x = x} {y = y} , ∃+ε≤→< {x = x} {y = y} )
-

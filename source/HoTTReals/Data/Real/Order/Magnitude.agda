@@ -59,9 +59,9 @@ magnitude'Continuous = lipschitz→continuous ∣_∣' 1 ℚ.0<1 magnitude'Lipsc
 ∣_∣ : ℝ → ℝ
 ∣ x ∣ = max x (- x)
 
-magnitudeExtendsRationalMagnitude : 
+magnitudeRational : 
   (∣_∣ ∘ rational) ∼ (rational ∘ ℚ.∣_∣)
-magnitudeExtendsRationalMagnitude q =
+magnitudeRational q =
   max (rational q) (- rational q)
     ≡⟨ cong (max (rational q))
             (liftLipschitz≡rational (rational ∘ ℚ.-_) 1 ℚ.0<1 -lipschitzℚ q) ⟩
@@ -108,7 +108,7 @@ magnitude∼magnitude' =
   χ π
   where
   φ : (∣_∣ ∘ rational) ∼ (rational ∘ ℚ.∣_∣)
-  φ = magnitudeExtendsRationalMagnitude
+  φ = magnitudeRational
 
   ψ : (∣_∣' ∘ rational) ∼ (rational ∘ ℚ.∣_∣)
   ψ = liftLipschitz≡rational
@@ -203,13 +203,13 @@ magnitudeMagnitude≡magnitude x = χ
 
   H : (f ∘ rational) ∼ (rational ∘ f')
   H q = max 0 ∣ rational q ∣
-          ≡⟨ cong (max 0) (magnitudeExtendsRationalMagnitude q) ⟩
+          ≡⟨ cong (max 0) (magnitudeRational q) ⟩
         max 0 (rational (ℚ.∣ q ∣))
           ≡⟨ liftNonexpanding₂≡rational ℚ.max maxNonexpandingℚ₂ 0 (ℚ.∣ q ∣) ⟩
         rational (ℚ.max 0 (ℚ.∣ q ∣)) ∎
 
   K : (g ∘ rational) ∼ (rational ∘ g')
-  K = magnitudeExtendsRationalMagnitude
+  K = magnitudeRational
 
   L : f' ∼ g'
   L q = ℚ.≤→max 0 ℚ.∣ q ∣ (ℚ.0≤∣∣ q)
@@ -254,3 +254,91 @@ magnitudeMagnitude≡magnitude x = χ
 
   ω : x ≤ - x
   ω = ≤-transitive x 0 (- x) φ ψ'
+
+magnitudeTriangleInequality : (x y : ℝ) → ∣ x + y ∣ ≤ ∣ x ∣ + ∣ y ∣
+magnitudeTriangleInequality =
+  continuousExtensionLaw₂
+    f g f' g'
+    φ ψ ω χ π ρ σ
+  where
+  f : ℝ → ℝ → ℝ
+  f x y = max ∣ x + y ∣ (∣ x ∣ + ∣ y ∣)
+
+  g : ℝ → ℝ → ℝ
+  g x y = ∣ x ∣ + ∣ y ∣
+
+  f' : ℚ.ℚ → ℚ.ℚ → ℚ.ℚ
+  f' q r = ℚ.max ℚ.∣ q ℚ.+ r ∣ (ℚ.∣ q ∣ ℚ.+ ℚ.∣ r ∣)
+
+  g' : ℚ.ℚ → ℚ.ℚ → ℚ.ℚ
+  g' q r = ℚ.∣ q ∣ ℚ.+ ℚ.∣ r ∣
+
+  φ : (q r : ℚ.ℚ) →
+      max ∣ rational q + rational r ∣ (∣ rational q ∣ + ∣ rational r ∣) ≡
+      rational (ℚ.max ℚ.∣ q ℚ.+ r ∣ (ℚ.∣ q ∣ ℚ.+ ℚ.∣ r ∣))
+  φ q r = 
+    max ∣ rational q + rational r ∣ (∣ rational q ∣ + ∣ rational r ∣)
+      ≡⟨ cong (λ ?x → max ∣ ?x ∣ (∣ rational q ∣ + ∣ rational r ∣))
+              (+rational q r) ⟩
+    max (∣ rational (q ℚ.+ r) ∣) (∣ rational q ∣ + ∣ rational r ∣)
+      ≡⟨ cong (λ ?x → max ?x (∣ rational q ∣ + ∣ rational r ∣))
+              (magnitudeRational (q ℚ.+ r)) ⟩
+    max (rational ℚ.∣ q ℚ.+ r ∣) (∣ rational q ∣ + ∣ rational r ∣)
+      ≡⟨ cong (λ ?x → max (rational ℚ.∣ q ℚ.+ r ∣) (?x + ∣ rational r ∣))
+              (magnitudeRational q) ⟩
+    max (rational ℚ.∣ q ℚ.+ r ∣) (rational ℚ.∣ q ∣ + ∣ rational r ∣)
+      ≡⟨ cong (λ ?x → max (rational ℚ.∣ q ℚ.+ r ∣) (rational ℚ.∣ q ∣ + ?x))
+              (magnitudeRational r) ⟩
+    max (rational ℚ.∣ q ℚ.+ r ∣) (rational ℚ.∣ q ∣ + rational ℚ.∣ r ∣)
+      ≡⟨ cong (max (rational ℚ.∣ q ℚ.+ r ∣))
+              (+rational ℚ.∣ q ∣ ℚ.∣ r ∣) ⟩
+    max (rational ℚ.∣ q ℚ.+ r ∣) (rational (ℚ.∣ q ∣ ℚ.+ ℚ.∣ r ∣))
+      ≡⟨ maxRational ℚ.∣ q ℚ.+ r ∣ (ℚ.∣ q ∣ ℚ.+ ℚ.∣ r ∣) ⟩
+    rational (ℚ.max (ℚ.∣ q ℚ.+ r ∣) (ℚ.∣ q ∣ ℚ.+ ℚ.∣ r ∣)) ∎
+
+  ψ : (q r : ℚ.ℚ) →
+      ∣ rational q ∣ + ∣ rational r ∣ ≡
+      rational (ℚ.∣ q ∣ ℚ.+ ℚ.∣ r ∣)
+  ψ q r =
+    ∣ rational q ∣ + ∣ rational r ∣
+      ≡⟨ cong₂ _+_ (magnitudeRational q) (magnitudeRational r) ⟩
+    (rational ℚ.∣ q ∣) + (rational ℚ.∣ r ∣)
+      ≡⟨ +rational ℚ.∣ q ∣ ℚ.∣ r ∣ ⟩
+    rational (ℚ.∣ q ∣ ℚ.+ ℚ.∣ r ∣) ∎
+
+  ω : (q r : ℚ.ℚ) → 
+      ℚ.max ℚ.∣ q ℚ.+ r ∣ (ℚ.∣ q ∣ ℚ.+ ℚ.∣ r ∣) ≡ ℚ.∣ q ∣ ℚ.+ ℚ.∣ r ∣
+  ω q r = ℚ.≤→max ℚ.∣ q ℚ.+ r ∣ (ℚ.∣ q ∣ ℚ.+ ℚ.∣ r ∣)
+                  (ℚ.magnitudeTriangleInequality q r)
+
+  χ : (x : ℝ) → Continuous $ f x
+  χ x = lipschitz→continuous
+          (f x)
+          2 _
+          (lipschitz₂-composeLipschitz₁-lipschitz
+            1 1 1 1
+            ℚ.0<1 ℚ.0<1 ℚ.0<1 ℚ.0<1
+            π ρ maxLipschitz₁ maxLipschitz₂)
+    where
+    π : Lipschitzℝ (λ y → ∣ x + y ∣) 1 (ℚ.0<· {1} {1} ℚ.0<1 ℚ.0<1)
+    π = lipschitzCompose
+          ∣_∣ (_+_ x)
+          1 1 ℚ.0<1 ℚ.0<1
+          (nonexpandingℝ→lipschitzℝ ∣_∣ magnitudeNonexpandingℝ)
+          (+lipschitz₂ x) 
+
+    ρ : Lipschitzℝ (λ y → ∣ x ∣ + ∣ y ∣) 1 ℚ.0<1
+    ρ = lipschitzCompose
+          (_+_ $ ∣ x ∣) ∣_∣
+          1 1 ℚ.0<1 ℚ.0<1
+          (+lipschitz₂ ∣ x ∣)
+          (nonexpandingℝ→lipschitzℝ ∣_∣ magnitudeNonexpandingℝ)
+
+  π : (y : ℝ) → Continuous $ flip f y
+  π = {!!}
+
+  ρ : (x : ℝ) → Continuous $ g x
+  ρ = {!!}
+
+  σ : (y : ℝ) → Continuous $ flip g y
+  σ = {!!}

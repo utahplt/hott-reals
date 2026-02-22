@@ -318,27 +318,49 @@ magnitudeTriangleInequality =
           (lipschitz₂-composeLipschitz₁-lipschitz
             1 1 1 1
             ℚ.0<1 ℚ.0<1 ℚ.0<1 ℚ.0<1
-            π ρ maxLipschitz₁ maxLipschitz₂)
+            α β maxLipschitz₁ maxLipschitz₂)
     where
-    π : Lipschitzℝ (λ y → ∣ x + y ∣) 1 (ℚ.0<· {1} {1} ℚ.0<1 ℚ.0<1)
-    π = lipschitzCompose
+    α : Lipschitzℝ (λ y → ∣ x + y ∣) 1 (ℚ.0<· {1} {1} ℚ.0<1 ℚ.0<1)
+    α = lipschitzCompose
           ∣_∣ (_+_ x)
           1 1 ℚ.0<1 ℚ.0<1
           (nonexpandingℝ→lipschitzℝ ∣_∣ magnitudeNonexpandingℝ)
           (+lipschitz₂ x) 
 
-    ρ : Lipschitzℝ (λ y → ∣ x ∣ + ∣ y ∣) 1 ℚ.0<1
-    ρ = lipschitzCompose
+    β : Lipschitzℝ (λ y → ∣ x ∣ + ∣ y ∣) 1 ℚ.0<1
+    β = lipschitzCompose
           (_+_ $ ∣ x ∣) ∣_∣
           1 1 ℚ.0<1 ℚ.0<1
           (+lipschitz₂ ∣ x ∣)
           (nonexpandingℝ→lipschitzℝ ∣_∣ magnitudeNonexpandingℝ)
 
   π : (y : ℝ) → Continuous $ flip f y
-  π = {!!}
+  π y = lipschitz→continuous
+          (flip f y)
+          2 _
+          (lipschitz₂-composeLipschitz₁-lipschitz
+            1 1 1 1
+            ℚ.0<1 ℚ.0<1 ℚ.0<1 ℚ.0<1
+            α β maxLipschitz₁ maxLipschitz₂)
+    where
+    α : Lipschitzℝ (λ x → ∣ x + y ∣) 1 (ℚ.0<· {1} {1} ℚ.0<1 ℚ.0<1)
+    α = lipschitzCompose
+          ∣_∣ (flip _+_ y)
+          1 1 ℚ.0<1 ℚ.0<1
+          (nonexpandingℝ→lipschitzℝ ∣_∣ magnitudeNonexpandingℝ)
+          (+lipschitz₁ y)
+
+    β : Lipschitzℝ (λ x → ∣ x ∣ + ∣ y ∣) 1 ℚ.0<1
+    β = lipschitzCompose
+          (flip _+_ $ ∣ y ∣) ∣_∣
+          1 1 ℚ.0<1 ℚ.0<1
+          (+lipschitz₁ ∣ y ∣)
+          (nonexpandingℝ→lipschitzℝ ∣_∣ magnitudeNonexpandingℝ)
 
   ρ : (x : ℝ) → Continuous $ g x
-  ρ = {!!}
+  ρ x = continuousCompose ∣_∣ (_+_ ∣ x ∣)
+                          magnitudeContinuous (+continuous₂ ∣ x ∣)
 
   σ : (y : ℝ) → Continuous $ flip g y
-  σ = {!!}
+  σ y = continuousCompose ∣_∣ (flip _+_ ∣ y ∣)
+                          magnitudeContinuous (+continuous₁ ∣ y ∣)

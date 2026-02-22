@@ -443,8 +443,124 @@ maxMultiplyBoundedReciprocalPositiveContinuous δ φ x ε ψ = {!!}
             (max y (rational δ) · boundedReciprocalPositive δ φ x)))
   ω = continuousCompose
         (flip max (rational δ)) (flip _·_ $ boundedReciprocalPositive δ φ x)
-        (maxContinuous₁ $ rational δ) {!!}
-        {!!} {!!} {!!}
+        (maxContinuous₁ $ rational δ)
+        (multiplyContinuous₁ $ boundedReciprocalPositive δ φ x)
+        x (ε ℚ./ 2 [ ℚ.2≠0 ]) ψ'
+
+  χ : ∃ ℚ.ℚ
+      (λ η₂ →
+      Σ (0 ℚ.< η₂)
+      (λ ζ →
+      (y : ℝ) →
+      Close η₂ ζ x y →
+      Close (ε ℚ./ 2 [ ℚ.2≠0 ]) ψ'
+            (max y (rational δ) · boundedReciprocalPositive δ φ x)
+            (max y (rational δ) · boundedReciprocalPositive δ φ y)))
+  χ = {!!}
+
+  π : Σ ℚ.ℚ
+       (λ η₁ →
+          Σ (0 ℚ.< η₁)
+          (λ ζ →
+             (y : ℝ) →
+             Close η₁ ζ x y →
+             Close (ε ℚ./ 2 [ ℚ.2≠0 ]) ψ'
+             (max x (rational δ) · boundedReciprocalPositive δ φ x)
+             (max y (rational δ) · boundedReciprocalPositive δ φ x))) →
+      Σ ℚ.ℚ
+        (λ η₂ →
+          Σ (0 ℚ.< η₂)
+          (λ ζ →
+             (y : ℝ) →
+             Close η₂ ζ x y →
+             Close (ε ℚ./ 2 [ ℚ.2≠0 ]) ψ'
+             (max y (rational δ) · boundedReciprocalPositive δ φ x)
+             (max y (rational δ) · boundedReciprocalPositive δ φ y))) →
+      Σ ℚ.ℚ
+        (λ η →
+          Σ (0 ℚ.< η)
+          (λ ζ →
+             (y : ℝ) →
+             Close η ζ x y →
+             Close ε ψ (max x (rational δ) · boundedReciprocalPositive δ φ x)
+             (max y (rational δ) · boundedReciprocalPositive δ φ y)))
+  π (η₁ , ρ₁ , σ₁) (η₂ , ρ₂ , σ₂) = η , ρ , σ
+    where
+    η : ℚ.ℚ
+    η = ℚ.min η₁ η₂
+
+    ρ : 0 ℚ.< η
+    ρ = ℚ.minGreatestLowerBound< {η₁} {η₂} {0} ρ₁ ρ₂
+
+    σ : (y : ℝ) →
+        Close η ρ x y →
+        Close ε ψ
+              (max x (rational δ) · boundedReciprocalPositive δ φ x)
+              (max y (rational δ) · boundedReciprocalPositive δ φ y)
+    σ y τ = υ''
+      where
+      τ' : distance x y < rational η
+      τ' = close→distance< ρ τ 
+
+      υ₁ : distance x y < rational η₁
+      υ₁ = <→≤→< {distance x y} {rational η} {rational η₁}
+                 τ' (rationalMonotone {η} {η₁} $ ℚ.min≤ η₁ η₂)
+
+      υ₂ : distance x y < rational η₂
+      υ₂ = <→≤→< {distance x y} {rational η} {rational η₂}
+                 τ' (rationalMonotone {η} {η₂} $ ℚ.min≤' η₁ η₂)
+
+      υ₁' : Close η₁ ρ₁ x y 
+      υ₁' = distance<→close ρ₁ υ₁
+
+      υ₂' : Close η₂ ρ₂ x y 
+      υ₂' = distance<→close ρ₂ υ₂
+
+      υ : Close ((ε ℚ./ 2 [ ℚ.2≠0 ]) ℚ.+ (ε ℚ./ 2 [ ℚ.2≠0 ]))
+                (ℚ.0<+' {ε ℚ./ 2 [ ℚ.2≠0 ]} {ε ℚ./ 2 [ ℚ.2≠0 ]} ψ' ψ')
+                (max x (rational δ) · boundedReciprocalPositive δ φ x)
+                (max y (rational δ) · boundedReciprocalPositive δ φ y)
+      υ = closeTriangleInequality
+            (max x (rational δ) · boundedReciprocalPositive δ φ x)
+            (max y (rational δ) · boundedReciprocalPositive δ φ x)
+            (max y (rational δ) · boundedReciprocalPositive δ φ y)
+            (ε ℚ./ 2 [ ℚ.2≠0 ]) (ε ℚ./ 2 [ ℚ.2≠0 ])
+            ψ' ψ'
+            (σ₁ y υ₁') (σ₂ y υ₂')
+
+      α : (ε ℚ./ 2 [ ℚ.2≠0 ]) ℚ.+ (ε ℚ./ 2 [ ℚ.2≠0 ]) ≡ ε
+      α = ℚ.self/2≡self ε ℚ.2≠0
+
+      υ' : Σ (0 ℚ.< ε)
+             (λ ξ → Close ε ξ
+                      (max x (rational δ) · boundedReciprocalPositive δ φ x)
+                      (max y (rational δ) · boundedReciprocalPositive δ φ y))
+      υ' = subst (λ ?x → Σ (0 ℚ.< ?x) (λ ξ → Close ?x ξ _ _))
+                 α
+                 ((ℚ.0<+' {ε ℚ./ 2 [ ℚ.2≠0 ]} {ε ℚ./ 2 [ ℚ.2≠0 ]} ψ' ψ') , υ)
+
+      υ'' : Close ε ψ
+                    (max x (rational δ) · boundedReciprocalPositive δ φ x)
+                    (max y (rational δ) · boundedReciprocalPositive δ φ y)
+      υ'' = subst (λ ?ξ →
+                    Close
+                      ε ?ξ
+                      (max x (rational δ) · boundedReciprocalPositive δ φ x)
+                      (max y (rational δ) · boundedReciprocalPositive δ φ y))
+                  (ℚ.isProp< 0 ε (fst υ') ψ)
+                  (snd υ')
+
+  ρ : ∃ ℚ.ℚ
+      (λ η →
+      Σ (0 ℚ.< η)
+      (λ ζ →
+      (y : ℝ) →
+      Close η ζ x y →
+      Close ε ψ
+            (max x (rational δ) · boundedReciprocalPositive δ φ x)
+            (max y (rational δ) · boundedReciprocalPositive δ φ y)))
+  ρ = PropositionalTruncation.map2 π ω χ
+
 
 boundedReciprocalPositive-inverseₗ :
   (δ : ℚ.ℚ) (φ : 0 ℚ.< δ)

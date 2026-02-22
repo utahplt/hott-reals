@@ -243,6 +243,9 @@ closeRounded = ω
 closeOpen : Open Close squash
 closeOpen u v ε φ = fst $ closeRounded u v ε φ
 
+closeMonotone : Monotone Close squash
+closeMonotone u v ε φ = snd $ closeRounded u v ε φ
+
 closeTriangleInequality : TriangleInequality Close squash
 closeTriangleInequality = ψ
   where

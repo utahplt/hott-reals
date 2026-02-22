@@ -358,3 +358,23 @@ liftLipschitz≡rational :
   (q : ℚ) →
   liftLipschitz f L φ ψ (rational q) ≡ f q
 liftLipschitz≡rational f L φ ψ q = refl
+
+lipschitzMapApproximation :
+  (f : ℝ → ℝ) (L : ℚ) (φ : 0 < L) →
+  ((ε : ℚ) → 0 < ε → ℝ) →
+  ((ε : ℚ) → 0 < ε → ℝ)
+lipschitzMapApproximation f L φ x ε ψ =
+  f $ x (ε / L [ φ' ]) ω
+  where
+  φ' : ¬ L ≡ 0
+  φ' = ≠-symmetric $ <→≠ φ
+
+  ω : 0 < ε / L [ φ' ]
+  ω = 0</' {x = ε} {y = L} ψ φ
+
+lipschitzMapApproximationCauchy :
+  (f : ℝ → ℝ) (L : ℚ) (φ : 0 < L) →
+  (x : (ε : ℚ) → 0 < ε → ℝ) →
+  CauchyApproximation x →
+  CauchyApproximation (lipschitzMapApproximation f L φ x)
+lipschitzMapApproximationCauchy f L φ x ψ ε δ ω χ = {!!}

@@ -45,6 +45,9 @@ open import HoTTReals.Data.Rationals.Properties
 0<2⁻¹ : 0 < 2 [ 2≠0 ]⁻¹
 0<2⁻¹ = Bool.toWitness {Q = <Dec 0 (2 [ 2≠0 ]⁻¹)} tt
 
+0<3 : 0 ℚ.< 3
+0<3 = Bool.toWitness {Q = <Dec 0 3} tt
+
 0<4 : 0 ℚ.< 4
 0<4 = Bool.toWitness {Q = <Dec 0 4} tt
 
@@ -1838,3 +1841,19 @@ affineCombinationStrictMonotone x y t₁ t₂ φ ψ = π'
 
   π' : (1 - t₁) · x + t₁ · y < (1 - t₂) · x + t₂ · y
   π' = subst2 _<_ (sym ρ₁) (sym ρ₂) π
+
+0<→distance<+ :
+  {x y : ℚ} →
+  0 < x → 0 < y →
+  distance x y < x + y
+0<→distance<+ {x} {y} φ ψ =
+  <→∣∣< {x - y} {x + y} ω χ'
+  where
+  ω : x - y < x + y
+  ω = <-o+ (- y) y x (isTrans< (- y) 0 y (<antitone- {0} {y} ψ) ψ)
+
+  χ : - x + - y < x + - y
+  χ = <-+o (- x) x (- y) (isTrans< (- x) 0 x (<antitone- {0} {x} φ) φ)
+
+  χ' : - (x + y) < x - y
+  χ' = subst (flip _<_ $ x - y) (sym $ negateAdd x y) χ

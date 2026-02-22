@@ -14,7 +14,7 @@ open import Cubical.Data.Sum as Sum
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.HLevels
 open import Cubical.Foundations.Prelude
-open import Cubical.Functions.Logic hiding (⊥; ¬_)
+open import Cubical.Functions.Logic hiding (⊥; ¬_; inl; inr)
 open import Cubical.HITs.PropositionalTruncation as PropositionalTruncation
 open import Cubical.Homotopy.Base
 open import Cubical.Relation.Binary
@@ -408,6 +408,8 @@ isStrictOrder< =
 _#_ : ℝ → ℝ → Type ℓ-zero
 _#_ = SymClosure _<_
 
+infix 4 _#_ 
+
 isApartness# : IsApartness _#_
 isApartness# = isStrictOrder→isApartnessSymClosure isStrictOrder<
 
@@ -423,7 +425,25 @@ isApartness# = isStrictOrder→isApartnessSymClosure isStrictOrder<
 #-symmetric : isSym _#_
 #-symmetric = IsApartness.is-sym isApartness#
 
-infix 4 _#_ 
+apart→negateApart : {x : ℝ} → x # 0 → (- x) # 0
+apart→negateApart {x} (inl φ) = inr $ -antitone< {x} {0} φ
+apart→negateApart {x} (inr φ) = inl $ -antitone< {0} {x} φ
+
+negateApart→apart : {x : ℝ} → (- x) # 0 → x # 0
+negateApart→apart {x} (inl φ) = inr ψ'
+  where
+  ψ : 0 < - - x
+  ψ = -antitone< { - x } {0} φ
+
+  ψ' : 0 < x
+  ψ' = subst (_<_ 0) (-involutive x) ψ
+negateApart→apart {x} (inr φ) = inl ψ'
+  where
+  ψ : - - x < 0
+  ψ = -antitone< {0} { - x } φ
+
+  ψ' : x < 0
+  ψ' = subst (flip _<_ 0) (-involutive x) ψ
 
 <+ε : (x : ℝ) (ε : ℚ.ℚ) →
       0 ℚ.< ε →

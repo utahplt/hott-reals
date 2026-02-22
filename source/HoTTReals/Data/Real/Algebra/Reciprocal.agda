@@ -725,11 +725,11 @@ maxMultiplyBoundedReciprocalPositiveContinuous δ φ x ε ψ = ρ
   ρ = PropositionalTruncation.map2 π ω χ
 
 
-boundedReciprocalPositive-inverseₗ :
+boundedReciprocalPositiveInverseₗ :
   (δ : ℚ.ℚ) (φ : 0 ℚ.< δ)
   (x : ℝ) →
   max x (rational δ) · boundedReciprocalPositive δ φ x ≡ 1
-boundedReciprocalPositive-inverseₗ δ φ =
+boundedReciprocalPositiveInverseₗ δ φ =
   continuousExtensionLaw₁
     f g f' g'
     ψ ω χ π ρ
@@ -774,3 +774,32 @@ boundedReciprocalPositive-inverseₗ δ φ =
 
   ρ : Continuous g
   ρ = constantContinuous 1
+
+reciprocalPositiveInverseᵣ :
+  (x : ℝ) (φ : 0 < x) →
+  x · reciprocalPositive x φ ≡ 1
+reciprocalPositiveInverseᵣ x φ =
+  ∃-rec (ℝ-isSet (x · reciprocalPositive x φ) 1) ω ψ
+  where
+  ψ : ∃ ℚ.ℚ (λ δ → (0 ℚ.< δ) × (rational δ ≤ x))
+  ψ = 0<→existsPositiveRational≤ φ
+
+  ω : (δ : ℚ.ℚ) →
+      (0 ℚ.< δ) × (rational δ ≤ x) →
+      x · reciprocalPositive x φ ≡ 1
+  ω δ (χ , π) =
+    x · reciprocalPositive x φ
+      ≡⟨ cong (_·_ x) (reciprocalPositive≡boundedReciprocalPositive δ χ x π φ) ⟩
+    x · (boundedReciprocalPositive δ χ x)
+      ≡⟨ cong (λ ?x → ?x · boundedReciprocalPositive δ χ x)
+              (sym $ maxCommutative x (rational δ) ∙ π) ⟩
+    (max x (rational δ)) · (boundedReciprocalPositive δ χ x)
+      ≡⟨ boundedReciprocalPositiveInverseₗ δ χ x ⟩
+    1 ∎
+
+negateReciprocalPositive :
+  (x : ℝ) (φ : (- x) # 0) →
+  (- x) [ φ ]⁻¹ ≡ - (x [ negateApart→apart φ ]⁻¹)
+negateReciprocalPositive x (inl φ) =
+  {!!}
+negateReciprocalPositive x (inr φ) = {!!}

@@ -37,8 +37,9 @@ open import HoTTReals.Data.Real.Algebra.Negation
 open import HoTTReals.Data.Real.Order.Addition.Addition1
 open import HoTTReals.Data.Real.Order.Addition.Addition2
 open import HoTTReals.Data.Real.Order.Base
-open import HoTTReals.Data.Real.Order.Magnitude
 open import HoTTReals.Data.Real.Order.Distance
+open import HoTTReals.Data.Real.Order.Magnitude
+open import HoTTReals.Data.Real.Order.Properties.Properties1
 
 import HoTTReals.Data.Rationals.Order as ℚ
 import HoTTReals.Data.Rationals.Properties as ℚ
@@ -86,6 +87,10 @@ module ApproximateBelow
 
   approximateBelow : (ε : ℚ.ℚ) → 0 ℚ.< ε → ℝ
   approximateBelow ε φ = x - rational ε
+
+  approximateBelowDefinition : (ε : ℚ.ℚ) (φ : 0 ℚ.< ε) →
+    approximateBelow ε φ ≡ x - rational ε 
+  approximateBelowDefinition ε φ = refl
 
   approximateBelowCauchy :
     CauchyApproximation approximateBelow
@@ -221,13 +226,9 @@ module ApproximateBelow
   ω : x < x
   ω = ≤→<→< {x} {y} {x} φ ψ
 
--- lipschitzMapApproximationApproximateBelow :
---   (x : ℝ) →
---   lipschitzMapApproximation (approximateBelow x)
-
 ¬<→≤ : {x y : ℝ} → ¬ x < y → y ≤ x
 ¬<→≤ {x} {y} φ =
-  {!!}
+  ω''
   where
   open ApproximateBelow 0
   open LipschitzMapApproximation
@@ -237,60 +238,78 @@ module ApproximateBelow
     approximateBelow
     approximateBelowCauchy
 
-  foo : limit lipschitzMapApproximation lipschitzMapApproximationCauchy ≡
+  ψ : (ε : ℚ.ℚ) (ω : 0 ℚ.< ε) → - rational ε < x - y
+  ψ ε ω = σ
+    where
+    χ : y - rational ε < y
+    χ = -ε< y ε ω
+
+    π : (y - rational ε < x) ⊔′ (x < y)
+    π = <-isWeaklyLinear (y - rational ε) y x χ
+
+    ρ : y - rational ε < x → - rational ε < x - y
+    ρ σ = +<→<-' {y} { - rational ε} {x} σ 
+
+    σ : - rational ε < x - y
+    σ = PropositionalTruncation.rec (<-isProp (- rational ε) (x - y))
+                                    (Sum.rec ρ (Empty.rec ∘ φ))
+                                    π
+
+  ω : max 0 (x - y) ≡ x - y
+  ω = max 0 (x - y)
+        ≡⟨ cong (flip max $ x - y) (sym χ) ⟩
+      max (limit approximateBelow approximateBelowCauchy) (x - y)
+        ≡⟨ sym π ⟩
+      limit lipschitzMapApproximation lipschitzMapApproximationCauchy
+        ≡⟨ σ ⟩
+      x - y ∎
+    where
+    χ : limit approximateBelow approximateBelowCauchy ≡ 0
+    χ = approximateBelowLimit
+
+    π : limit lipschitzMapApproximation lipschitzMapApproximationCauchy ≡
         max (limit approximateBelow approximateBelowCauchy) (x - y)
-  foo = lipschitzMapApproximationLimit
+    π = lipschitzMapApproximationLimit
 
-  bar : limit approximateBelow approximateBelowCauchy ≡ 0
-  bar = approximateBelowLimit
+    -- Almost didn't survive
+    ρ : (ε : ℚ.ℚ) (σ : 0 ℚ.< ε) →
+        lipschitzMapApproximation ε σ ≡ (x - y)
+    ρ ε σ = 
+      -- Using equational reasoning here means spelling out the type which
+      -- causes type checking to freeze indefinitely because unification gets
+      -- stuck
+      lipschitzMapApproximationDefinition'
+              ε σ ℚ.1≠0 (ℚ.0</ {ε} {1} σ ℚ.0<1 ℚ.1≠0) ∙
+      cong (flip max (x - y)) α ∙
+      β
+      where
+      α : approximateBelow (ε / 1 [ ℚ.1≠0 ]) (ℚ.0</ {ε} {1} σ ℚ.0<1 ℚ.1≠0) ≡
+           - rational ε
+      α = approximateBelow (ε / 1 [ ℚ.1≠0 ]) (ℚ.0</ {ε} {1} σ ℚ.0<1 ℚ.1≠0)
+             ≡⟨ approximateBelowDefinition (ε / 1 [ ℚ.1≠0 ])
+                                           (ℚ.0</ {ε} {1} σ ℚ.0<1 ℚ.1≠0) ⟩
+           0 - rational (ε / 1 [ ℚ.1≠0 ])
+             ≡⟨ +-unitˡ $ - rational (ε / 1 [ ℚ.1≠0 ]) ⟩
+           - rational (ε / 1 [ ℚ.1≠0 ])
+             ≡⟨ cong (λ ?x → - rational ?x) (ℚ.·IdR ε) ⟩
+           - rational ε ∎
 
-  buzz : (ε : ℚ.ℚ) (ψ : 0 ℚ.< ε) →
-         - rational ε < x - y
-  buzz ε ψ = {!!}
+      β : max (- rational ε) (x - y) ≡ x - y
+      β = <→≤ { - rational ε} {x - y} (ψ ε σ)
 
-  baz : (ε : ℚ.ℚ) (ψ : 0 ℚ.< ε) →
-        lipschitzMapApproximation ε ψ ≡
-        -- max (0 - rational (ε / 1 [ ≠-symmetric $ ℚ.<→≠ ℚ.0<1 ])) (x - y)
-        (flip max (x - y)) (approximateBelow (ε / 1 [ _ ]) _)
-  baz ε ψ = refl
-    -- max (0 - rational (ε / 1 [ ? ])) (x - y)
-    --   ≡⟨ ? ⟩
-    -- max (- rational (ε / 1 [ ? ])) (x - y)
-    --   ≡⟨ ? ⟩
-    -- x - y ∎
+    σ : limit lipschitzMapApproximation lipschitzMapApproximationCauchy ≡
+        x - y
+    σ = eventuallyConstantAt≡constant
+          1 ℚ.0<1
+          lipschitzMapApproximation lipschitzMapApproximationCauchy
+          (x - y)
+          (λ ε χ _ → ρ ε χ)
 
-  -- f : ℝ → ℝ
-  -- f = flip max (x - y)
+  ω' : 0 + y ≤ x
+  ω' = ≤-→+≤ {0} {y} {x} ω
 
-  -- ψ : Lipschitzℝ f 1 ℚ.0<1
-  -- ψ = maxLipschitz₁ (x - y)
+  ω'' : y ≤ x
+  ω'' = subst (flip _≤_ x) (+-unitˡ y) ω'
 
-  -- z : (ε : ℚ.ℚ) → 0 ℚ.< ε → ℝ
-  -- z = approximateBelow
-                       
-  -- ω : CauchyApproximation z
-  -- ω = approximateBelowCauchy
-                             
-  -- w : (ε : ℚ.ℚ) → 0 ℚ.< ε → ℝ
-  -- w = lipschitzMapApproximation f 1 ℚ.0<1 z
-                                                           
-  -- χ : Lipschitzℝ f 1 ℚ.0<1 →
-  --      (x₁ : (ε : ℚ.ℚ) → 0 ℚ.< ε → ℝ) →
-  --      CauchyApproximation x₁ →
-  --      CauchyApproximation (lipschitzMapApproximation f 1 ℚ.0<1 x₁)
-  -- χ : CauchyApproximation (lipschitzMapApproximation f 1 ℚ.0<1 z)
-  -- χ = lipschitzMapApproximationCauchy f 1 ℚ.0<1 ψ z ω -- ? w ω -- lipschitzMapApproximationCauchy f 1 ℚ.0<1 ψ z ω
-
-  -- foo : limit w χ ≡ max (limit z ω) (x - y)
-  -- foo = lipschitzMapApproximationLimit f 1 ℚ.0<1 ψ z ω
-        -- (flip max (x - y))
-        --   1 ℚ.0<1
-        --   ψ
-        --   (approximateBelow 0)
-        --   (approximateBelowCauchy 0)
-
-  -- bar : limit approximateBelow ω ≡ 0
-  -- bar = approximateBelowLimit
-
--- ≤↔¬< : (x y : ℝ) → (x ≤ y) ↔ (¬ y < x)
--- ≤↔¬< x y = ≤→¬< {x} {y} , ¬<→≤ {y} {x}
+≤↔¬< : (x y : ℝ) → (x ≤ y) ↔ (¬ y < x)
+≤↔¬< x y = ≤→¬< {x} {y} , ¬<→≤ {y} {x}

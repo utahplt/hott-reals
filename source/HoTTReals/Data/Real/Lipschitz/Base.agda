@@ -377,6 +377,28 @@ module LipschitzMapApproximation
     χ : 0 < ε / L [ φ' ]
     χ = 0</' {x = ε} {y = L} ω φ
 
+  lipschitzMapApproximationDefinition : 
+    (ε : ℚ) (ω : 0 < ε) →
+    lipschitzMapApproximation ε ω ≡
+    f (x (ε / L [ φ' ]) (0</' {x = ε} {y = L} ω φ))
+  lipschitzMapApproximationDefinition ε ω = refl
+
+  lipschitzMapApproximationDefinition' : 
+    (ε : ℚ) (ω : 0 < ε) (ω' : ¬ L ≡ 0) (ω'' : 0 < ε / L [ ω' ]) →
+    lipschitzMapApproximation ε ω ≡ f (x (ε / L [ ω' ]) ω'')
+  lipschitzMapApproximationDefinition' ε ω ω' ω'' =
+    lipschitzMapApproximationDefinition ε ω ∙
+    cong f (cong₂ x χ π)
+    where
+    χ : (ε / L [ φ' ]) ≡ (ε / L [ ω' ])
+    χ = (cong (ε / L [_]) (isProp¬ (L ≡ 0) φ' ω'))
+
+    π : PathP (λ z → 0 < (ε / L [ isProp¬ (L ≡ 0) φ' ω' z ]))
+              (0</' {ε} {L} ω φ) ω''
+    π = (isProp→PathP
+          (λ i → isProp< 0 (ε / L [ isProp¬ (L ≡ 0) φ' ω' i ]))
+          (0</' {x = ε} {y = L} ω φ) ω'')
+
   lipschitzMapApproximationCauchy :
     CauchyApproximation lipschitzMapApproximation
   lipschitzMapApproximationCauchy ε δ χ π =

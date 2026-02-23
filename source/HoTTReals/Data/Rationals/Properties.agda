@@ -11,6 +11,9 @@ open import Cubical.Relation.Nullary
 
 open import HoTTReals.Algebra.Field.Instances.Rationals as ℚ
 
+1≠0 : ¬ 1 ≡ 0
+1≠0 = Bool.toWitnessFalse {Q = discreteℚ 1 0} tt
+
 2≠0 : ¬ 2 ≡ 0
 2≠0 = Bool.toWitnessFalse {Q = discreteℚ 2 0} tt
 

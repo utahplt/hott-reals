@@ -71,3 +71,19 @@ addRightStrictMonotone {x} {y} {a} φ = ψ'
 
   ψ' : x + a < y + a
   ψ' = subst2 _<_ (+-commutative a x) (+-commutative a y) ψ
+
++<→<- : {x y z : ℝ} → x + y < z → x < z - y
++<→<- {x} {y} {z} φ = ψ'
+  where
+  ψ : (x + y) - y < z - y
+  ψ = addRightStrictMonotone {x = x + y} {a = - y} φ
+
+  ψ' : x < z - y
+  ψ' = subst (flip _<_ $ z - y) (addSubtractRightCancel x y) ψ
+
++<→<-' : {x y z : ℝ} → x + y < z → y < z - x
++<→<-' {x} {y} {z} φ =
+  +<→<- {y} {x} {z} φ'
+  where
+  φ' : y + x < z
+  φ' = subst (flip _<_ z) (+-commutative x y) φ

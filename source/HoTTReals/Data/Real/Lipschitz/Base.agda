@@ -374,7 +374,149 @@ lipschitzMapApproximation f L φ x ε ψ =
 
 lipschitzMapApproximationCauchy :
   (f : ℝ → ℝ) (L : ℚ) (φ : 0 < L) →
+  Lipschitzℝ f L φ →
   (x : (ε : ℚ) → 0 < ε → ℝ) →
   CauchyApproximation x →
   CauchyApproximation (lipschitzMapApproximation f L φ x)
-lipschitzMapApproximationCauchy f L φ x ψ ε δ ω χ = {!!}
+lipschitzMapApproximationCauchy f L φ ψ x χ ε δ ω τ =
+  σ'
+  where
+  φ' : ¬ L ≡ 0
+  φ' = ≠-symmetric $ <→≠ φ
+
+  π : Close
+        ((ε / L [ φ' ]) + (δ / L [ φ' ]))
+        (0<+' {x = ε / L [ φ' ]} {y = δ / L [ φ' ]}
+          (0</' {x = ε} {y = L} ω φ)
+          (0</' {x = δ} {y = L} τ φ))
+        (x (ε / L [ φ' ]) (0</' {x = ε} {y = L} ω φ))
+        (x (δ / L [ φ' ]) (0</' {x = δ} {y = L} τ φ))
+  π = χ (ε / L [ φ' ]) (δ / L [ φ' ])
+        (0</' {x = ε} {y = L} ω φ)
+        (0</' {x = δ} {y = L} τ φ)
+
+  ρ : L · ((ε / L [ φ' ]) + (δ / L [ φ' ])) ≡ ε + δ
+  ρ = L · ((ε / L [ φ' ]) + (δ / L [ φ' ]))
+        ≡⟨ cong (_·_ L) (sym $ ·DistR+ ε δ (L [ φ' ]⁻¹)) ⟩
+      L · ((ε + δ) · L [ φ' ]⁻¹)
+        ≡⟨ cong (_·_ L) (·Comm (ε + δ) (L [ φ' ]⁻¹)) ⟩
+      L · (L [ φ' ]⁻¹ · (ε + δ))
+        ≡⟨ ·Assoc L (L [ φ' ]⁻¹) (ε + δ) ⟩
+      (L · L [ φ' ]⁻¹) · (ε + δ)
+        ≡⟨ cong (flip _·_ (ε + δ)) (⁻¹-inverse L φ') ⟩
+      1 · (ε + δ)
+        ≡⟨ ·IdL (ε + δ) ⟩
+      ε + δ ∎
+
+  σ : Σ (0 < ε + δ)
+        (λ ξ → Close (ε + δ) ξ
+                     (f (x (ε / L [ φ' ]) (0</' {x = ε} {y = L} ω φ)))
+                     (f (x (δ / L [ φ' ]) (0</' {x = δ} {y = L} τ φ))))
+  σ = subst (λ ?x → Σ (0 < ?x)
+              (λ ξ → Close ?x ξ
+                (f (x (ε / L [ φ' ]) (0</' {x = ε} {y = L} ω φ)))
+                (f (x (δ / L [ φ' ]) (0</' {x = δ} {y = L} τ φ)))))
+            ρ
+            ((0<· {x = L} {y = (ε / L [ φ' ]) + (δ / L [ φ' ])}
+              φ
+              (0<+' {x = ε / L [ φ' ]} {y = δ / L [ φ' ]}
+                (0</' {x = ε} {y = L} ω φ)
+                (0</' {x = δ} {y = L} τ φ))) ,
+             ψ
+              (x (ε / L [ φ' ]) (0</' {x = ε} {y = L} ω φ))
+              (x (δ / L [ φ' ]) (0</' {x = δ} {y = L} τ φ))
+              ((ε / L [ φ' ]) + (δ / L [ φ' ]))
+              (0<+' {x = ε / L [ φ' ]} {y = δ / L [ φ' ]}
+                (0</' {x = ε} {y = L} ω φ)
+                (0</' {x = δ} {y = L} τ φ))
+              π)
+
+  σ' : Close (ε + δ) (0<+' {x = ε} {y = δ} ω τ)
+             (f (x (ε / L [ φ' ]) (0</' {x = ε} {y = L} ω φ)))
+             (f (x (δ / L [ φ' ]) (0</' {x = δ} {y = L} τ φ)))
+  σ' = subst (λ ?x → Close (ε + δ) ?x
+                (f (x (ε / L [ φ' ]) (0</' {x = ε} {y = L} ω φ)))
+                (f (x (δ / L [ φ' ]) (0</' {x = δ} {y = L} τ φ))))
+             (isProp< 0 (ε + δ) (fst σ) (0<+' {x = ε} {y = δ} ω τ))
+             (snd σ)
+
+lipschitzMapApproximationLimit :
+  (f : ℝ → ℝ) (L : ℚ) (φ : 0 < L) →
+  (ψ : Lipschitzℝ f L φ)
+  (x : (ε : ℚ) → 0 < ε → ℝ)
+  (ω : CauchyApproximation x) →
+  limit (lipschitzMapApproximation f L φ x)
+        (lipschitzMapApproximationCauchy f L φ ψ x ω) ≡
+  f (limit x ω)
+lipschitzMapApproximationLimit f L φ ψ x ω =
+  path _ _ χ
+  where
+  χ : (ε : ℚ) (π : 0 < ε) →
+      Close ε π
+      (limit (lipschitzMapApproximation f L φ x)
+             (lipschitzMapApproximationCauchy f L φ ψ x ω))
+      (f (limit x ω))
+  χ ε π = {!!}
+    where
+    φ' : ¬ L ≡ 0
+    φ' = ≠-symmetric $ <→≠ φ
+
+    π' : 0 < ε / 2 [ ℚ.2≠0 ]
+    π' = {!!}
+
+    π'' : 0 < ε / 4 [ ℚ.4≠0 ]
+    π'' = {!!}
+
+    ρ : Close (ε / 4 [ ℚ.4≠0 ] + ε / 4 [ ℚ.4≠0 ]) {!!}
+              (limit (lipschitzMapApproximation f L φ x)
+                     (lipschitzMapApproximationCauchy f L φ ψ x ω))
+              (f (x ((ε / 4 [ ℚ.4≠0 ]) · L [ φ' ]⁻¹) {!!}))
+    ρ = limitClose'' (lipschitzMapApproximation f L φ x)
+                     (lipschitzMapApproximationCauchy f L φ ψ x ω)
+                     (ε / 4 [ ℚ.4≠0 ]) (ε / 4 [ ℚ.4≠0 ]) π'' π''
+
+    ρ' : Σ (0 < ε / 2 [ ℚ.2≠0 ])
+           (λ ξ → Close (ε / 2 [ ℚ.2≠0 ]) ξ
+                        (limit (lipschitzMapApproximation f L φ x)
+                               (lipschitzMapApproximationCauchy f L φ ψ x ω))
+                        (f (x ((ε / 4 [ ℚ.4≠0 ]) · L [ φ' ]⁻¹) {!!})))
+    ρ' = {!!}
+
+    σ : Close (((ε / 4 [ ℚ.4≠0 ]) · L [ φ' ]⁻¹) +
+               ((ε / 4 [ ℚ.4≠0 ]) · L [ φ' ]⁻¹))
+              {!!}
+              (x ((ε / 4 [ ℚ.4≠0 ]) · L [ φ' ]⁻¹) {!!})
+              (limit x ω)
+    σ = closeLimit''
+          x ω
+          ((ε / 4 [ ℚ.4≠0 ]) · L [ φ' ]⁻¹) ((ε / 4 [ ℚ.4≠0 ]) · L [ φ' ]⁻¹)
+          {!!} {!!}
+
+    τ : Close (L · (((ε / 4 [ ℚ.4≠0 ]) · L [ φ' ]⁻¹) +
+                     ((ε / 4 [ ℚ.4≠0 ]) · L [ φ' ]⁻¹)))
+               {!!}
+               (f (x ((ε / 4 [ ℚ.4≠0 ]) · L [ φ' ]⁻¹) {!!}))
+               (f (limit x ω))
+    τ = ψ (x ((ε / 4 [ ℚ.4≠0 ]) · L [ φ' ]⁻¹) {!!}) (limit x ω)
+           {!!} {!!} σ
+
+    τ' : Σ (0 < ε / 2 [ ℚ.2≠0 ])
+           (λ ξ → Close (ε / 2 [ ℚ.2≠0 ]) ξ
+                        (f (x ((ε / 4 [ ℚ.4≠0 ]) · L [ φ' ]⁻¹) {!!}))
+                        (f (limit x ω)))
+    τ' = {!!}
+
+    υ : Close (ε / 2 [ ℚ.2≠0 ] + ε / 2 [ ℚ.2≠0 ])
+              {!!}
+              (limit (lipschitzMapApproximation f L φ x)
+                     (lipschitzMapApproximationCauchy f L φ ψ x ω))
+              (f (limit x ω))
+    υ = closeTriangleInequality
+          (limit (lipschitzMapApproximation f L φ x)
+                 (lipschitzMapApproximationCauchy f L φ ψ x ω))
+          (f (x ((ε / 4 [ ℚ.4≠0 ]) · L [ φ' ]⁻¹) {!!}))
+          (f (limit x ω))
+          (ε / 2 [ ℚ.2≠0 ]) (ε / 2 [ ℚ.2≠0 ])
+          {!!} {!!}
+          (snd ρ') (snd τ')
+

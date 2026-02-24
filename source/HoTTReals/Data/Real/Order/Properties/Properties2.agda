@@ -14,7 +14,7 @@ open import Cubical.Data.Sum as Sum
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.HLevels
 open import Cubical.Foundations.Prelude
-open import Cubical.Functions.Logic hiding (⊥; ¬_)
+open import Cubical.Functions.Logic hiding (⊥; ¬_; inl; inr)
 open import Cubical.HITs.PropositionalTruncation as PropositionalTruncation
 open import Cubical.Homotopy.Base
 open import Cubical.Relation.Binary
@@ -313,3 +313,50 @@ module ApproximateBelow
 
 ≤↔¬< : (x y : ℝ) → (x ≤ y) ↔ (¬ y < x)
 ≤↔¬< x y = ≤→¬< {x} {y} , ¬<→≤ {y} {x}
+
+magnitudePositive→positive∨negatePositive :
+  {x : ℝ} → 0 < ∣ x ∣ → (0 < x) ⊔′ (0 < - x)
+magnitudePositive→positive∨negatePositive {x} φ = χ
+  where
+  ψ : (0 < x) ⊔′ (x < ∣ x ∣)
+  ψ = <-isWeaklyLinear 0 ∣ x ∣ x φ
+
+  ω : x < ∣ x ∣ → 0 < - x
+  ω χ = φ'
+    where
+    π : ¬ 0 < x
+    π ρ = <-irreflexive x χ' 
+      where
+      σ : ∣ x ∣ ≡ x
+      σ = 0≤→∣∣≡self x (<→≤ {0} {x} ρ)
+
+      χ' : x < x
+      χ' = subst (_<_ x) σ χ
+
+    ρ : x ≤ 0
+    ρ = ¬<→≤ π
+
+    σ : ∣ x ∣ ≡ - x
+    σ = ≤0→∣∣≡negateSelf x ρ
+
+    φ' : 0 < - x
+    φ' = subst (_<_ 0) σ φ
+
+  χ : (0 < x) ⊔′ (0 < - x)
+  χ = PropositionalTruncation.map (Sum.map (idfun _) ω) ψ
+
+magnitudePositive→apartZero :
+  {x : ℝ} → 0 < ∣ x ∣ → x # 0 
+magnitudePositive→apartZero {x} =
+  PropositionalTruncation.rec (#-isProp x 0) φ ∘
+  magnitudePositive→positive∨negatePositive {x}
+  where
+  φ : (0 < x) ⊎ (0 < - x) → x # 0
+  φ (inl ψ) = inr ψ
+  φ (inr ψ) = inl ψ''
+    where
+    ψ' : - - x < 0
+    ψ' = -antitone< {0} { - x} ψ
+
+    ψ'' : x < 0
+    ψ'' = subst (flip _<_ 0) (-involutive x) ψ'

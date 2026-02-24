@@ -727,7 +727,6 @@ maxMultiplyBoundedReciprocalPositiveContinuous δ φ x ε ψ = ρ
             (max y (rational δ) · boundedReciprocalPositive δ φ y)))
   ρ = PropositionalTruncation.map2 π ω χ
 
-
 boundedReciprocalPositiveInverseₗ :
   (δ : ℚ.ℚ) (φ : 0 ℚ.< δ)
   (x : ℝ) →

@@ -1156,3 +1156,73 @@ multiplyNegateRight x y =
   - (y · x)
     ≡⟨ cong -_ (·-commutative y x) ⟩
   - (x · y) ∎
+
+·-annihilateˡ : (x : ℝ) → 0 · x ≡ 0
+·-annihilateˡ x =
+  0 · x
+    ≡⟨ cong (flip _·_ x) (sym φ) ⟩
+  (0 - 0) · x
+    ≡⟨ ·-distributesOver-+ʳ x 0 (- 0) ⟩
+  0 · x + (- 0) · x
+    ≡⟨ cong (_+_ (0 · x)) (multiplyNegateLeft 0 x) ⟩
+  0 · x - 0 · x
+    ≡⟨ +-inverseᵣ (0 · x) ⟩
+  0 ∎
+  where
+  φ : 0 - 0 ≡ 0
+  φ = refl
+
+·-annihilateʳ : (x : ℝ) → x · 0 ≡ 0
+·-annihilateʳ x =
+  let
+    -- Agda wtf
+    foo = ·-commutative x 0 ∙ ·-annihilateˡ x
+  in foo
+
+magnitudeMultiply≡multiplyMagnitude :
+  (x y : ℝ) →
+  ∣ x · y ∣ ≡ ∣ x ∣ · ∣ y ∣
+magnitudeMultiply≡multiplyMagnitude =
+  continuousExtensionLaw₂ f g f' g' H K L φ ψ ω χ
+  where
+  f : ℝ → ℝ → ℝ
+  f x y = ∣ x · y ∣
+
+  g : ℝ → ℝ → ℝ
+  g x y = ∣ x ∣ · ∣ y ∣
+
+  f' : ℚ.ℚ → ℚ.ℚ → ℚ.ℚ
+  f' q r = ℚ.∣ q ℚ.· r ∣
+
+  g' : ℚ.ℚ → ℚ.ℚ → ℚ.ℚ
+  g' q r = ℚ.∣ q ∣ ℚ.· ℚ.∣ r ∣
+
+  H : (q r : ℚ.ℚ) → f (rational q) (rational r) ≡ rational (f' q r)
+  H q r = magnitudeRational (q ℚ.· r)
+
+  K : (q r : ℚ.ℚ) → g (rational q) (rational r) ≡ rational (g' q r)
+  K q r =
+    ∣ rational q ∣ · ∣ rational r ∣
+      ≡⟨ cong₂ _·_ (magnitudeRational q) (magnitudeRational r) ⟩
+    rational ℚ.∣ q ∣ · rational ℚ.∣ r ∣
+      ≡⟨ refl ⟩
+    rational (ℚ.∣ q ∣ ℚ.· ℚ.∣ r ∣) ∎
+
+  L : (q r : ℚ.ℚ) → f' q r ≡ g' q r
+  L q r = ℚ.magnitudeMultiply≡multiplyMagnitude q r
+
+  φ : (u : ℝ) → Continuous (f u)
+  φ u = continuousCompose (_·_ u) ∣_∣
+                          (multiplyContinuous₂ u) magnitudeContinuous
+
+  ψ : (v : ℝ) → Continuous (flip f v)
+  ψ v = continuousCompose (flip _·_ v) ∣_∣
+                          (multiplyContinuous₁ v) magnitudeContinuous
+
+  ω : (u : ℝ) → Continuous (g u)
+  ω u = continuousCompose ∣_∣ (_·_ ∣ u ∣)
+                          magnitudeContinuous (multiplyContinuous₂ ∣ u ∣)
+
+  χ : (v : ℝ) → Continuous (flip g v)
+  χ v = continuousCompose ∣_∣ (flip _·_ ∣ v ∣)
+                          magnitudeContinuous (multiplyContinuous₁ ∣ v ∣)

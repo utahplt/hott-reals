@@ -480,3 +480,6 @@ rationalStrictReflective {q} {r} φ =
     ο : rational (s ℚ.+ ε) ≤ rational (q ℚ.+ ε)
     ο = rationalMonotone {q = s ℚ.+ ε} {r = q ℚ.+ ε}
                          (ℚ.≤-+o s q ε (rationalReflective {q = s} {r = q} σ))
+
+0<1 : 0 < 1
+0<1 = rationalStrictMonotone {0} {1} ℚ.0<1

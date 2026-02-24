@@ -342,6 +342,23 @@ addSubtractRightCancel x y = (x + y) - y
                                ≡⟨ +-unitʳ x ⟩
                              x ∎
 
+-- TODO: Naming inconsistent
+negateAddCancelLeft : (x y : ℝ) → (- x) + (x + y) ≡ y
+negateAddCancelLeft x y =
+  (- x) + (x + y)
+    ≡⟨ +-commutative (- x) (x + y) ⟩
+  (x + y) + (- x)
+    ≡⟨ addSubtractLeftCancel x y ⟩
+  y ∎
+
+negateAddCancelRight : (x y : ℝ) → (- y) + (x + y) ≡ x
+negateAddCancelRight x y = 
+  (- y) + (x + y)
+    ≡⟨ +-commutative (- y) (x + y) ⟩
+  (x + y) + (- y)
+    ≡⟨ addSubtractRightCancel x y ⟩
+  x ∎
+
 subtractAddRightCancel : (x y : ℝ) → (y - x) + x ≡ y
 subtractAddRightCancel x y = (y - x) + x
                                ≡⟨ +-associative y (- x) x ⟩

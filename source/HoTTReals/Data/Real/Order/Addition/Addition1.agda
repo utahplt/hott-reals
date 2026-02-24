@@ -348,3 +348,21 @@ addRightMonotone {x} {y} {a} φ =
   a + y
     ≡⟨ +-commutative a y ⟩
   y + a ∎
+
+addLeftReflective : {x y a : ℝ} → a + x ≤ a + y → x ≤ y
+addLeftReflective {x} {y} {a} φ = ψ'
+  where
+  ψ : (- a) + (a + x) ≤ (- a) + (a + y)
+  ψ = addLeftMonotone {a + x} {a + y} { - a } φ
+
+  ψ' : x ≤ y
+  ψ' = subst2 _≤_ (negateAddCancelLeft a x) (negateAddCancelLeft a y) ψ
+
+addRightReflective : {x y a : ℝ} → x + a ≤ y + a → x ≤ y
+addRightReflective {x} {y} {a} φ = ψ'
+  where
+  φ' : a + x ≤ a + y
+  φ' = subst2 _≤_ (+-commutative x a) (+-commutative y a) φ
+
+  ψ' : x ≤ y
+  ψ' = addLeftReflective {x} {y} {a} φ'

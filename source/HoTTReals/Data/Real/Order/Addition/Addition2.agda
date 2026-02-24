@@ -8,9 +8,11 @@ open import Cubical.Algebra.Group.Properties
 open import Cubical.Data.Empty as Empty
 open import Cubical.Data.Nat.Literals public
 open import Cubical.Data.Sigma
+open import Cubical.Data.Sum as Sum
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.HLevels
 open import Cubical.Foundations.Prelude
+open import Cubical.Functions.Logic hiding (⊥; ¬_)
 open import Cubical.HITs.PropositionalTruncation as PropositionalTruncation
 open import Cubical.Homotopy.Base
 open import Cubical.Relation.Binary
@@ -72,6 +74,24 @@ addRightStrictMonotone {x} {y} {a} φ = ψ'
   ψ' : x + a < y + a
   ψ' = subst2 _<_ (+-commutative a x) (+-commutative a y) ψ
 
+addLeftStrictReflective : {x y a : ℝ} → a + x < a + y → x < y
+addLeftStrictReflective {x} {y} {a} φ = ψ'
+  where
+  ψ : (- a) + (a + x) < (- a) + (a + y)
+  ψ = addLeftStrictMonotone {a + x} {a + y} { - a } φ
+
+  ψ' : x < y
+  ψ' = subst2 _<_ (negateAddCancelLeft a x) (negateAddCancelLeft a y) ψ
+
+addRightStrictReflective : {x y a : ℝ} → x + a < y + a → x < y
+addRightStrictReflective {x} {y} {a} φ = ψ'
+  where
+  φ' : a + x < a + y
+  φ' = subst2 _<_ (+-commutative x a) (+-commutative y a) φ
+
+  ψ' : x < y
+  ψ' = addLeftStrictReflective {x} {y} {a} φ'
+
 +<→<- : {x y z : ℝ} → x + y < z → x < z - y
 +<→<- {x} {y} {z} φ = ψ'
   where
@@ -87,3 +107,23 @@ addRightStrictMonotone {x} {y} {a} φ = ψ'
   where
   φ' : y + x < z
   φ' = subst (flip _<_ z) (+-commutative x y) φ
+
+addPositive→leftPositive∨rightPositive :
+  {x y : ℝ} →
+  0 < x + y → (0 < x) ⊔′ (0 < y)
+addPositive→leftPositive∨rightPositive {x} {y} φ = χ
+  where
+  ψ : (0 < x) ⊔′ (x < x + y)
+  ψ = <-isWeaklyLinear 0 (x + y) x φ
+
+  ω : x < x + y → 0 < y
+  ω χ = π
+    where
+    χ' : x + 0 < x + y
+    χ' = subst (flip _<_ $ x + y) (sym $ +-unitʳ x) χ
+
+    π : 0 < y
+    π = addLeftStrictReflective {0} {y} {x} χ'
+
+  χ : (0 < x) ⊔′ (0 < y)
+  χ = PropositionalTruncation.map (Sum.map (idfun _) ω) ψ

@@ -422,3 +422,24 @@ recursion∼ α@(fRational , fLimit , φ , ψ , θ , ω , χ , π)
                (recursion∼ α ζ)
                (recursion∼ α ζ')
                i
+
+recursionComputationRuleRational :
+  {i j : Level}
+  {A : Type i} →
+  {B : (a b : A) → (ε : ℚ) → 0 < ε → Type j} →
+  (α : Recursion A B)
+  (q : ℚ) →
+  recursion α (rational q) ≡ (fst α) q
+recursionComputationRuleRational α q = refl
+
+recursionComputationRuleLimit :
+  {i j : Level}
+  {A : Type i} →
+  {B : (a b : A) → (ε : ℚ) → 0 < ε → Type j} →
+  (α : Recursion A B)
+  (x : (ε : ℚ) → 0 < ε → ℝ)
+  (φ : CauchyApproximation x) →
+  recursion α (limit x φ) ≡ fst (snd α) x φ
+                              (λ ε ψ → recursion α (x ε ψ))
+                              (λ ε δ ψ θ → recursion∼ α (φ ε δ ψ θ))
+recursionComputationRuleLimit α x φ = refl

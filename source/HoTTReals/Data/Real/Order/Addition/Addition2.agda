@@ -43,6 +43,7 @@ open import HoTTReals.Logic
 addLeftStrictMonotone : {x y a : ℝ} → x < y → a + x < a + y
 addLeftStrictMonotone {x} {y} {a} φ = χ
   where
+  ψ : ∃ ℚ.ℚ (λ ε → (0 ℚ.< ε) × (x + rational ε ≤ y))
   ψ = <→∃+ε≤ {x = x} {y = y} φ
 
   ω : (ε : ℚ.ℚ) →

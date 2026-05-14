@@ -1,5 +1,28 @@
 {
   "nodes": {
+    "agda-mcp": {
+      "inputs": {
+        "flake-utils": [
+          "flake-utils"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1778727821,
+        "narHash": "sha256-0uggoa+B1FqsZ3EJhAzFLQsNRwmmcdjEPrp3jw8dA9k=",
+        "owner": "broughjt",
+        "repo": "agda-mcp",
+        "rev": "715254deda7f82a002fa2ee4ad7c3bc8e3fb4fe2",
+        "type": "github"
+      },
+      "original": {
+        "owner": "broughjt",
+        "repo": "agda-mcp",
+        "type": "github"
+      }
+    },
     "flake-utils": {
       "inputs": {
         "systems": "systems"
@@ -36,6 +59,7 @@
     },
     "root": {
       "inputs": {
+        "agda-mcp": "agda-mcp",
         "flake-utils": "flake-utils",
         "nixpkgs": "nixpkgs"
       }

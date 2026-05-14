@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "agda-mcp": {
+      "command": "agda-mcp"
+    }
+  }
+}

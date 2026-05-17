@@ -129,6 +129,7 @@ open import HoTTReals.Logic
 -≤→≤+' : {x y z : ℝ} → x - y ≤ z → x ≤ y + z
 -≤→≤+' {x} {y} {z} φ = subst (x ≤_) (+-commutative z y) (-≤→≤+ {x} {y} {z} φ)
 
+-- Gilbert Lemma 4.2
 close→≤+ε :
   {x y : ℝ} {ε : ℚ.ℚ} (φ : 0 ℚ.< ε) →
   x ∼[ ε , φ ] y →

@@ -270,6 +270,7 @@ rationalStrictReflective {q} {r} φ =
   ψ' : max x y ≡ y
   ψ' = cong (flip max y) φ ∙ ψ
 
+-- HoTT Lemma 11.3.42
 ≤rational→close→≤rational+ε :
   {q : ℚ.ℚ} {x y : ℝ} {ε : ℚ.ℚ}
   (φ : 0 ℚ.< ε) →

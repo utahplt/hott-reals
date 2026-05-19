@@ -12,11 +12,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1779134762,
-        "narHash": "sha256-QG2Bwj3418DgDCOaUvs74Erib8Uq3kZFarBmjH9x7AM=",
+        "lastModified": 1779154058,
+        "narHash": "sha256-4oxyU7v/wBbQFsbtU1/50rLj0jMFOiJNd5t0NN7SBxs=",
         "owner": "broughjt",
         "repo": "agda-mcp",
-        "rev": "7199399586bc781bba4f5f897061621312b6e5d6",
+        "rev": "5a1b48e0dedbe80261dbb63ecb4c75eef54dff2a",
         "type": "github"
       },
       "original": {

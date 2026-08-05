@@ -1,0 +1,3 @@
+[mcp_servers."agda-mcp"]
+command = "nix"
+args = ["run", ".#agda-mcp"]

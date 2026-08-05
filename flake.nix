@@ -18,12 +18,15 @@
           pkgs = nixpkgs.legacyPackages.${system};
           libraries = [ pkgs.agdaPackages.cubical ];
           agda = pkgs.agda.withPackages libraries;
+          agda-mcp' = agda-mcp.packages.${system}.default.withPackages libraries;
         in
           {
+            packages.agda-mcp = agda-mcp';
+
             devShells.default = pkgs.mkShell {
               buildInputs = [
                 agda
-                (agda-mcp.packages.${system}.default.withPackages libraries)
+                agda-mcp'
               ];
             };
           }

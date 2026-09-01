@@ -26,17 +26,17 @@
     "cubical": {
       "flake": false,
       "locked": {
-        "lastModified": 1788289984,
-        "narHash": "sha256-MxMCj5qvBcbC3y4Mc6/Qs812MveSmhF4nH7NcY0HBlE=",
+        "lastModified": 1788300926,
+        "narHash": "sha256-UuQ2i8MzXe9C5j5/LfVBNuvE0a/5L3acEPE3ZHPoqTE=",
         "owner": "broughjt",
         "repo": "cubical",
-        "rev": "8d4867d7dfa50ac25092275a0df98f0a420f9cab",
+        "rev": "da4178930c94e0cbc6124d5547db8ff1758e4d09",
         "type": "github"
       },
       "original": {
         "owner": "broughjt",
         "repo": "cubical",
-        "rev": "8d4867d7dfa50ac25092275a0df98f0a420f9cab",
+        "rev": "da4178930c94e0cbc6124d5547db8ff1758e4d09",
         "type": "github"
       }
     },

@@ -2,20 +2,20 @@ module HoTTReals.Data.Rationals.Order where
 
 import Cubical.Data.Bool as Bool
 open import Cubical.Data.Empty as Empty using (⊥)
-open import Cubical.Data.Int.Base as ℤ using (ℤ)
-open import Cubical.Data.Int.Order as ℤ using ()
-open import Cubical.Data.Int.Properties as ℤ using ()
+open import Cubical.Data.Fast.Int.Base as ℤ using (ℤ)
+open import Cubical.Data.Fast.Int.Order as ℤ using ()
+open import Cubical.Data.Fast.Int.Properties as ℤ using ()
 open import Cubical.Data.Nat as ℕ using (ℕ ; zero ; suc)
 open import Cubical.Data.NatPlusOne
-open import Cubical.Data.Rationals as ℚ hiding (_∼_)
-open import Cubical.Data.Rationals.Order as ℚ
+open import HoTTReals.Data.Rationals as ℚ hiding (_∼_)
+open import HoTTReals.Data.Rationals.Order.Base as ℚ
 open import Cubical.Data.Sigma
 open import Cubical.Data.Sum
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.HLevels
 open import Cubical.Foundations.Prelude
 open import Cubical.HITs.PropositionalTruncation as PropositionalTruncation
-open import Cubical.HITs.SetQuotients as SetQuotients using ()
+open import HoTTReals.HITs.SetQuotients as SetQuotients using ()
 open import Cubical.Homotopy.Base
 open import Cubical.Relation.Binary.Order
 open import Cubical.Relation.Nullary
@@ -83,7 +83,10 @@ open import HoTTReals.Data.Rationals.Properties
   r = ≤Monotone+ 0 x 0 y p q
 
 0<· : {x y : ℚ} → 0 < x → 0 < y → 0 < x · y
-0<· {x} {y} p q = subst (λ ?x → ?x < x · y) (·AnnihilL y) r
+-- recompute< keeps the witness in canonical form: without it the proof gets
+-- stuck under the transp introduced by subst, and two proofs of the same
+-- positivity fact no longer agree definitionally.
+0<· {x} {y} p q = recompute< (subst (λ ?x → ?x < x · y) (·AnnihilL y) r)
   where
   r : 0 · y < x · y
   r = <-·o 0 x y q p
@@ -97,10 +100,10 @@ open import HoTTReals.Data.Rationals.Properties
   p x y = isProp→ (isProp≤ (- y) (- x))
 
   q : (u v : ℤ × ℕ₊₁) → [ u ] ≤ [ v ] → (- [ v ]) ≤ (- [ u ])
-  q (a , b) (c , d) p = t
+  q (a , b) (c , d) p = inj t
     where
     r : ℤ.- (c ℤ.· (ℕ₊₁→ℤ b)) ℤ.≤ ℤ.- (a ℤ.· (ℕ₊₁→ℤ d))
-    r = ℤ.-Dist≤ p
+    r = ℤ.-Dist≤ (_≤_.prf p)
 
     s : (c : ℤ) (b : ℕ₊₁) →
         ((-1) ℤ.· c) ℤ.· ℕ₊₁→ℤ (1 ·₊₁ b) ≡ ℤ.- (c ℤ.· (ℕ₊₁→ℤ b))
@@ -108,7 +111,7 @@ open import HoTTReals.Data.Rationals.Properties
       ((-1) ℤ.· c) ℤ.· ℕ₊₁→ℤ (1 ·₊₁ b)
         ≡⟨ cong (λ ?x → (-1 ℤ.· c) ℤ.· ℕ₊₁→ℤ ?x) (·₊₁-identityˡ b) ⟩
       ((-1) ℤ.· c) ℤ.· ℕ₊₁→ℤ b
-        ≡⟨ refl ⟩
+        ≡⟨ cong (ℤ._· ℕ₊₁→ℤ b) (ℤ.-1·x≡-x c) ⟩
       (ℤ.- c) ℤ.· ℕ₊₁→ℤ b
         ≡⟨ sym $ ℤ.-DistL· c (ℕ₊₁→ℤ b) ⟩
       ℤ.- (c ℤ.· (ℕ₊₁→ℤ b)) ∎
@@ -124,10 +127,10 @@ open import HoTTReals.Data.Rationals.Properties
   p x y = isProp→ (isProp< (- y) (- x))
 
   q : (u v : ℤ × ℕ₊₁) → [ u ] < [ v ] → (- [ v ]) < (- [ u ])
-  q (a , b) (c , d) p = t
+  q (a , b) (c , d) p = inj t
     where
     r : ℤ.- (c ℤ.· (ℕ₊₁→ℤ b)) ℤ.< ℤ.- (a ℤ.· (ℕ₊₁→ℤ d))
-    r = ℤ.-Dist< p
+    r = ℤ.-Dist< (_<_.prf p)
 
     -- TODO: Copypasta from above
     s : (c : ℤ) (b : ℕ₊₁) →
@@ -136,7 +139,7 @@ open import HoTTReals.Data.Rationals.Properties
       ((-1) ℤ.· c) ℤ.· ℕ₊₁→ℤ (1 ·₊₁ b)
         ≡⟨ cong (λ ?x → (-1 ℤ.· c) ℤ.· ℕ₊₁→ℤ ?x) (·₊₁-identityˡ b) ⟩
       ((-1) ℤ.· c) ℤ.· ℕ₊₁→ℤ b
-        ≡⟨ refl ⟩
+        ≡⟨ cong (ℤ._· ℕ₊₁→ℤ b) (ℤ.-1·x≡-x c) ⟩
       (ℤ.- c) ℤ.· ℕ₊₁→ℤ b
         ≡⟨ sym $ ℤ.-DistL· c (ℕ₊₁→ℤ b) ⟩
       ℤ.- (c ℤ.· (ℕ₊₁→ℤ b)) ∎
@@ -159,37 +162,27 @@ open import HoTTReals.Data.Rationals.Properties
   q (ℤ.pos zero , (1+ m)) p p' = Empty.rec (isIrrefl< 0 s)
     where
     r : 0 ℤ.· (ℕ₊₁→ℤ (1+ m)) ℤ.< 0 ℤ.· 1
-    r = p
+    r = _<_.prf p
 
     s : 0 < 0
-    -- TODO: Why are annihilator laws not working?
-    s = subst2 ℤ._≤_ refl refl r
-  q (ℤ.pos (suc n) , (1+ m)) p p' = s
+    s = inj r
+  q (ℤ.pos (suc n) , (1+ m)) p p' = inj s
     where
     r : 0 ℤ.< ℕ₊₁→ℤ (1+ m)
-    r = m , s
-      where
-      s : (ℤ.sucℤ 0) ℤ.+pos m ≡ ℕ₊₁→ℤ (1+ m)
-      s = (ℤ.sucℤ 0) ℤ.+pos m
-            ≡⟨ refl ⟩
-          1 ℤ.+ (ℤ.pos m)
-            ≡⟨ ℤ.+Comm 1 (ℤ.pos m) ⟩
-          (ℤ.pos m) ℤ.+ 1
-            ≡⟨ refl ⟩
-          ℕ₊₁→ℤ (1+ m) ∎
+    r = ℤ.zero-<possuc
 
     s : 0 ℤ.· (ℤ.pos (suc n)) ℤ.< (ℕ₊₁→ℤ (1+ m)) ℤ.· 1
     s = subst2 (λ ?x ?y → ?x ℤ.< ?y)
                (sym (ℤ.·AnnihilL (ℤ.pos (suc n))))
                (sym (ℤ.·IdR (ℕ₊₁→ℤ (1+ m))))
                r
-  q (ℤ.negsuc n , (1+ m)) p = Empty.rec (ℤ.¬pos≤negsuc r)
+  q (ℤ.negsuc n , (1+ m)) p = Empty.rec (ℤ.¬pos<negsuc r)
     where
     p' : 0 ℤ.· (ℤ.pos (suc m)) ℤ.< ℤ.negsuc n ℤ.· 1
-    p' = p
+    p' = _<_.prf p
 
-    r : ℤ.pos (suc 0) ℤ.≤ ℤ.negsuc n
-    r = subst2 ℤ._≤_ refl (ℤ.·IdR (ℤ.negsuc n)) p' 
+    r : 0 ℤ.< ℤ.negsuc n
+    r = subst (0 ℤ.<_) (ℤ.·IdR (ℤ.negsuc n)) p'
 
 0<⁻¹' : {x : ℚ} (p : 0 < x) → 0 < x [ ≠-symmetric (<→≠ p) ]⁻¹
 0<⁻¹' {x} p = 0<⁻¹ {x} p (≠-symmetric $ <→≠ p)

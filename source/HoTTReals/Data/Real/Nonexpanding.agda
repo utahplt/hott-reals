@@ -1,8 +1,8 @@
 module HoTTReals.Data.Real.Nonexpanding where
 
 import Cubical.Data.Bool as Bool
-open import Cubical.Data.Rationals as ℚ
-open import Cubical.Data.Rationals.Order as ℚ
+open import HoTTReals.Data.Rationals as ℚ
+open import HoTTReals.Data.Rationals.Order.Base as ℚ
 open import Cubical.Data.Sigma
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.HLevels

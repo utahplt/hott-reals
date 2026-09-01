@@ -4,16 +4,16 @@ open import Cubical.Algebra.CommRing
 open import Cubical.Algebra.Field
 open import Cubical.Algebra.Ring
 open import Cubical.Data.Empty as Empty using (rec)
-open import Cubical.Data.Int.Base as ℤ using (ℤ)
-open import Cubical.Data.Int.Properties as ℤ
+open import Cubical.Data.Fast.Int.Base as ℤ using (ℤ)
+open import Cubical.Data.Fast.Int.Properties as ℤ
 open import Cubical.Data.Nat as ℕ using (ℕ ; zero ; suc)
 open import Cubical.Data.NatPlusOne
-open import Cubical.Data.Rationals as ℚ
+open import HoTTReals.Data.Rationals as ℚ
 open import Cubical.Data.Sigma
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.HLevels
 open import Cubical.Foundations.Prelude
-open import Cubical.HITs.SetQuotients as SetQuotients
+open import HoTTReals.HITs.SetQuotients as SetQuotients
 open import Cubical.Relation.Nullary
 
 numeratorZero→rationalZero : (u : ℤ × ℕ₊₁) → u .fst ≡ 0 → [ u ] ≡ 0

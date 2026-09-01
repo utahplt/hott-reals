@@ -1,8 +1,8 @@
 module HoTTReals.Data.Real.Close.ReflexiveSymmetric where
 
 import Cubical.Data.Bool as Bool
-open import Cubical.Data.Rationals as ℚ
-open import Cubical.Data.Rationals.Order as ℚ
+open import HoTTReals.Data.Rationals as ℚ
+open import HoTTReals.Data.Rationals.Order.Base as ℚ
 open import Cubical.Foundations.Equiv
 open import Cubical.Foundations.HLevels
 open import Cubical.Foundations.Prelude

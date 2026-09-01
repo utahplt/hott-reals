@@ -1,8 +1,8 @@
 module HoTTReals.Data.Real.Order.Properties.Properties2 where
 
 import Cubical.Data.Bool as Bool
-import Cubical.Data.Rationals as ℚ
-import Cubical.Data.Rationals.Order as ℚ
+import HoTTReals.Data.Rationals as ℚ
+import HoTTReals.Data.Rationals.Order.Base as ℚ
 open import Cubical.Algebra.AbGroup.Base
 open import Cubical.Algebra.Group.Base
 open import Cubical.Algebra.Group.Properties

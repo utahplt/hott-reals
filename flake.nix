@@ -5,7 +5,7 @@
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
     cubical = {
-      url = "github:broughjt/cubical/8d4867d7dfa50ac25092275a0df98f0a420f9cab";
+      url = "github:broughjt/cubical/da4178930c94e0cbc6124d5547db8ff1758e4d09";
       flake = false;
     };
     agda-mcp = {
@@ -21,7 +21,7 @@
         let
           pkgs = nixpkgs.legacyPackages.${system};
           cubical' = pkgs.agdaPackages.cubical.overrideAttrs (_: {
-            version = "beans-8d4867d7";
+            version = "beans-da417893";
             src = cubical;
           });
           libraries = [ cubical' ];

@@ -7,15 +7,15 @@ open import Cubical.Data.Fast.Int.Order as ℤ using ()
 open import Cubical.Data.Fast.Int.Properties as ℤ using ()
 open import Cubical.Data.Nat as ℕ using (ℕ ; zero ; suc)
 open import Cubical.Data.NatPlusOne
-open import HoTTReals.Data.Rationals as ℚ hiding (_∼_)
-open import HoTTReals.Data.Rationals.Order.Base as ℚ
+open import Cubical.Data.Rationals as ℚ hiding (_∼_)
+open import Cubical.Data.Rationals.Order as ℚ
 open import Cubical.Data.Sigma
 open import Cubical.Data.Sum
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.HLevels
 open import Cubical.Foundations.Prelude
 open import Cubical.HITs.PropositionalTruncation as PropositionalTruncation
-open import HoTTReals.HITs.SetQuotients as SetQuotients using ()
+open import Cubical.HITs.SetQuotients as SetQuotients using ()
 open import Cubical.Homotopy.Base
 open import Cubical.Relation.Binary.Order
 open import Cubical.Relation.Nullary

@@ -1,7 +1,7 @@
 module HoTTReals.Data.Real.Lipschitz.Closed where
 
-import HoTTReals.Data.Rationals as ℚ
-import HoTTReals.Data.Rationals.Order.Base as ℚ
+import Cubical.Data.Rationals as ℚ
+import Cubical.Data.Rationals.Order as ℚ
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.Prelude
 open import Cubical.Relation.Nullary

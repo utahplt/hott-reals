@@ -1,8 +1,8 @@
 module HoTTReals.Data.Real.Properties where
 
 import Cubical.Data.Bool as Bool
-open import HoTTReals.Data.Rationals as ℚ hiding (_∼_)
-open import HoTTReals.Data.Rationals.Order.Base as ℚ
+open import Cubical.Data.Rationals as ℚ hiding (_∼_)
+open import Cubical.Data.Rationals.Order as ℚ
 open import Cubical.Data.Sigma
 open import Cubical.Foundations.Equiv
 open import Cubical.Foundations.Function

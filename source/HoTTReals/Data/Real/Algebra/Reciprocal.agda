@@ -1,7 +1,7 @@
 module HoTTReals.Data.Real.Algebra.Reciprocal where
 
-import HoTTReals.Data.Rationals as ℚ
-import HoTTReals.Data.Rationals.Order.Base as ℚ
+import Cubical.Data.Rationals as ℚ
+import Cubical.Data.Rationals.Order as ℚ
 open import Cubical.Data.Nat.Literals public
 open import Cubical.Algebra.Ring.Properties
 open import Cubical.Data.Sigma

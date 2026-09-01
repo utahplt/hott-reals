@@ -3,7 +3,7 @@ module HoTTReals.Data.Rationals.Properties where
 open import Cubical.Algebra.CommRing
 open import Cubical.Algebra.Field.Base
 open import Cubical.Data.Bool as Bool using ()
-open import HoTTReals.Data.Rationals as ℚ
+open import Cubical.Data.Rationals as ℚ
 open import Cubical.Data.Sigma
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.Prelude

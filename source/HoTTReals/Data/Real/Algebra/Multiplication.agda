@@ -1,7 +1,7 @@
 module HoTTReals.Data.Real.Algebra.Multiplication where
 
-import HoTTReals.Data.Rationals as ℚ
-import HoTTReals.Data.Rationals.Order.Base as ℚ
+import Cubical.Data.Rationals as ℚ
+import Cubical.Data.Rationals.Order as ℚ
 open import Cubical.Algebra.CommRing.Base
 open import Cubical.Algebra.Ring.Base
 open import Cubical.Data.Nat.Literals public

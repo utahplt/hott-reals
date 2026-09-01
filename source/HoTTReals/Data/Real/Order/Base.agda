@@ -1,7 +1,7 @@
 module HoTTReals.Data.Real.Order.Base where
 
-import HoTTReals.Data.Rationals as ℚ
-import HoTTReals.Data.Rationals.Order.Base as ℚ
+import Cubical.Data.Rationals as ℚ
+import Cubical.Data.Rationals.Order as ℚ
 open import Cubical.Data.Empty as Empty
 open import Cubical.Data.Nat.Literals public
 open import Cubical.Data.Sigma

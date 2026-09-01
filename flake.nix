@@ -4,6 +4,10 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
+    cubical = {
+      url = "github:agda/cubical/6e6df4e74d4b03205c942c1574c6fea0b2cc213e";
+      flake = false;
+    };
     agda-mcp = {
       url = "github:broughjt/agda-mcp";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -11,12 +15,16 @@
     };
   };
 
-  outputs = { self, nixpkgs, flake-utils, agda-mcp }:
+  outputs = { self, nixpkgs, flake-utils, cubical, agda-mcp }:
     flake-utils.lib.eachDefaultSystem
       (system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
-          libraries = [ pkgs.agdaPackages.cubical ];
+          cubical' = pkgs.agdaPackages.cubical.overrideAttrs (_: {
+            version = "master-6e6df4e7";
+            src = cubical;
+          });
+          libraries = [ cubical' ];
           agda = pkgs.agda.withPackages libraries;
           agda-mcp' = agda-mcp.packages.${system}.default.withPackages libraries;
         in

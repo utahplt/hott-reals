@@ -9,7 +9,7 @@
       flake = false;
     };
     agda-mcp = {
-      url = "github:broughjt/agda-mcp";
+      url = "github:broughjt/agda-mcp/cli-daemon";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
@@ -26,15 +26,15 @@
           });
           libraries = [ cubical' ];
           agda = pkgs.agda.withPackages libraries;
-          agda-mcp' = agda-mcp.packages.${system}.default.withPackages libraries;
+          agda-interact' = agda-mcp.packages.${system}.agda-interact.withPackages libraries;
         in
           {
-            packages.agda-mcp = agda-mcp';
+            packages.agda-interact = agda-interact';
 
             devShells.default = pkgs.mkShell {
               buildInputs = [
                 agda
-                agda-mcp'
+                agda-interact'
               ];
             };
           }

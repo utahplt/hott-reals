@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "agda-mcp": {
-      "command": "nix",
-      "args": ["run", ".#agda-mcp"]
-    }
-  }
-}

@@ -10,15 +10,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1785906088,
-        "narHash": "sha256-noKxg9bVS0RZdmSErPX98wMkx7qxPyIXHs2PUn0Kyjs=",
+        "lastModified": 1788366386,
+        "narHash": "sha256-RKTEa0g7ifl+EZ3iT0yphRZPnBBRiLbUi8v2N3EXIu8=",
         "owner": "broughjt",
         "repo": "agda-mcp",
-        "rev": "a1c63190a8fc999b155e1daf45df6d2289c32436",
+        "rev": "00d180aacd55c93b885a4498373bd7b38ded5740",
         "type": "github"
       },
       "original": {
         "owner": "broughjt",
+        "ref": "cli-daemon",
         "repo": "agda-mcp",
         "type": "github"
       }

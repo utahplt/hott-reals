@@ -23,11 +23,11 @@ module _
   (X : PremetricSpace ℓX ℓX') where
 
   uncurryIsLipschitzWith
-    : (h : ⟨ M ⟩ → ⟨ N ⟩ → ⟨ X ⟩) (N₁ N₂ : ℚ₊)
-    → (∀ y → IsLipschitzWith (snd M) (flip h y) (snd X) N₁)
-    → (∀ x → IsLipschitzWith (snd N) (h x)      (snd X) N₂)
-    → IsLipschitzWith (snd (M ×PrSp N)) (uncurry h) (snd X) (N₁ +₊ N₂)
-  uncurryIsLipschitzWith h N₁ N₂ leftLipschitz rightLipschitz = {!!}
+    : (h : ⟨ M ⟩ → ⟨ N ⟩ → ⟨ X ⟩) (L₁ L₂ : ℚ₊)
+    → ((y : ⟨ N ⟩) → IsLipschitzWith (snd M) (flip h y) (snd X) L₁)
+    → ((x : ⟨ M ⟩) → IsLipschitzWith (snd N) (h x)      (snd X) L₂)
+    → IsLipschitzWith (snd (M ×PrSp N)) (uncurry h) (snd X) (L₁ +₊ L₂)
+  uncurryIsLipschitzWith h L₁ L₂ leftLipschitz rightLipschitz = {!!}
 
   uncurryNE₂ : NE₂[ M , N , X ] → L[ M ×PrSp N , X ]
   uncurryNE₂ f = {!!}

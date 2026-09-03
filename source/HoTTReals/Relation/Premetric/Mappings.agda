@@ -17,6 +17,18 @@ private
   variable
     ℓM ℓM' ℓN ℓN' ℓO ℓO' : Level
 
+module _ {M : PremetricSpace ℓM ℓM'} {N : PremetricSpace ℓN ℓN'} where
+  private
+    module PN where
+      open PremetricStr (snd N) public
+
+  constⁿ : ⟨ N ⟩ → NE[ M , N ]
+  fst (constⁿ y) = const y
+  IsNonExpansive.pres≈ (snd (constⁿ y)) _ _ ε _ = PN.isRefl≈ y ε
+
+  constᶜ : ⟨ N ⟩ → C[ M , N ]
+  constᶜ = NE→C ∘ constⁿ
+
 module _
   {M : PremetricSpace ℓM ℓM'}
   {N : PremetricSpace ℓN ℓN'}

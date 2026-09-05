@@ -44,14 +44,14 @@ module _ (R' : OrderedCommRing ℓ ℓ') where
     -⊔ : (x y : R) → - (x ⊔ y) ≡ (- x) ⊓ (- y)
     -⊔ = {!!}
 
-    absΔ⊔≤R : (x y z : R) → abs ((x ⊔ z) - (y ⊔ z)) ≤ abs (x - y)
-    absΔ⊔≤R = {!!}
-
-    absΔ⊔≤L : (x y z : R) → abs ((x ⊔ y) - (x ⊔ z)) ≤ abs (y - z)
-    absΔ⊔≤L = {!!}
-
     absΔ⊓≤R : (x y z : R) → abs ((x ⊓ z) - (y ⊓ z)) ≤ abs (x - y)
     absΔ⊓≤R = {!!}
 
     absΔ⊓≤L : (x y z : R) → abs ((x ⊓ y) - (x ⊓ z)) ≤ abs (y - z)
     absΔ⊓≤L = {!!}
+
+    absΔ⊔≤R : (x y z : R) → abs ((x ⊔ z) - (y ⊔ z)) ≤ abs (x - y)
+    absΔ⊔≤R = {!!}
+
+    absΔ⊔≤L : (x y z : R) → abs ((x ⊔ y) - (x ⊔ z)) ≤ abs (y - z)
+    absΔ⊔≤L = {!!}

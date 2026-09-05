@@ -6,6 +6,8 @@ open import Cubical.Algebra.OrderedCommRing.Base
 import Cubical.Algebra.OrderedCommRing.Properties as OrderedCommRingProperties
 
 open import Cubical.Relation.Binary.Order.Pseudolattice.Base
+open import Cubical.Relation.Binary.Order.Pseudolattice.Properties
+  using (DualPseudolattice)
 
 private
   variable
@@ -30,6 +32,17 @@ module _ (R' : OrderedCommRing ℓ ℓ') where
 
     +DistL⊔ : (x y z : R) → (x ⊔ y) + z ≡ (x + z) ⊔ (y + z)
     +DistL⊔ = {!!}
+
+    -PseudolatticeEquiv : PseudolatticeEquiv R≤ (DualPseudolattice R≤)
+    fst (fst -PseudolatticeEquiv) = -_
+    snd (fst -PseudolatticeEquiv) = {!!}
+    snd -PseudolatticeEquiv = {!!}
+
+    -⊓ : (x y : R) → - (x ⊓ y) ≡ (- x) ⊔ (- y)
+    -⊓ = {!!}
+
+    -⊔ : (x y : R) → - (x ⊔ y) ≡ (- x) ⊓ (- y)
+    -⊔ = {!!}
 
     absΔ⊔≤R : (x y z : R) → abs ((x ⊔ z) - (y ⊔ z)) ≤ abs (x - y)
     absΔ⊔≤R = {!!}

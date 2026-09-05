@@ -34,6 +34,12 @@ module PseudolatticeTheory (L≤ : Pseudolattice ℓ ℓ') where
   open MeetProperties L≤ public
   open JoinProperties L≤ public
 
+DualPseudolatticeEquiv :
+  {L≤ : Pseudolattice ℓ ℓ'} {M≤ : Pseudolattice ℓ'' ℓ'''} →
+  PseudolatticeEquiv L≤ M≤ →
+  PseudolatticeEquiv (DualPseudolattice L≤) (DualPseudolattice M≤)
+DualPseudolatticeEquiv e = {!!}
+
 module _
   {L≤ : Pseudolattice ℓ ℓ'} {M≤ : Pseudolattice ℓ'' ℓ'''}
   (e : PseudolatticeEquiv L≤ M≤)

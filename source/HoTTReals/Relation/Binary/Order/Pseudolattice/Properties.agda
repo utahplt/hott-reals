@@ -1,6 +1,8 @@
 module HoTTReals.Relation.Binary.Order.Pseudolattice.Properties where
 
 open import Cubical.Foundations.Prelude
+open import Cubical.Foundations.Equiv
+open import Cubical.Foundations.Structure
 
 open import Cubical.Relation.Binary.Order.Pseudolattice.Base
 open import Cubical.Relation.Binary.Order.Pseudolattice.Properties
@@ -8,7 +10,7 @@ open import Cubical.Relation.Binary.Order.Pseudolattice.Properties
 
 private
   variable
-    ℓ ℓ' : Level
+    ℓ ℓ' ℓ'' ℓ''' : Level
 
 module MeetProperties (L≤ : Pseudolattice ℓ ℓ') where
   private
@@ -31,3 +33,18 @@ module JoinProperties (L≤ : Pseudolattice ℓ ℓ') where
 module PseudolatticeTheory (L≤ : Pseudolattice ℓ ℓ') where
   open MeetProperties L≤ public
   open JoinProperties L≤ public
+
+module _
+  {L≤ : Pseudolattice ℓ ℓ'} {M≤ : Pseudolattice ℓ'' ℓ'''}
+  (e : PseudolatticeEquiv L≤ M≤)
+  where
+  private
+    module L = PseudolatticeStr (L≤ .snd)
+    module M = PseudolatticeStr (M≤ .snd)
+    f = equivFun (e .fst)
+
+  pres∧ : (a b : ⟨ L≤ ⟩) → f (a L.∧l b) ≡ f a M.∧l f b
+  pres∧ = {!!}
+
+  pres∨ : (a b : ⟨ L≤ ⟩) → f (a L.∨l b) ≡ f a M.∨l f b
+  pres∨ = {!!}

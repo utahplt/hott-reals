@@ -23,8 +23,8 @@ module _ (R' : OrderedCommRing ℓ ℓ') where
     snd (fst (+PseudolatticeEquivR z)) = {!!}
     snd (+PseudolatticeEquivR z) = {!!}
 
-    +DistL⊔ : (x y z : R) → (x ⊔ y) + z ≡ (x + z) ⊔ (y + z)
-    +DistL⊔ = {!!}
-
     +DistL⊓ : (x y z : R) → (x ⊓ y) + z ≡ (x + z) ⊓ (y + z)
     +DistL⊓ = {!!}
+
+    +DistL⊔ : (x y z : R) → (x ⊔ y) + z ≡ (x + z) ⊔ (y + z)
+    +DistL⊔ = {!!}

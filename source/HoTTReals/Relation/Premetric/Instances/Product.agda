@@ -40,22 +40,22 @@ module _
     (x , y) (x' , y') ε (x≈x' , y≈y') =
     PX.subst≈ (h x y) (h x' y') (sym (ℚ.·DistR+ ⟨ L₁ ⟩₊ ⟨ L₂ ⟩₊ ⟨ ε ⟩₊)) $
       PX.isTriangular≈
-        (h x y)
-        (h x' y)
-        (h x' y')
-        (L₁ ·₊ ε)
-        (L₂ ·₊ ε)
-        (IsLipschitzWith.pres≈ (leftLipschitz y) x x' ε x≈x')
-        (IsLipschitzWith.pres≈ (rightLipschitz x') y y' ε y≈y')
+        ( h x y)
+        ( h x' y)
+        ( h x' y')
+        ( L₁ ·₊ ε)
+        ( L₂ ·₊ ε)
+        ( IsLipschitzWith.pres≈ (leftLipschitz y) x x' ε x≈x')
+        ( IsLipschitzWith.pres≈ (rightLipschitz x') y y' ε y≈y')
 
   uncurryNE₂ : NE₂[ M , N , X ] → L[ M ×PrSp N , X ]
   fst (uncurryNE₂ f) = uncurry (NE₂[_,_,_].fun f)
   snd (uncurryNE₂ f) =
     ∣ 1 +₊ 1 ,
       uncurryIsLipschitzWith
-        fun
-        1
-        1
-        (isNonExpansive→isLipschitzWith1 _ _ _ ∘ lNE)
-        (isNonExpansive→isLipschitzWith1 _ _ _ ∘ rNE) ∣₁
+        ( fun)
+        ( 1)
+        ( 1)
+        ( isNonExpansive→isLipschitzWith1 _ _ _ ∘ lNE)
+        ( isNonExpansive→isLipschitzWith1 _ _ _ ∘ rNE) ∣₁
     where open NE₂[_,_,_] f

@@ -73,14 +73,14 @@ module _
   pres∧ : (a b : ⟨ L≤ ⟩) → f (a L.∧l b) ≡ f a M.∧l f b
   pres∧ a b = sym $
     MM.isMeet→≡∧
-      (f (a L.∧l b))
-      (λ m≤a∧b →
+      ( f (a L.∧l b))
+      ( λ m≤a∧b →
         invEq≤→≤equivFun (equivFun ML.isMeet∧ (≤equivFun→invEq≤ m≤a∧b) .fst))
-      (λ m≤a∧b →
+      ( λ m≤a∧b →
         invEq≤→≤equivFun (equivFun ML.isMeet∧ (≤equivFun→invEq≤ m≤a∧b) .snd))
-      (λ m≤a m≤b →
+      ( λ m≤a m≤b →
         invEq≤→≤equivFun
-          (invEq ML.isMeet∧ (≤equivFun→invEq≤ m≤a , ≤equivFun→invEq≤ m≤b)))
+          ( invEq ML.isMeet∧ (≤equivFun→invEq≤ m≤a , ≤equivFun→invEq≤ m≤b)))
 
 module _
   {L≤ : Pseudolattice ℓ ℓ'} {M≤ : Pseudolattice ℓ'' ℓ'''}

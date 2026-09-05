@@ -40,7 +40,7 @@ module _ (R' : OrderedCommRing ℓ ℓ') where
     fst (fst (+PseudolatticeEquivR z)) = _+ z
     snd (fst (+PseudolatticeEquivR z)) =
       isoToIsEquiv
-        (iso (_+ z) (_- z) subtractAddInverse addSubtractInverse)
+        ( iso (_+ z) (_- z) subtractAddInverse addSubtractInverse)
       where
       subtractAddInverse : (x : R) → (x - z) + z ≡ x
       subtractAddInverse x = solve! RCR
@@ -49,9 +49,9 @@ module _ (R' : OrderedCommRing ℓ ℓ') where
       addSubtractInverse x = solve! RCR
     snd (+PseudolatticeEquivR z) =
       makeIsPseudolatticeEquiv
-        (fst (+PseudolatticeEquivR z))
-        (λ x y → +MonoR≤ x y z)
-        (λ x y → +MonoR≤ x y (- z))
+        ( fst (+PseudolatticeEquivR z))
+        ( λ x y → +MonoR≤ x y z)
+        ( λ x y → +MonoR≤ x y (- z))
 
     +DistL⊓ : (x y z : R) → (x ⊓ y) + z ≡ (x + z) ⊓ (y + z)
     +DistL⊓ x y z = pres∧ (+PseudolatticeEquivR z) x y
@@ -65,9 +65,9 @@ module _ (R' : OrderedCommRing ℓ ℓ') where
       isoToIsEquiv (iso -_ -_ -Idempotent -Idempotent)
     snd -PseudolatticeEquiv =
       makeIsPseudolatticeEquiv
-        (fst -PseudolatticeEquiv)
-        -Flip≤
-        (flip -Flip≤)
+        ( fst -PseudolatticeEquiv)
+        ( -Flip≤)
+        ( flip -Flip≤)
 
     -⊓ : (x y : R) → - (x ⊓ y) ≡ (- x) ⊔ (- y)
     -⊓ = pres∧ -PseudolatticeEquiv
@@ -141,11 +141,12 @@ module _ (R' : OrderedCommRing ℓ ℓ') where
 
     absΔ⊔≤R : (x y z : R) → abs ((x ⊔ z) - (y ⊔ z)) ≤ abs (x - y)
     absΔ⊔≤R x y z =
-      subst2 _≤_
-        (cong abs (cong₂ _-_ (sym (-⊔ x z)) (sym (-⊔ y z))) ∙
-         absΔ- (x ⊔ z) (y ⊔ z))
-        (absΔ- x y)
-        (absΔ⊓≤R (- x) (- y) (- z))
+      subst2
+        ( _≤_)
+        ( cong abs (cong₂ _-_ (sym (-⊔ x z)) (sym (-⊔ y z))) ∙
+          absΔ- (x ⊔ z) (y ⊔ z))
+        ( absΔ- x y)
+        ( absΔ⊓≤R (- x) (- y) (- z))
       where
       absΔ- : (a b : R) → abs (- a - (- b)) ≡ abs (a - b)
       absΔ- a b = cong abs (solve! RCR) ∙ abs- (a - b)

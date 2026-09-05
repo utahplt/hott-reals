@@ -24,32 +24,32 @@ open PositiveRationals
 
 +InvRIsLipschitzWith :
   IsLipschitzWith
-    (snd ℝPremetricSpace)
-    (λ x → x + (- x))
-    (snd ℝPremetricSpace)
-    2
+    ( snd ℝPremetricSpace)
+    ( λ x → x + (- x))
+    ( snd ℝPremetricSpace)
+    ( 2)
 +InvRIsLipschitzWith =
   subst
-    (IsLipschitzWith
-      (snd ℝPremetricSpace)
-      (λ x → x + (- x))
-      (snd ℝPremetricSpace))
-    (ℚ₊≡ refl)
-    (composeIsLipschitzWith
-      (uncurry _+_)
-      (fst pairing)
-      (1 +₊ 1)
-      1
-      (uncurryIsLipschitzWith
-        _
-        _
-        _
-        _+_
-        1
-        1
-        (isNonExpansive→isLipschitzWith1 _ _ _ ∘ lNE)
-        (isNonExpansive→isLipschitzWith1 _ _ _ ∘ rNE))
-      (isNonExpansive→isLipschitzWith1 _ _ _ (snd pairing)))
+    ( IsLipschitzWith
+      ( snd ℝPremetricSpace)
+      ( λ x → x + (- x))
+      ( snd ℝPremetricSpace))
+    ( ℚ₊≡ refl)
+    ( composeIsLipschitzWith
+      ( uncurry _+_)
+      ( fst pairing)
+      ( 1 +₊ 1)
+      ( 1)
+      ( uncurryIsLipschitzWith
+        ( _)
+        ( _)
+        ( _)
+        ( _+_)
+        ( 1)
+        ( 1)
+        ( isNonExpansive→isLipschitzWith1 _ _ _ ∘ lNE)
+        ( isNonExpansive→isLipschitzWith1 _ _ _ ∘ rNE))
+      ( isNonExpansive→isLipschitzWith1 _ _ _ (snd pairing)))
   where
     open NE₂[_,_,_] +NE₂
 
@@ -59,11 +59,11 @@ open PositiveRationals
 +InvR : (x : ℝ) → x + (- x) ≡ 0
 +InvR =
   continuous≡
-    _
-    _
-    (L→C ((λ x → x + (- x)) , ∣ 2 , +InvRIsLipschitzWith ∣₁))
-    (constᶜ 0)
-    (cong rat ∘ ℚ.+InvR)
+    ( _)
+    ( _)
+    ( L→C ((λ x → x + (- x)) , ∣ 2 , +InvRIsLipschitzWith ∣₁))
+    ( constᶜ 0)
+    ( cong rat ∘ ℚ.+InvR)
 
 ℝAbGroup : AbGroup ℓ-zero
 ℝAbGroup = makeAbGroup 0 _+_ -_ isSetℭ +Assoc +IdR +InvR +Comm

@@ -4,6 +4,7 @@ open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.Equiv
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.Structure
+open import Cubical.Foundations.Transport
 
 open import Cubical.Relation.Binary.Order.Pseudolattice.Base
 open import Cubical.Relation.Binary.Order.Pseudolattice.Properties
@@ -58,29 +59,26 @@ module _
     f = equivFun (e .fst)
     g = invEq (e .fst)
 
-    -- TODO: Pull into public lemma?
-    ≤equivFun→invEq≤ : {m : ⟨ M≤ ⟩} {x : ⟨ L≤ ⟩} → m M.≤ f x → g m L.≤ x
-    ≤equivFun→invEq≤ {m} {x} =
-      invEq (IsPseudolatticeEquiv.pres≤ (e .snd) (g m) x) ∘
-      subst (M._≤ f x) (sym (secEq (e .fst) m))
-
-    -- TODO: Ditto
-    invEq≤→≤equivFun : {m : ⟨ M≤ ⟩} {x : ⟨ L≤ ⟩} → g m L.≤ x → m M.≤ f x
-    invEq≤→≤equivFun {m} {x} =
-      subst (M._≤ f x) (secEq (e .fst) m) ∘
-      equivFun (IsPseudolatticeEquiv.pres≤ (e .snd) (g m) x)
+  ≤equivFun≃invEq≤ : {m : ⟨ M≤ ⟩} {x : ⟨ L≤ ⟩} → m M.≤ f x ≃ g m L.≤ x
+  ≤equivFun≃invEq≤ {m} {x} =
+    compEquiv
+      ( substEquiv (M._≤ f x) (sym (secEq (e .fst) m)))
+      ( invEquiv (IsPseudolatticeEquiv.pres≤ (e .snd) (g m) x))
 
   pres∧ : (a b : ⟨ L≤ ⟩) → f (a L.∧l b) ≡ f a M.∧l f b
   pres∧ a b = sym $
     MM.isMeet→≡∧
       ( f (a L.∧l b))
       ( λ m≤a∧b →
-        invEq≤→≤equivFun (equivFun ML.isMeet∧ (≤equivFun→invEq≤ m≤a∧b) .fst))
+        invEq ≤equivFun≃invEq≤
+          ( equivFun ML.isMeet∧ (equivFun ≤equivFun≃invEq≤ m≤a∧b) .fst))
       ( λ m≤a∧b →
-        invEq≤→≤equivFun (equivFun ML.isMeet∧ (≤equivFun→invEq≤ m≤a∧b) .snd))
+        invEq ≤equivFun≃invEq≤
+          ( equivFun ML.isMeet∧ (equivFun ≤equivFun≃invEq≤ m≤a∧b) .snd))
       ( λ m≤a m≤b →
-        invEq≤→≤equivFun
-          ( invEq ML.isMeet∧ (≤equivFun→invEq≤ m≤a , ≤equivFun→invEq≤ m≤b)))
+        invEq ≤equivFun≃invEq≤
+          ( invEq ML.isMeet∧
+            ( equivFun ≤equivFun≃invEq≤ m≤a , equivFun ≤equivFun≃invEq≤ m≤b)))
 
 module _
   {L≤ : Pseudolattice ℓ ℓ'} {M≤ : Pseudolattice ℓ'' ℓ'''}

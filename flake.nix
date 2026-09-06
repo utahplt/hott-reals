@@ -9,7 +9,7 @@
       flake = false;
     };
     agda-mcp = {
-      url = "github:broughjt/agda-mcp/cli-daemon";
+      url = "github:broughjt/agda-mcp/cli-daemon-fixes";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };

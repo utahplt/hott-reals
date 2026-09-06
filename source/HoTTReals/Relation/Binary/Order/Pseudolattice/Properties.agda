@@ -44,7 +44,7 @@ DualPseudolatticeEquiv :
   PseudolatticeEquiv (DualPseudolattice L≤) (DualPseudolattice M≤)
 DualPseudolatticeEquiv e =
   e .fst ,
-    ispseudolatticeequiv (λ x y → IsPseudolatticeEquiv.pres≤ (e .snd) y x)
+    ispseudolatticeequiv (flip $ IsPseudolatticeEquiv.pres≤ (e .snd))
 
 module _
   {L≤ : Pseudolattice ℓ ℓ'} {M≤ : Pseudolattice ℓ'' ℓ'''}
@@ -58,13 +58,13 @@ module _
     f = equivFun (e .fst)
     g = invEq (e .fst)
 
-    -- m ≤ f x if and only if g m ≤ x, since f (g m) ≡ m and f preserves
-    -- and reflects order.
+    -- TODO: Pull into public lemma?
     ≤equivFun→invEq≤ : {m : ⟨ M≤ ⟩} {x : ⟨ L≤ ⟩} → m M.≤ f x → g m L.≤ x
     ≤equivFun→invEq≤ {m} {x} =
       invEq (IsPseudolatticeEquiv.pres≤ (e .snd) (g m) x) ∘
       subst (M._≤ f x) (sym (secEq (e .fst) m))
 
+    -- TODO: Ditto
     invEq≤→≤equivFun : {m : ⟨ M≤ ⟩} {x : ⟨ L≤ ⟩} → g m L.≤ x → m M.≤ f x
     invEq≤→≤equivFun {m} {x} =
       subst (M._≤ f x) (secEq (e .fst) m) ∘

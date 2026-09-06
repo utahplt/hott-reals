@@ -33,26 +33,26 @@ module _
       (f : ⟨ K ⟩ → ⟨ M ⟩)
       (g : ⟨ K ⟩ → ⟨ N ⟩)
       (h : ⟨ M ⟩ → ⟨ N ⟩ → ⟨ X ⟩)
-      (L R N₁ N₂ : ℚ₊) →
-      IsLipschitzWith (snd K) f (snd M) L →
-      IsLipschitzWith (snd K) g (snd N) R →
+      (L₁ L₂ R₁ R₂ : ℚ₊) →
+      IsLipschitzWith (snd K) f (snd M) L₁ →
+      IsLipschitzWith (snd K) g (snd N) L₂ →
       ((y : ⟨ N ⟩) →
-        IsLipschitzWith (snd M) (flip h y) (snd X) N₁) →
+        IsLipschitzWith (snd M) (flip h y) (snd X) R₁) →
       ((x : ⟨ M ⟩) →
-        IsLipschitzWith (snd N) (h x) (snd X) N₂) →
+        IsLipschitzWith (snd N) (h x) (snd X) R₂) →
       IsLipschitzWith
         ( snd K)
         ( λ x → h (f x) (g x))
         ( snd X)
-        ( N₁ ·₊ L +₊ N₂ ·₊ R)
+        ( R₁ ·₊ L₁ +₊ R₂ ·₊ L₂)
     composeIsLipschitzWith₂ = {!!}
 
   uncurryIsLipschitzWith :
-    (h : ⟨ M ⟩ → ⟨ N ⟩ → ⟨ X ⟩) (L₁ L₂ : ℚ₊) →
-    ((y : ⟨ N ⟩) → IsLipschitzWith (snd M) (flip h y) (snd X) L₁) →
-    ((x : ⟨ M ⟩) → IsLipschitzWith (snd N) (h x) (snd X) L₂) →
-    IsLipschitzWith (snd (M ×PrSp N)) (uncurry h) (snd X) (L₁ +₊ L₂)
-  uncurryIsLipschitzWith h L₁ L₂ leftLipschitz rightLipschitz =
+    (h : ⟨ M ⟩ → ⟨ N ⟩ → ⟨ X ⟩) (R₁ R₂ : ℚ₊) →
+    ((y : ⟨ N ⟩) → IsLipschitzWith (snd M) (flip h y) (snd X) R₁) →
+    ((x : ⟨ M ⟩) → IsLipschitzWith (snd N) (h x) (snd X) R₂) →
+    IsLipschitzWith (snd (M ×PrSp N)) (uncurry h) (snd X) (R₁ +₊ R₂)
+  uncurryIsLipschitzWith h R₁ R₂ leftLipschitz rightLipschitz =
     subst
       ( IsLipschitzWith
         ( snd (M ×PrSp N))
@@ -60,16 +60,16 @@ module _
         ( snd X))
       ( ℚ₊≡
         ( cong₂ ℚ._+_
-          (ℚ.·IdR ⟨ L₁ ⟩₊)
-          (ℚ.·IdR ⟨ L₂ ⟩₊)))
+          (ℚ.·IdR ⟨ R₁ ⟩₊)
+          (ℚ.·IdR ⟨ R₂ ⟩₊)))
       ( composeIsLipschitzWith₂
         ( fst)
         ( snd)
         ( h)
         ( 1)
         ( 1)
-        ( L₁)
-        ( L₂)
+        ( R₁)
+        ( R₂)
         ( isNonExpansive→isLipschitzWith1 _ _ _ (snd (projⁿ₁ M N)))
         ( isNonExpansive→isLipschitzWith1 _ _ _ (snd (projⁿ₂ M N)))
         ( leftLipschitz)

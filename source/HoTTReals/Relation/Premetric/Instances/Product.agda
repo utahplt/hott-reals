@@ -15,6 +15,8 @@ open import Cubical.Relation.Premetric.Mappings
 open import Cubical.Relation.Premetric.Instances.FunctionSpace
 open import Cubical.Relation.Premetric.Instances.Product
 
+open import Cubical.Tactics.CommRingSolver.Specialised.Rationals
+
 open PositiveRationals
 
 private
@@ -45,7 +47,49 @@ module _
         ( λ x → h (f x) (g x))
         ( snd X)
         ( R₁ ·₊ L₁ +₊ R₂ ·₊ L₂)
-    composeIsLipschitzWith₂ = {!!}
+    IsLipschitzWith.pres≈
+      ( composeIsLipschitzWith₂
+        ( f)
+        ( g)
+        ( h)
+        ( L₁)
+        ( L₂)
+        ( R₁)
+        ( R₂)
+        ( fLipschitz)
+        ( gLipschitz)
+        ( hLipschitzL)
+        ( hLipschitzR))
+      x y ε x≈y =
+      subst≈
+        ( h (f x) (g x))
+        ( h (f y) (g y))
+        ( combineConstants)
+        ( isTriangular≈
+          ( h (f x) (g x))
+          ( h (f y) (g x))
+          ( h (f y) (g y))
+          ( R₁ ·₊ (L₁ ·₊ ε))
+          ( R₂ ·₊ (L₂ ·₊ ε))
+          ( hLipschitzL (g x) .pres≈
+            ( f x)
+            ( f y)
+            ( L₁ ·₊ ε)
+            ( fLipschitz .pres≈ x y ε x≈y))
+          ( hLipschitzR (f y) .pres≈
+            ( g x)
+            ( g y)
+            ( L₂ ·₊ ε)
+            ( gLipschitz .pres≈ x y ε x≈y)))
+      where
+        open IsLipschitzWith
+        open PremetricStr (snd X)
+        open PremetricTheory X
+
+        combineConstants :
+          ⟨ R₁ ·₊ (L₁ ·₊ ε) +₊ R₂ ·₊ (L₂ ·₊ ε) ⟩₊ ≡
+          ⟨ (R₁ ·₊ L₁ +₊ R₂ ·₊ L₂) ·₊ ε ⟩₊
+        combineConstants = ℚ!
 
     composeNE₂ :
       NE[ K , M ] →

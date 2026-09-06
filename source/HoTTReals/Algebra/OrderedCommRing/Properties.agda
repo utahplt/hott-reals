@@ -72,16 +72,8 @@ module _ (R' : OrderedCommRing ℓ ℓ') where
     -⊓ : (x y : R) → - (x ⊓ y) ≡ (- x) ⊔ (- y)
     -⊓ = pres∧ -PseudolatticeEquiv
 
-    -- TODO: Use solver?
     -⊔ : (x y : R) → - (x ⊔ y) ≡ (- x) ⊓ (- y)
-    -⊔ x y =
-      - (x ⊔ y)
-        ≡⟨ cong -_ (sym (cong₂ _⊔_ (-Idempotent x) (-Idempotent y))) ⟩
-      - ((- (- x)) ⊔ (- (- y)))
-        ≡⟨ cong -_ (sym (-⊓ (- x) (- y))) ⟩
-      - (- ((- x) ⊓ (- y)))
-        ≡⟨ -Idempotent _ ⟩
-      (- x) ⊓ (- y) ∎
+    -⊔ = pres∨ -PseudolatticeEquiv
 
     absΔ⊓≤R : (x y z : R) → abs ((x ⊓ z) - (y ⊓ z)) ≤ abs (x - y)
     absΔ⊓≤R x y z =

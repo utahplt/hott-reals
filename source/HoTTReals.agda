@@ -6,6 +6,8 @@ import HoTTReals.Algebra.OrderedCommRing.Properties
 
 import HoTTReals.Data.Real.Algebra.Addition
 
+import HoTTReals.Data.Real.Algebra.Lattice
+
 import HoTTReals.Relation.Binary.Order.Pseudolattice.Properties
 
 import HoTTReals.Relation.Premetric.Instances.Product

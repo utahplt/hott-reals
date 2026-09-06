@@ -47,6 +47,36 @@ module _
         ( R₁ ·₊ L₁ +₊ R₂ ·₊ L₂)
     composeIsLipschitzWith₂ = {!!}
 
+    composeNE₂ :
+      NE[ K , M ] →
+      NE[ K , N ] →
+      NE₂[ M , N , X ] →
+      L[ K , X ]
+    fst (composeNE₂ f g h) x =
+      NE₂[_,_,_].fun h (fst f x) (fst g x)
+    snd (composeNE₂ f g h) =
+      ∣ 2 ,
+        subst
+          ( IsLipschitzWith
+            ( snd K)
+            ( λ x → NE₂[_,_,_].fun h (fst f x) (fst g x))
+            ( snd X))
+          ( ℚ₊≡ refl)
+          ( composeIsLipschitzWith₂
+            ( fst f)
+            ( fst g)
+            ( NE₂[_,_,_].fun h)
+            ( 1)
+            ( 1)
+            ( 1)
+            ( 1)
+            ( isNonExpansive→isLipschitzWith1 _ _ _ (snd f))
+            ( isNonExpansive→isLipschitzWith1 _ _ _ (snd g))
+            ( isNonExpansive→isLipschitzWith1 _ _ _ ∘
+              NE₂[_,_,_].lNE h)
+            ( isNonExpansive→isLipschitzWith1 _ _ _ ∘
+              NE₂[_,_,_].rNE h)) ∣₁
+
   uncurryIsLipschitzWith :
     (h : ⟨ M ⟩ → ⟨ N ⟩ → ⟨ X ⟩) (R₁ R₂ : ℚ₊) →
     ((y : ⟨ N ⟩) → IsLipschitzWith (snd M) (flip h y) (snd X) R₁) →
@@ -86,37 +116,3 @@ module _
         ( isNonExpansive→isLipschitzWith1 _ _ _ ∘ lNE)
         ( isNonExpansive→isLipschitzWith1 _ _ _ ∘ rNE) ∣₁
     where open NE₂[_,_,_] f
-
-  module _
-    {ℓK ℓK'}
-    {K : PremetricSpace ℓK ℓK'} where
-
-    composeNE₂ :
-      NE[ K , M ] →
-      NE[ K , N ] →
-      NE₂[ M , N , X ] →
-      L[ K , X ]
-    fst (composeNE₂ f g h) x =
-      NE₂[_,_,_].fun h (fst f x) (fst g x)
-    snd (composeNE₂ f g h) =
-      ∣ 2 ,
-        subst
-          ( IsLipschitzWith
-            ( snd K)
-            ( λ x → NE₂[_,_,_].fun h (fst f x) (fst g x))
-            ( snd X))
-          ( ℚ₊≡ refl)
-          ( composeIsLipschitzWith₂
-            ( fst f)
-            ( fst g)
-            ( NE₂[_,_,_].fun h)
-            ( 1)
-            ( 1)
-            ( 1)
-            ( 1)
-            ( isNonExpansive→isLipschitzWith1 _ _ _ (snd f))
-            ( isNonExpansive→isLipschitzWith1 _ _ _ (snd g))
-            ( isNonExpansive→isLipschitzWith1 _ _ _ ∘
-              NE₂[_,_,_].lNE h)
-            ( isNonExpansive→isLipschitzWith1 _ _ _ ∘
-              NE₂[_,_,_].rNE h)) ∣₁

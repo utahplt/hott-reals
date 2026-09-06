@@ -19,3 +19,5 @@ import HoTTReals.Relation.Premetric.Instances.Product
 import HoTTReals.Relation.Premetric.Instances.Rationals
 
 import HoTTReals.Relation.Premetric.Mappings
+
+import HoTTReals.Relation.Premetric.Properties

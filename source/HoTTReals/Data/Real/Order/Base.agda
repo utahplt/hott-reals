@@ -4,15 +4,25 @@ open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.Equiv
 open import Cubical.Foundations.Function
 
+open import Cubical.Data.Sigma
+open import Cubical.Data.Rationals as ℚ using (ℚ)
+open import Cubical.Data.Rationals.Order as ℚ using ()
+
+open import Cubical.HITs.PropositionalTruncation using (squash₁)
+
+open import Cubical.Algebra.OrderedCommRing.Instances.Rationals
+
 open import Cubical.Relation.Binary.Base
 open import Cubical.Relation.Binary.Order.Poset
 open import Cubical.Relation.Binary.Order.Pseudolattice
+open import Cubical.Relation.Binary.Order.Quoset
 
 open import Cubical.Relation.Premetric.Completion.Instances.HIITReals
 
 open import HoTTReals.Data.Real.Algebra.Lattice
 
 open BinaryRelation
+open PositiveRationals
 
 _≤_ : ℝ → ℝ → Type ℓ-zero
 x ≤ y = max x y ≡ y
@@ -126,3 +136,62 @@ maxLUB {x} {a} {b} a≤x b≤x =
     ( λ {x} {y} → L≤max {x} {y})
     ( λ {x} {y} → R≤max {x} {y})
     ( λ {a} {b} {x} → maxLUB {x} {a} {b})
+
+_<_ : ℝ → ℝ → Type ℓ-zero
+x < y = ∃[ (q , r) ∈ ℚ × ℚ ] (x ≤ rat q) × (q ℚ.< r) × (rat r ≤ y)
+
+infix 4 _<_
+
+isProp< : isPropValued _<_
+isProp< = {!!}
+
+≤≃rat≤ : {q r : ℚ} → (q ℚ.≤ r) ≃ (rat q ≤ rat r)
+≤≃rat≤ = {!!}
+
+<≃rat< : {q r : ℚ} → (q ℚ.< r) ≃ (rat q < rat r)
+<≃rat< = {!!}
+
+<Weaken≤ : {x y : ℝ} → x < y → x ≤ y
+<Weaken≤ = {!!}
+
+isIrrefl< : isIrrefl _<_
+isIrrefl< = {!!}
+
+isTrans< : isTrans _<_
+isTrans< = {!!}
+
+ℝ<Quoset : Quoset ℓ-zero ℓ-zero
+fst ℝ<Quoset = ℝ
+QuosetStr._<_ (snd ℝ<Quoset) = _<_
+QuosetStr.isQuoset (snd ℝ<Quoset) = {!!}
+
+isTrans≤< : {x y z : ℝ} → x ≤ y → y < z → x < z
+isTrans≤< = {!!}
+
+isTrans<≤ : {x y z : ℝ} → x < y → y ≤ z → x < z
+isTrans<≤ = {!!}
+
+0<1 : 0 < 1
+0<1 = {!!}
+
+-- TODO: Define IsArchimedean for any ordered field when we have that definition later, tie to Lorenzo's Archimedean rings
+isArchimedean< : (x y : ℝ) → x < y → ∃[ q ∈ ℚ ] (x < rat q) × (rat q < y)
+isArchimedean< = {!!}
+
+rat∼→≤rat+ :
+  {q : ℚ} {ε : ℚ₊} {w : ℝ} → rat q ∼[ ε ] w → w ≤ rat (q ℚ.+ ⟨ ε ⟩₊)
+rat∼→≤rat+ = {!!}
+
+≤rat→∼→≤rat+ :
+  {x y : ℝ} {q : ℚ} {ε : ℚ₊} →
+  x ≤ rat q →
+  x ∼[ ε ] y →
+  y ≤ rat (q ℚ.+ ⟨ ε ⟩₊)
+≤rat→∼→≤rat+ = {!!}
+
+<rat→∼→<rat+ :
+  {x y : ℝ} {q : ℚ} {ε : ℚ₊} →
+  x < rat q →
+  x ∼[ ε ] y →
+  y < rat (q ℚ.+ ⟨ ε ⟩₊)
+<rat→∼→<rat+ = {!!}

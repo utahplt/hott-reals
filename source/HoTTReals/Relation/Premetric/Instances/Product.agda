@@ -4,8 +4,6 @@ open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.SIP using (⟨_⟩)
 
-open import Cubical.Data.Rationals as ℚ using ()
-
 open import Cubical.HITs.PropositionalTruncation using (∣_∣₁)
 
 open import Cubical.Algebra.OrderedCommRing.Instances.Rationals
@@ -132,10 +130,7 @@ module _
         ( snd (M ×PrSp N))
         ( uncurry h)
         ( snd X))
-      ( ℚ₊≡
-        ( cong₂ ℚ._+_
-          (ℚ.·IdR ⟨ R₁ ⟩₊)
-          (ℚ.·IdR ⟨ R₂ ⟩₊)))
+      ( ℚ₊≡ dropUnits)
       ( composeIsLipschitzWith₂
         ( fst)
         ( snd)
@@ -148,15 +143,24 @@ module _
         ( isNonExpansive→isLipschitzWith1 _ _ _ (snd (projⁿ₂ M N)))
         ( leftLipschitz)
         ( rightLipschitz))
+    where
+      dropUnits : ⟨ R₁ ·₊ 1 +₊ R₂ ·₊ 1 ⟩₊ ≡ ⟨ R₁ +₊ R₂ ⟩₊
+      dropUnits = ℚ!
 
   uncurryNE₂ : NE₂[ M , N , X ] → L[ M ×PrSp N , X ]
   fst (uncurryNE₂ f) = uncurry (NE₂[_,_,_].fun f)
   snd (uncurryNE₂ f) =
-    ∣ 1 +₊ 1 ,
-      uncurryIsLipschitzWith
-        ( fun)
-        ( 1)
-        ( 1)
-        ( isNonExpansive→isLipschitzWith1 _ _ _ ∘ lNE)
-        ( isNonExpansive→isLipschitzWith1 _ _ _ ∘ rNE) ∣₁
+    ∣ 2 ,
+      subst
+        ( IsLipschitzWith
+          ( snd (M ×PrSp N))
+          ( uncurry fun)
+          ( snd X))
+        ( ℚ₊≡ refl)
+        ( uncurryIsLipschitzWith
+          ( fun)
+          ( 1)
+          ( 1)
+          ( isNonExpansive→isLipschitzWith1 _ _ _ ∘ lNE)
+          ( isNonExpansive→isLipschitzWith1 _ _ _ ∘ rNE)) ∣₁
     where open NE₂[_,_,_] f

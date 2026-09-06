@@ -39,14 +39,6 @@ module PseudolatticeTheory (L≤ : Pseudolattice ℓ ℓ') where
   open MeetProperties L≤ public
   open JoinProperties L≤ public
 
-DualPseudolatticeEquiv :
-  {L≤ : Pseudolattice ℓ ℓ'} {M≤ : Pseudolattice ℓ'' ℓ'''} →
-  PseudolatticeEquiv L≤ M≤ →
-  PseudolatticeEquiv (DualPseudolattice L≤) (DualPseudolattice M≤)
-DualPseudolatticeEquiv e =
-  e .fst ,
-    ispseudolatticeequiv (flip $ IsPseudolatticeEquiv.pres≤ (e .snd))
-
 module _
   {L≤ : Pseudolattice ℓ ℓ'} {M≤ : Pseudolattice ℓ'' ℓ'''}
   (e : PseudolatticeEquiv L≤ M≤)
@@ -79,6 +71,14 @@ module _
         invEq ≤equivFun≃invEq≤
           ( invEq ML.isMeet∧
             ( equivFun ≤equivFun≃invEq≤ m≤a , equivFun ≤equivFun≃invEq≤ m≤b)))
+
+DualPseudolatticeEquiv :
+  {L≤ : Pseudolattice ℓ ℓ'} {M≤ : Pseudolattice ℓ'' ℓ'''} →
+  PseudolatticeEquiv L≤ M≤ →
+  PseudolatticeEquiv (DualPseudolattice L≤) (DualPseudolattice M≤)
+DualPseudolatticeEquiv e =
+  e .fst ,
+    ispseudolatticeequiv (flip $ IsPseudolatticeEquiv.pres≤ (e .snd))
 
 module _
   {L≤ : Pseudolattice ℓ ℓ'} {M≤ : Pseudolattice ℓ'' ℓ'''}

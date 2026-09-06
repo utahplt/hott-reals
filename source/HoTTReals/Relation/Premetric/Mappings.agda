@@ -29,6 +29,9 @@ module _ {M : PremetricSpace ℓM ℓM'} {N : PremetricSpace ℓN ℓN'} where
   constᶜ : ⟨ N ⟩ → C[ M , N ]
   constᶜ = NE→C ∘ constⁿ
 
+  constᴸ : ⟨ N ⟩ → L[ M , N ]
+  constᴸ = NE→L ∘ constⁿ
+
 module _
   {M : PremetricSpace ℓM ℓM'}
   {N : PremetricSpace ℓN ℓN'}

@@ -4,8 +4,15 @@ open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.Equiv
 open import Cubical.Foundations.Function
 
-open import Cubical.Data.Rationals as ℚ using ()
+open import Cubical.Data.Sigma
+open import Cubical.Data.Rationals as ℚ using (ℚ)
 open import Cubical.Data.Rationals.Order as ℚ using ()
+
+open import Cubical.Functions.Logic using (_⊔′_)
+
+open import Cubical.Relation.Nullary using (¬_)
+open import Cubical.Relation.Binary.Base
+open import Cubical.Relation.Binary.Order.StrictOrder
 
 open import Cubical.Algebra.AbGroup
 open import Cubical.Algebra.Group.Properties
@@ -22,6 +29,9 @@ open import HoTTReals.Data.Real.Algebra.Lattice
 open import HoTTReals.Data.Real.Order.Base
 open import HoTTReals.Relation.Premetric.Instances.Product
 open import HoTTReals.Relation.Premetric.Mappings
+
+open BinaryRelation
+open PositiveRationals
 
 -DistMin : (x y : ℝ) → - min x y ≡ max (- x) (- y)
 -DistMin =
@@ -99,3 +109,52 @@ open import HoTTReals.Relation.Premetric.Mappings
 +MonoR≤ : {x y a : ℝ} → x ≤ y → x + a ≤ y + a
 +MonoR≤ {x} {y} {a} x≤y =
   subst2 _≤_ (+Comm a x) (+Comm a y) (+MonoL≤ {x} {y} {a} x≤y)
+
+-Flip< : {x y : ℝ} → x < y → - y < - x
+-Flip< {x} {y} x<y = {!!}
+
+∼→≤+rat : {x y : ℝ} {ε : ℚ₊} → x ∼[ ε ] y → y ≤ x + rat ⟨ ε ⟩₊
+∼→≤+rat {x} {y} {ε} x∼y = {!!}
+
+<→∼→<+rat :
+  {x y z : ℝ} {ε : ℚ₊} → x < y → x ∼[ ε ] z → z < y + rat ⟨ ε ⟩₊
+<→∼→<+rat {x} {y} {z} {ε} x<y x∼z = {!!}
+
+<→∼→-rat< :
+  {x y z : ℝ} {ε : ℚ₊} → x < y → y ∼[ ε ] z → x - rat ⟨ ε ⟩₊ < z
+<→∼→-rat< {x} {y} {z} {ε} x<y y∼z = {!!}
+
+<→rat<∨<rat : {q r : ℚ} (x : ℝ) → q ℚ.< r → (rat q < x) ⊔′ (x < rat r)
+<→rat<∨<rat {q} {r} x q<r = {!!}
+
+isWeaklyLinear< : isWeaklyLinear _<_
+isWeaklyLinear< x y z x<y = {!!}
+
+ℝ<StrictOrder : StrictOrder ℓ-zero ℓ-zero
+fst ℝ<StrictOrder = ℝ
+StrictOrderStr._<_ (snd ℝ<StrictOrder) = _<_
+StrictOrderStr.isStrictOrder (snd ℝ<StrictOrder) = {!!}
+
+<+rat : (x : ℝ) (ε : ℚ₊) → x < x + rat ⟨ ε ⟩₊
+<+rat x ε = {!!}
+
+<≃∃+rat≤ : {x y : ℝ} → (x < y) ≃ (∃[ ε ∈ ℚ₊ ] (x + rat ⟨ ε ⟩₊ ≤ y))
+<≃∃+rat≤ {x} {y} = {!!}
+
++MonoL< : {x y a : ℝ} → x < y → a + x < a + y
++MonoL< {x} {y} {a} x<y = {!!}
+
++MonoR< : {x y a : ℝ} → x < y → x + a < y + a
++MonoR< {x} {y} {a} x<y = {!!}
+
++ReflectL< : {x y a : ℝ} → a + x < a + y → x < y
++ReflectL< {x} {y} {a} a+x<a+y = {!!}
+
+posSum→pos∨pos : {x y : ℝ} → 0 < x + y → (0 < x) ⊔′ (0 < y)
+posSum→pos∨pos {x} {y} 0<x+y = {!!}
+
+-rat≤→≤ : {x y : ℝ} → ((ε : ℚ₊) → x - rat ⟨ ε ⟩₊ ≤ y) → x ≤ y
+-rat≤→≤ {x} {y} hypothesis = {!!}
+
+≤≃¬> : {x y : ℝ} → (x ≤ y) ≃ (¬ (y < x))
+≤≃¬> {x} {y} = {!!}

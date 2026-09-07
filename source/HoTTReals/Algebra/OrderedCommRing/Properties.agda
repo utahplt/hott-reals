@@ -31,7 +31,7 @@ module _ (R' : OrderedCommRing ℓ ℓ') where
     open OrderedCommRingProperties.OrderedCommRingReasoning R'
     open OrderedCommRingProperties.OrderedCommRingTheory R'
       using (⊔LUB ; ⊔Comm ; ⊓Comm ; -Flip≤ ; 0≤→-≤0 ;
-             abs ; ≤abs ; 0≤abs ; abs- ; abs-Comm)
+             abs ; ≤abs ; -≤abs ; 0≤abs ; abs- ; abs-Comm)
     open RingTheory (OrderedCommRingProperties.OrderedCommRing→Ring R')
       using (-Idempotent)
     open MeetProperties R≤ using (∧Mono)
@@ -74,6 +74,16 @@ module _ (R' : OrderedCommRing ℓ ℓ') where
 
     -⊔ : (x y : R) → - (x ⊔ y) ≡ (- x) ⊓ (- y)
     -⊔ = pres∨ -PseudolatticeEquiv
+
+    absΔ<→<+ : {x y z : R} → abs (x - y) < z → y < x + z
+    absΔ<→<+ {x} {y} {z} ∣x-y∣<z = begin<
+      y
+        ≡→≤⟨ solve! RCR ⟩
+      x + (- (x - y))
+        ≤⟨ [ x ]+≤ -≤abs (x - y) ⟩
+      x + abs (x - y)
+        <⟨ [ x ]+< ∣x-y∣<z ⟩
+      x + z ◾
 
     absΔ⊓≤R : (x y z : R) → abs ((x ⊓ z) - (y ⊓ z)) ≤ abs (x - y)
     absΔ⊓≤R x y z =

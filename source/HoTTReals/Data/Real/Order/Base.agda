@@ -32,13 +32,16 @@ open import Cubical.Relation.Premetric.Completion.Instances.HIITReals
 
 open import Cubical.Tactics.CommRingSolver.Specialised.Rationals using (ℚ!)
 
+import HoTTReals.Algebra.OrderedCommRing.Properties as
+  HoTTRealsOrderedCommRingProperties
 open import HoTTReals.Data.Real.Algebra.Lattice
 open import HoTTReals.Relation.Premetric.Properties
 
 open BinaryRelation
 open PositiveRationals
 open OrderedCommRingReasoning ℚOrderedCommRing
-open OrderedCommRingTheory ℚOrderedCommRing using (abs ; -≤abs)
+open HoTTRealsOrderedCommRingProperties.OrderedCommRingTheory ℚOrderedCommRing
+  using (absΔ<→<+)
 open 1/2∈ℚ using (mean ; <→<mean ; <→mean<)
 open PremetricTheory ℝPremetricSpace
 
@@ -264,16 +267,6 @@ rat∼→≤rat+ :
   {q : ℚ} {ε : ℚ₊} {w : ℝ} → rat q ∼[ ε ] w → w ≤ rat (q ℚ.+ ⟨ ε ⟩₊)
 rat∼→≤rat+ {q} {ε} {w} = Elimℭ-Prop.go e w
   where
-  abs<→≤+ : (s : ℚ) → abs (q ℚ.- s) ℚ.< ⟨ ε ⟩₊ → s ℚ.≤ q ℚ.+ ⟨ ε ⟩₊
-  abs<→≤+ s ∣q-s∣<ε = begin≤
-    s
-      ≡→≤⟨ ℚ! ⟩
-    q ℚ.+ (ℚ.- (q ℚ.- s))
-      ≤⟨ [ q ]+≤ -≤abs (q ℚ.- s) ⟩
-    q ℚ.+ abs (q ℚ.- s)
-      ≤⟨ [ q ]+≤ ℚ.<Weaken≤ (abs (q ℚ.- s)) ⟨ ε ⟩₊ ∣q-s∣<ε ⟩
-    q ℚ.+ ⟨ ε ⟩₊ ◾
-
   limitCase :
     (y : ℚ₊ → ℝ) (yIsCauchy : isCauchy∼ y) →
     ((δ : ℚ₊) → rat q ∼[ ε ] y δ → y δ ≤ rat (q ℚ.+ ⟨ ε ⟩₊)) →
@@ -320,7 +313,8 @@ rat∼→≤rat+ {q} {ε} {w} = Elimℭ-Prop.go e w
   Elimℭ-Prop.ιA e s ratq∼rats =
     equivFun
       ( ≤≃rat≤ {s} {q ℚ.+ ⟨ ε ⟩₊})
-      ( abs<→≤+ s (equivFun ∼≃B ratq∼rats))
+      ( ℚ.<Weaken≤ s (q ℚ.+ ⟨ ε ⟩₊)
+        ( absΔ<→<+ {q} {s} {⟨ ε ⟩₊} (equivFun ∼≃B ratq∼rats)))
   Elimℭ-Prop.limA e y yIsCauchy hypothesis ratq∼limy =
     PT.rec
       ( isProp≤ (lim y yIsCauchy) (rat (q ℚ.+ ⟨ ε ⟩₊)))

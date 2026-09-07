@@ -24,4 +24,11 @@ open import HoTTReals.Relation.Premetric.Instances.Product
     ( cong rat ∘ ℚ.+InvR)
 
 ℝAbGroup : AbGroup ℓ-zero
-ℝAbGroup = makeAbGroup 0 _+_ -_ isSetℭ +Assoc +IdR +InvR +Comm
+fst ℝAbGroup = ℝ
+AbGroupStr.0g  (snd ℝAbGroup) = 0
+AbGroupStr._+_ (snd ℝAbGroup) = _+_
+AbGroupStr.-_  (snd ℝAbGroup) = -_
+AbGroupStr.isAbGroup (snd ℝAbGroup) = isAbGroupℝ
+  where opaque
+    isAbGroupℝ : IsAbGroup 0 _+_ (-_)
+    isAbGroupℝ = makeIsAbGroup isSetℭ +Assoc +IdR +InvR +Comm

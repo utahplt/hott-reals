@@ -242,7 +242,7 @@ isTrans<≤ {x} {y} {z} x<y y≤z =
     ( x<y)
 
 0<1 : 0 < 1
-0<1 = equivFun (<≃rat< {0} {1}) (ℚ.pos<pos _)
+0<1 = ∣ (0 , 1) , refl , ℚ.pos<pos tt , refl ∣₁
 
 -- TODO: Define IsArchimedean for any ordered field when we have that
 -- definition later, tie to Lorenzo's Archimedean rings

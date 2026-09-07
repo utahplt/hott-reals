@@ -13,6 +13,7 @@ open import Cubical.Relation.Premetric.Completion.Lift
 open import Cubical.Relation.Premetric.Completion.Instances.HIITReals
 
 import HoTTReals.Relation.Premetric.Instances.Rationals as ℚ
+open import HoTTReals.Relation.Premetric.Completion.Lift
 open import HoTTReals.Relation.Premetric.Instances.Product
 open import HoTTReals.Relation.Premetric.Mappings
 
@@ -120,36 +121,32 @@ maxAssoc x =
         ( x))
 
 minAbsorbLMax : (x y : ℝ) → min x (max x y) ≡ x
-minAbsorbLMax x =
-  nonExpansive≡
+minAbsorbLMax =
+  continuous₂≡
     ( _)
     ( _)
-    ( [ x ]minⁿ ∘NE [ x ]maxⁿ)
-    ( constⁿ x)
-    ( λ r →
-      lipschitz≡
-        ( _)
-        ( _)
-        ( composeNE₂ _ _ _ idⁿ maxⁿ[ rat r ] minNE₂)
-        ( idᴸ)
-        ( λ q → cong rat (ℚ.minAbsorbLMax q r))
-        ( x))
+    ( _)
+    ( λ x y → min x (max x y))
+    ( λ x _ → x)
+    ( λ x → snd (NE→C ([ x ]minⁿ ∘NE [ x ]maxⁿ)))
+    ( λ y → snd (L→C (composeNE₂ _ _ _ idⁿ maxⁿ[ y ] minNE₂)))
+    ( λ x → snd (NE→C (constⁿ x)))
+    ( λ _ → snd (NE→C idⁿ))
+    ( λ q r → cong rat (ℚ.minAbsorbLMax q r))
 
 maxAbsorbLMin : (x y : ℝ) → max x (min x y) ≡ x
-maxAbsorbLMin x =
-  nonExpansive≡
+maxAbsorbLMin =
+  continuous₂≡
     ( _)
     ( _)
-    ( [ x ]maxⁿ ∘NE [ x ]minⁿ)
-    ( constⁿ x)
-    ( λ r →
-      lipschitz≡
-        ( _)
-        ( _)
-        ( composeNE₂ _ _ _ idⁿ minⁿ[ rat r ] maxNE₂)
-        ( idᴸ)
-        ( λ q → cong rat (ℚ.maxAbsorbLMin q r))
-        ( x))
+    ( _)
+    ( λ x y → max x (min x y))
+    ( λ x _ → x)
+    ( λ x → snd (NE→C ([ x ]maxⁿ ∘NE [ x ]minⁿ)))
+    ( λ y → snd (L→C (composeNE₂ _ _ _ idⁿ minⁿ[ y ] maxNE₂)))
+    ( λ x → snd (NE→C (constⁿ x)))
+    ( λ _ → snd (NE→C idⁿ))
+    ( λ q r → cong rat (ℚ.maxAbsorbLMin q r))
 
 minAbsorbRMax : (x y : ℝ) → min (max x y) x ≡ x
 minAbsorbRMax x y = minComm (max x y) x ∙ minAbsorbLMax x y

@@ -31,4 +31,25 @@ module _
     ((v : ⟨ ℭB ⟩) → isContinuous (snd ℭA) (flip g v) (snd N)) →
     ((a : ⟨ A ⟩) (b : ⟨ B ⟩) → f (ι a) (ι b) ≡ g (ι a) (ι b)) →
     (u : ⟨ ℭA ⟩) (v : ⟨ ℭB ⟩) → f u v ≡ g u v
-  continuous₂≡ = {!!}
+  continuous₂≡
+    ( f)
+    ( g)
+    ( fContinuousR)
+    ( fContinuousL)
+    ( gContinuousR)
+    ( gContinuousL)
+    ( fιι≡gιι)
+    ( u) =
+    continuous≡
+      ( B)
+      ( N)
+      ( f u , fContinuousR u)
+      ( g u , gContinuousR u)
+      ( λ b →
+        continuous≡
+          ( A)
+          ( N)
+          ( flip f (ι b) , fContinuousL (ι b))
+          ( flip g (ι b) , gContinuousL (ι b))
+          ( flip fιι≡gιι b)
+          ( u))

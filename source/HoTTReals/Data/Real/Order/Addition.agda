@@ -24,18 +24,75 @@ open import HoTTReals.Relation.Premetric.Instances.Product
 open import HoTTReals.Relation.Premetric.Mappings
 
 -DistMin : (x y : ℝ) → - min x y ≡ max (- x) (- y)
--DistMin = {!!}
+-DistMin =
+  nonExpansive₂≡
+    ( _)
+    ( _)
+    ( _)
+    ( NE₂[_,_,_].makeNE₂ -minNE₂)
+    ( NE₂[_,_,_].makeNE₂ max-NE₂)
+    ( λ q r → cong rat (OrderedCommRingTheory.-⊓ ℚOrderedCommRing q r))
+  where
+  -minNE₂ : NE₂[ ℝPremetricSpace , ℝPremetricSpace , ℝPremetricSpace ]
+  NE₂[_,_,_].fun -minNE₂ x y = - min x y
+  NE₂[_,_,_].lNE -minNE₂ y = snd (-ⁿ ∘NE minⁿ[ y ])
+  NE₂[_,_,_].rNE -minNE₂ x = snd (-ⁿ ∘NE [ x ]minⁿ)
+
+  max-NE₂ : NE₂[ ℝPremetricSpace , ℝPremetricSpace , ℝPremetricSpace ]
+  NE₂[_,_,_].fun max-NE₂ x y = max (- x) (- y)
+  NE₂[_,_,_].lNE max-NE₂ y = snd (maxⁿ[ - y ] ∘NE -ⁿ)
+  NE₂[_,_,_].rNE max-NE₂ x = snd ([ - x ]maxⁿ ∘NE -ⁿ)
 
 -Flip≤ : {x y : ℝ} → x ≤ y → - y ≤ - x
--Flip≤ {x} {y} = {!!}
+-Flip≤ {x} {y} x≤y =
+  max (- y) (- x)
+    ≡⟨ maxComm (- y) (- x) ⟩
+  max (- x) (- y)
+    ≡⟨ sym (-DistMin x y) ⟩
+  - min x y
+    ≡⟨ cong -_ (sym (equivFun (≤≃min {x} {y}) x≤y)) ⟩
+  - x ∎
 
 +DistRMax :
   (a x y : ℝ) → a + max x y ≡ max (a + x) (a + y)
-+DistRMax = {!!}
++DistRMax a =
+  nonExpansive₂≡
+    ( _)
+    ( _)
+    ( _)
+    ( NE₂[_,_,_].makeNE₂ +maxNE₂)
+    ( NE₂[_,_,_].makeNE₂ max+NE₂)
+    ( λ q r →
+      lipschitz≡
+        ( _)
+        ( _)
+        ( NE→L +ⁿ[ max (rat q) (rat r) ])
+        ( composeNE₂ _ _ _ +ⁿ[ rat q ] +ⁿ[ rat r ] maxNE₂)
+        ( λ s →
+          cong rat
+            ( s ℚ.+ ℚ.max q r
+                ≡⟨ ℚ.+Comm s (ℚ.max q r) ⟩
+              ℚ.max q r ℚ.+ s
+                ≡⟨ OrderedCommRingTheory.+DistL⊔ ℚOrderedCommRing q r s ⟩
+              ℚ.max (q ℚ.+ s) (r ℚ.+ s)
+                ≡⟨ cong₂ ℚ.max (ℚ.+Comm q s) (ℚ.+Comm r s) ⟩
+              ℚ.max (s ℚ.+ q) (s ℚ.+ r) ∎))
+        ( a))
+  where
+  +maxNE₂ : NE₂[ ℝPremetricSpace , ℝPremetricSpace , ℝPremetricSpace ]
+  NE₂[_,_,_].fun +maxNE₂ x y = a + max x y
+  NE₂[_,_,_].lNE +maxNE₂ y = snd ([ a ]+ⁿ ∘NE maxⁿ[ y ])
+  NE₂[_,_,_].rNE +maxNE₂ x = snd ([ a ]+ⁿ ∘NE [ x ]maxⁿ)
+
+  max+NE₂ : NE₂[ ℝPremetricSpace , ℝPremetricSpace , ℝPremetricSpace ]
+  NE₂[_,_,_].fun max+NE₂ x y = max (a + x) (a + y)
+  NE₂[_,_,_].lNE max+NE₂ y = snd (maxⁿ[ a + y ] ∘NE [ a ]+ⁿ)
+  NE₂[_,_,_].rNE max+NE₂ x = snd ([ a + x ]maxⁿ ∘NE [ a ]+ⁿ)
 
 +MonoL≤ : {x y a : ℝ} → x ≤ y → a + x ≤ a + y
-+MonoL≤ {x} {y} {a} = {!!}
++MonoL≤ {x} {y} {a} x≤y = sym (+DistRMax a x y) ∙ cong (a +_) x≤y
 
 +MonoR≤ : {x y a : ℝ} → x ≤ y → x + a ≤ y + a
-+MonoR≤ {x} {y} {a} = {!!}
++MonoR≤ {x} {y} {a} x≤y =
+  subst2 _≤_ (+Comm a x) (+Comm a y) (+MonoL≤ {x} {y} {a} x≤y)
 

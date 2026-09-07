@@ -8,11 +8,14 @@ import HoTTReals.Data.Real.Algebra.Addition
 
 import HoTTReals.Data.Real.Algebra.Lattice
 
+import HoTTReals.Data.Real.Order.Addition
 import HoTTReals.Data.Real.Order.Base
 
 import HoTTReals.Relation.Binary.Order.Proset.Properties
 
 import HoTTReals.Relation.Binary.Order.Pseudolattice.Properties
+
+import HoTTReals.Relation.Premetric.Completion.Lift
 
 import HoTTReals.Relation.Premetric.Instances.Product
 

@@ -33,15 +33,17 @@ open import HoTTReals.Relation.Premetric.Mappings
     ( NE₂[_,_,_].makeNE₂ max-NE₂)
     ( λ q r → cong rat (OrderedCommRingTheory.-⊓ ℚOrderedCommRing q r))
   where
+  open NE₂[_,_,_]
+
   -minNE₂ : NE₂[ ℝPremetricSpace , ℝPremetricSpace , ℝPremetricSpace ]
-  NE₂[_,_,_].fun -minNE₂ x y = - min x y
-  NE₂[_,_,_].lNE -minNE₂ y = snd (-ⁿ ∘NE minⁿ[ y ])
-  NE₂[_,_,_].rNE -minNE₂ x = snd (-ⁿ ∘NE [ x ]minⁿ)
+  fun -minNE₂ x y = - min x y
+  lNE -minNE₂ y   = snd (-ⁿ ∘NE minⁿ[ y ])
+  rNE -minNE₂ x   = snd (-ⁿ ∘NE [ x ]minⁿ)
 
   max-NE₂ : NE₂[ ℝPremetricSpace , ℝPremetricSpace , ℝPremetricSpace ]
-  NE₂[_,_,_].fun max-NE₂ x y = max (- x) (- y)
-  NE₂[_,_,_].lNE max-NE₂ y = snd (maxⁿ[ - y ] ∘NE -ⁿ)
-  NE₂[_,_,_].rNE max-NE₂ x = snd ([ - x ]maxⁿ ∘NE -ⁿ)
+  fun max-NE₂ x y = max (- x) (- y)
+  lNE max-NE₂ y   = snd (maxⁿ[ - y ] ∘NE -ⁿ)
+  rNE max-NE₂ x   = snd ([ - x ]maxⁿ ∘NE -ⁿ)
 
 -Flip≤ : {x y : ℝ} → x ≤ y → - y ≤ - x
 -Flip≤ {x} {y} x≤y =
@@ -79,15 +81,17 @@ open import HoTTReals.Relation.Premetric.Mappings
               ℚ.max (s ℚ.+ q) (s ℚ.+ r) ∎))
         ( a))
   where
+  open NE₂[_,_,_]
+
   +maxNE₂ : NE₂[ ℝPremetricSpace , ℝPremetricSpace , ℝPremetricSpace ]
-  NE₂[_,_,_].fun +maxNE₂ x y = a + max x y
-  NE₂[_,_,_].lNE +maxNE₂ y = snd ([ a ]+ⁿ ∘NE maxⁿ[ y ])
-  NE₂[_,_,_].rNE +maxNE₂ x = snd ([ a ]+ⁿ ∘NE [ x ]maxⁿ)
+  fun +maxNE₂ x y = a + max x y
+  lNE +maxNE₂ y   = snd ([ a ]+ⁿ ∘NE maxⁿ[ y ])
+  rNE +maxNE₂ x   = snd ([ a ]+ⁿ ∘NE [ x ]maxⁿ)
 
   max+NE₂ : NE₂[ ℝPremetricSpace , ℝPremetricSpace , ℝPremetricSpace ]
-  NE₂[_,_,_].fun max+NE₂ x y = max (a + x) (a + y)
-  NE₂[_,_,_].lNE max+NE₂ y = snd (maxⁿ[ a + y ] ∘NE [ a ]+ⁿ)
-  NE₂[_,_,_].rNE max+NE₂ x = snd ([ a + x ]maxⁿ ∘NE [ a ]+ⁿ)
+  fun max+NE₂ x y = max (a + x) (a + y)
+  lNE max+NE₂ y   = snd (maxⁿ[ a + y ] ∘NE [ a ]+ⁿ)
+  rNE max+NE₂ x   = snd ([ a + x ]maxⁿ ∘NE [ a ]+ⁿ)
 
 +MonoL≤ : {x y a : ℝ} → x ≤ y → a + x ≤ a + y
 +MonoL≤ {x} {y} {a} x≤y = sym (+DistRMax a x y) ∙ cong (a +_) x≤y
@@ -95,4 +99,3 @@ open import HoTTReals.Relation.Premetric.Mappings
 +MonoR≤ : {x y a : ℝ} → x ≤ y → x + a ≤ y + a
 +MonoR≤ {x} {y} {a} x≤y =
   subst2 _≤_ (+Comm a x) (+Comm a y) (+MonoL≤ {x} {y} {a} x≤y)
-

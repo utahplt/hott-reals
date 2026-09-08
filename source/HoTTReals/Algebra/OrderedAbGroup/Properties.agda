@@ -117,6 +117,18 @@ module _ (G' : OrderedAbGroup ℓ ℓ') where
         ≡→≤⟨ addNegCancelCommAssoc y (- x) ⟩
       - x ◾
 
+    ≤→0≤Δ : (x y : G) → x ≤ y → 0g ≤ y - x
+    ≤→0≤Δ x y x≤y = {!!}
+
+    0≤Δ→≤ : (x y : G) → 0g ≤ y - x → x ≤ y
+    0≤Δ→≤ x y 0≤y-x = {!!}
+
+    <→0<Δ : (x y : G) → x < y → 0g < y - x
+    <→0<Δ x y x<y = {!!}
+
+    0<Δ→< : (x y : G) → 0g < y - x → x < y
+    0<Δ→< x y 0<y-x = {!!}
+
     -PseudolatticeEquiv : PseudolatticeEquiv G≤ (DualPseudolattice G≤)
     fst (fst -PseudolatticeEquiv) = -_
     snd (fst -PseudolatticeEquiv) = isoToIsEquiv (iso -_ -_ invInv invInv)

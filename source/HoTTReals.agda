@@ -9,6 +9,7 @@ import HoTTReals.Algebra.ArchimedeanRing.Base
 import HoTTReals.Algebra.CommRing.Properties
 
 import HoTTReals.Algebra.HeytingField.Base
+import HoTTReals.Algebra.HeytingField.Properties
 
 import HoTTReals.Algebra.OrderedAbGroup.Base
 import HoTTReals.Algebra.OrderedAbGroup.Instances.Rationals

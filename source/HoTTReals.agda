@@ -3,9 +3,8 @@ module HoTTReals where
 open import Cubical.Relation.Premetric.Completion.Instances.HIITReals
 
 import HoTTReals.Algebra.OrderedAbGroup.Base
+import HoTTReals.Algebra.OrderedAbGroup.Instances.Rationals
 import HoTTReals.Algebra.OrderedAbGroup.Properties
-
-import HoTTReals.Algebra.OrderedCommRing.Properties
 
 import HoTTReals.Data.Real.Algebra.Addition
 

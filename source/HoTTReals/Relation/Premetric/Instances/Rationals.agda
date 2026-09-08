@@ -2,19 +2,19 @@ module HoTTReals.Relation.Premetric.Instances.Rationals where
 
 open import Cubical.Foundations.Prelude
 
-open import Cubical.Algebra.OrderedCommRing.Base
-open import Cubical.Algebra.OrderedCommRing.Instances.Rationals
-
 open import Cubical.Data.Rationals using (min ; max)
 
 open import Cubical.Relation.Premetric.Mappings
 open import Cubical.Relation.Premetric.Instances.FunctionSpace
 open import Cubical.Relation.Premetric.Instances.Rationals
 
-open import HoTTReals.Algebra.OrderedCommRing.Properties
+open import HoTTReals.Algebra.OrderedAbGroup.Base
+open import HoTTReals.Algebra.OrderedAbGroup.Properties
+open import HoTTReals.Algebra.OrderedAbGroup.Instances.Rationals
 
-open OrderedCommRingStr (snd ℚOrderedCommRing) using (≤-<-trans)
-open OrderedCommRingTheory ℚOrderedCommRing
+open OrderedAbGroupStr (snd ℚOrderedAbGroup) using (≤-<-trans)
+open OrderedAbGroupTheory ℚOrderedAbGroup using
+  ( absΔ⊓≤R ; absΔ⊓≤L ; absΔ⊔≤R ; absΔ⊔≤L)
 
 open NE₂[_,_,_]
 open IsNonExpansive

@@ -32,16 +32,15 @@ open import Cubical.Relation.Premetric.Completion.Instances.HIITReals
 
 open import Cubical.Tactics.CommRingSolver.Specialised.Rationals using (ℚ!)
 
-import HoTTReals.Algebra.OrderedCommRing.Properties as
-  HoTTRealsOrderedCommRingProperties
+open import HoTTReals.Algebra.OrderedAbGroup.Properties
+open import HoTTReals.Algebra.OrderedAbGroup.Instances.Rationals
 open import HoTTReals.Data.Real.Algebra.Lattice
 open import HoTTReals.Relation.Premetric.Properties
 
 open BinaryRelation
 open PositiveRationals
 open OrderedCommRingReasoning ℚOrderedCommRing
-open HoTTRealsOrderedCommRingProperties.OrderedCommRingTheory ℚOrderedCommRing
-  using (absΔ<→<+)
+open OrderedAbGroupTheory ℚOrderedAbGroup using (absΔ<→<+)
 open 1/2∈ℚ using (mean ; <→<mean ; <→mean<)
 open PremetricTheory ℝPremetricSpace
 

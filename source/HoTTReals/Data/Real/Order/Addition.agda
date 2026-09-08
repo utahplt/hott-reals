@@ -39,8 +39,8 @@ open import Cubical.Relation.Premetric.Completion.Instances.HIITReals
 
 open import Cubical.Tactics.CommRingSolver.Specialised.Rationals using (ℚ!)
 
-import HoTTReals.Algebra.OrderedCommRing.Properties as
-  HoTTRealsOrderedCommRingProperties
+open import HoTTReals.Algebra.OrderedAbGroup.Properties
+open import HoTTReals.Algebra.OrderedAbGroup.Instances.Rationals
 open import HoTTReals.Data.Real.Algebra.Addition
 open import HoTTReals.Data.Real.Algebra.Lattice
 open import HoTTReals.Data.Real.Order.Base
@@ -52,8 +52,7 @@ open PositiveRationals
 open PositiveHalvesℚ
 open OrderedCommRingTheory ℚOrderedCommRing using
   ( <→0<Δ ; 0<Δ→< ; 0≤→abs≡id ; abs)
-open HoTTRealsOrderedCommRingProperties.OrderedCommRingTheory ℚOrderedCommRing
-  using (-⊓ ; +DistL⊔)
+open OrderedAbGroupTheory ℚOrderedAbGroup using (-⊓ ; +DistL⊔)
 open AbGroupStr (snd ℝAbGroup) using (+InvL)
 open GroupTheory (AbGroup→Group ℝAbGroup) using (invDistr ; invInv)
 open PremetricTheory ℝPremetricSpace using (isLimit≈<)

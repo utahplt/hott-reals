@@ -8,9 +8,12 @@ import HoTTReals.Algebra.OrderedAbGroup.Base
 import HoTTReals.Algebra.OrderedAbGroup.Instances.Rationals
 import HoTTReals.Algebra.OrderedAbGroup.Properties
 
+import HoTTReals.Algebra.OrderedCommRing.Properties
+
 import HoTTReals.Data.Real.Algebra.Addition
 
 import HoTTReals.Data.Real.Algebra.Lattice
+import HoTTReals.Data.Real.Algebra.Multiplication
 import HoTTReals.Data.Real.Algebra.OrderedAbGroup
 
 import HoTTReals.Data.Real.Order.Addition

@@ -23,7 +23,7 @@ open PremetricTheory using (isComplete)
 
 private
   variable
-    ℓA ℓA' ℓB ℓB' ℓM ℓM' ℓN ℓN' : Level
+    ℓA ℓA' ℓB ℓB' ℓC ℓC' ℓM ℓM' ℓN ℓN' : Level
 
 module _
   (A : PremetricSpace ℓA (ℓ-max ℓA ℓA'))
@@ -63,6 +63,36 @@ module _
           ( flip g (ι b) , gContinuousL (ι b))
           ( flip fιι≡gιι b)
           ( u))
+
+module _
+  (A : PremetricSpace ℓA (ℓ-max ℓA ℓA'))
+  (B : PremetricSpace ℓB (ℓ-max ℓB ℓB'))
+  (C : PremetricSpace ℓC (ℓ-max ℓC ℓC'))
+  (N : PremetricSpace ℓN' ℓN) where
+  private
+    ℭA = ℭ ℓA' A
+    ℭB = ℭ ℓB' B
+    ℭC = ℭ ℓC' C
+
+  continuous₃≡ :
+    (f g : ⟨ ℭA ⟩ → ⟨ ℭB ⟩ → ⟨ ℭC ⟩ → ⟨ N ⟩) →
+    ((u : ⟨ ℭA ⟩) (v : ⟨ ℭB ⟩) →
+      isContinuous (snd ℭC) (f u v) (snd N)) →
+    ((u : ⟨ ℭA ⟩) (w : ⟨ ℭC ⟩) →
+      isContinuous (snd ℭB) (λ v → f u v w) (snd N)) →
+    ((v : ⟨ ℭB ⟩) (w : ⟨ ℭC ⟩) →
+      isContinuous (snd ℭA) (λ u → f u v w) (snd N)) →
+    ((u : ⟨ ℭA ⟩) (v : ⟨ ℭB ⟩) →
+      isContinuous (snd ℭC) (g u v) (snd N)) →
+    ((u : ⟨ ℭA ⟩) (w : ⟨ ℭC ⟩) →
+      isContinuous (snd ℭB) (λ v → g u v w) (snd N)) →
+    ((v : ⟨ ℭB ⟩) (w : ⟨ ℭC ⟩) →
+      isContinuous (snd ℭA) (λ u → g u v w) (snd N)) →
+    ((a : ⟨ A ⟩) (b : ⟨ B ⟩) (c : ⟨ C ⟩) →
+      f (ι a) (ι b) (ι c) ≡ g (ι a) (ι b) (ι c)) →
+    (u : ⟨ ℭA ⟩) (v : ⟨ ℭB ⟩) (w : ⟨ ℭC ⟩) →
+    f u v w ≡ g u v w
+  continuous₃≡ = {!!}
 
 module _
   (M : PremetricSpace ℓM (ℓ-max ℓM ℓM'))

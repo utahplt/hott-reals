@@ -38,8 +38,8 @@ module _ (G' : OrderedAbGroup ℓ ℓ') where
   module OrderedAbGroupReasoning where
     open <-≤-Reasoning
       ( fst G')
-      ( str (OrderedAbGroup→Poset G'))
-      ( str (OrderedAbGroup→Quoset G'))
+      ( str $ OrderedAbGroup→Poset G')
+      ( str $ OrderedAbGroup→Quoset G')
       ( λ x {y} {z} → <-≤-trans x y z)
       ( λ x {y} {z} → ≤-<-trans x y z)
       ( λ {x} {y} → <-≤-weaken x y)
@@ -87,7 +87,7 @@ module _ (G' : OrderedAbGroup ℓ ℓ') where
           ( λ x → addSubCancelRight x z))
     snd (+PseudolatticeEquivR z) =
       makeIsPseudolatticeEquiv
-        ( fst (+PseudolatticeEquivR z))
+        ( fst $ +PseudolatticeEquivR z)
         ( λ x y → +MonoR≤ x y z)
         ( λ x y → +MonoR≤ x y (- z))
 
@@ -100,7 +100,7 @@ module _ (G' : OrderedAbGroup ℓ ℓ') where
     -Flip≤ : {x y : G} → x ≤ y → - y ≤ - x
     -Flip≤ {x} {y} x≤y = begin≤
       - y
-        ≡→≤⟨ sym (addNegCancelLeft x (- y)) ⟩
+        ≡→≤⟨ sym $ addNegCancelLeft x (- y) ⟩
       x + (- x - y)
         ≤⟨ x≤y ≤+[ - x - y ] ⟩
       y + (- x - y)
@@ -110,7 +110,7 @@ module _ (G' : OrderedAbGroup ℓ ℓ') where
     -Flip< : {x y : G} → x < y → - y < - x
     -Flip< {x} {y} x<y = begin<
       - y
-        ≡→≤⟨ sym (addNegCancelLeft x (- y)) ⟩
+        ≡→≤⟨ sym $ addNegCancelLeft x (- y) ⟩
       x + (- x - y)
         <⟨ x<y <+[ - x - y ] ⟩
       y + (- x - y)
@@ -144,7 +144,7 @@ module _ (G' : OrderedAbGroup ℓ ℓ') where
     0≤abs : (z : G) → 0g ≤ abs z
     0≤abs z =
       invEq
-        ( ≤≃¬> 0g (abs z))
+        ( ≤≃¬> 0g $ abs z)
         ( λ ∣z∣<0 →
           is-irrefl 0g
             ( begin<
@@ -153,7 +153,7 @@ module _ (G' : OrderedAbGroup ℓ ℓ') where
               - 0g
                 <⟨ -Flip< ∣z∣<0 ⟩
               - abs z
-                ≤⟨ -Flip≤ (≤abs z) ⟩
+                ≤⟨ -Flip≤ $ ≤abs z ⟩
               - z
                 ≤⟨ -≤abs z ⟩
               abs z
@@ -168,13 +168,13 @@ module _ (G' : OrderedAbGroup ℓ ℓ') where
       (x - y) ⊔ (- (x - y))
         ≡⟨ ⊔Comm ⟩
       (- (x - y)) ⊔ (x - y)
-        ≡⟨ cong₂ _⊔_ (negSub x y) (sym (negSub y x)) ⟩
+        ≡⟨ cong₂ _⊔_ (negSub x y) (sym $ negSub y x) ⟩
       (y - x) ⊔ (- (y - x)) ∎
 
     absΔ<→<+ : {x y z : G} → abs (x - y) < z → y < x + z
     absΔ<→<+ {x} {y} {z} ∣x-y∣<z = begin<
       y
-        ≡→≤⟨ sym (subSubSelf x y) ⟩
+        ≡→≤⟨ sym $ subSubSelf x y ⟩
       x + (- (x - y))
         ≤⟨ [ x ]+≤ -≤abs (x - y) ⟩
       x + abs (x - y)
@@ -184,13 +184,13 @@ module _ (G' : OrderedAbGroup ℓ ℓ') where
     absΔ⊓≤R : (x y z : G) → abs ((x ⊓ z) - (y ⊓ z)) ≤ abs (x - y)
     absΔ⊓≤R x y z =
       ⊔LUB (Δ⊓≤ x y)
-        ( subst2 _≤_ (sym (negSub (x ⊓ z) (y ⊓ z))) (abs-Comm y x)
+        ( subst2 _≤_ (sym $ negSub (x ⊓ z) (y ⊓ z)) (abs-Comm y x)
           ( Δ⊓≤ y x))
       where
       Δ⊓≤ : (a b : G) → (a ⊓ z) - (b ⊓ z) ≤ abs (a - b)
       Δ⊓≤ a b = begin≤
         (a ⊓ z) - (b ⊓ z)
-          ≡→≤⟨ sym (subAddSubCancel (a ⊓ z) d (b ⊓ z)) ⟩
+          ≡→≤⟨ sym $ subAddSubCancel (a ⊓ z) d (b ⊓ z) ⟩
         ((a ⊓ z) - d) + (d - (b ⊓ z))
           ≤⟨ meetSubtractBound≤ ≤+[ d - (b ⊓ z) ] ⟩
         (b ⊓ z) + (d - (b ⊓ z))
@@ -198,12 +198,12 @@ module _ (G' : OrderedAbGroup ℓ ℓ') where
         d ◾
         where
         d : G
-        d = abs (a - b)
+        d = abs $ a - b
 
         subtractBound≤ : a - d ≤ b
         subtractBound≤ = begin≤
           a - d
-            ≡→≤⟨ sym (subAddSubCancel a b d) ⟩
+            ≡→≤⟨ sym $ subAddSubCancel a b d ⟩
           (a - b) + (b - d)
             ≤⟨ ≤abs (a - b) ≤+[ b - d ] ⟩
           d + (b - d)
@@ -213,7 +213,7 @@ module _ (G' : OrderedAbGroup ℓ ℓ') where
         subtractNonnegative≤ : z - d ≤ z
         subtractNonnegative≤ = begin≤
           z - d
-            ≤⟨ [ z ]+≤ -Flip≤ (0≤abs (a - b)) ⟩
+            ≤⟨ [ z ]+≤ -Flip≤ (0≤abs $ a - b) ⟩
           z + (- 0g)
             ≡→≤⟨ cong (z +_) inv1g ∙ +IdR z ⟩
           z ◾
@@ -244,7 +244,7 @@ module _ (G' : OrderedAbGroup ℓ ℓ') where
         abs (((- x) ⊓ (- z)) - ((- y) ⊓ (- z))) ≡ abs ((x ⊔ z) - (y ⊔ z))
       meetsToJoins =
         abs (((- x) ⊓ (- z)) - ((- y) ⊓ (- z)))
-          ≡⟨ cong abs (cong₂ _-_ (sym (-⊔ x z)) (sym (-⊔ y z))) ⟩
+          ≡⟨ cong abs $ cong₂ _-_ (sym $ -⊔ x z) (sym $ -⊔ y z) ⟩
         abs ((- (x ⊔ z)) - (- (y ⊔ z)))
           ≡⟨ absΔ- (x ⊔ z) (y ⊔ z) ⟩
         abs ((x ⊔ z) - (y ⊔ z)) ∎
@@ -265,7 +265,7 @@ module _ (G' : OrderedAbGroup ℓ ℓ') where
         ( ≤abs x)
 
     absAbs : (x : G) → abs (abs x) ≡ abs x
-    absAbs x = 0≤→abs≡id (0≤abs x)
+    absAbs x = 0≤→abs≡id $ 0≤abs x
 
     ▵≤ : (x y : G) → abs (x + y) ≤ abs x + abs y
     ▵≤ x y =
@@ -291,22 +291,22 @@ module _ (G' : OrderedAbGroup ℓ ℓ') where
     absΔabs≤ : (x y : G) → abs (abs x - abs y) ≤ abs (x - y)
     absΔabs≤ x y =
       invEq
-        ( abs≤≃ {abs x - abs y} {abs (x - y)})
+        ( abs≤≃ {abs x - abs y} {abs $ x - y})
         ( bound x y ,
-          subst2 _≤_ (sym (negSub (abs x) (abs y))) (abs-Comm y x) (bound y x))
+          subst2 _≤_ (sym $ negSub (abs x) (abs y)) (abs-Comm y x) (bound y x))
       where
       bound : (a b : G) → abs a - abs b ≤ abs (a - b)
       bound a b = begin≤
         abs a - abs b
           ≤⟨ absBelowSum ≤+[ - abs b ] ⟩
         (abs (a - b) + abs b) - abs b
-          ≡→≤⟨ addSubCancelRight (abs (a - b)) (abs b) ⟩
+          ≡→≤⟨ addSubCancelRight (abs $ a - b) (abs b) ⟩
         abs (a - b) ◾
         where
         absBelowSum : abs a ≤ abs (a - b) + abs b
         absBelowSum = begin≤
           abs a
-            ≡→≤⟨ cong abs (sym (subAddCancel a b)) ⟩
+            ≡→≤⟨ cong abs $ sym $ subAddCancel a b ⟩
           abs ((a - b) + b)
             ≤⟨ ▵≤ (a - b) b ⟩
           abs (a - b) + abs b ◾
@@ -319,4 +319,4 @@ module _ (G' : OrderedAbGroup ℓ ℓ') where
       subst
         ( - y <_)
         ( invInv x)
-        ( -Flip< (≤-<-trans (- x) (abs x) y (-≤abs x) ∣x∣<y))
+        ( -Flip< $ ≤-<-trans (- x) (abs x) y (-≤abs x) ∣x∣<y)

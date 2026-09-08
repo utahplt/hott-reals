@@ -87,10 +87,10 @@ PosetStr.isPoset (snd ℝ≤Poset) =
 ≤≃min {x} {y} =
   propBiimpl→Equiv
     ( isProp≤ x y)
-    ( isSetℭ x (min x y))
+    ( isSetℭ x $ min x y)
     ( λ x≤y →
       x
-        ≡⟨ sym (minAbsorbLMax x y) ⟩
+        ≡⟨ sym $ minAbsorbLMax x y ⟩
       min x (max x y)
         ≡⟨ cong (min x) x≤y ⟩
       min x y ∎)
@@ -118,7 +118,7 @@ minGLB {x} {a} {b} x≤a x≤b =
       min x b
         ≡⟨ cong (flip min b) (equivFun (≤≃min {x} {a}) x≤a) ⟩
       min (min x a) b
-        ≡⟨ sym (minAssoc x a b) ⟩
+        ≡⟨ sym $ minAssoc x a b ⟩
       min x (min a b) ∎)
 
 L≤max : {x y : ℝ} → x ≤ max x y
@@ -137,7 +137,7 @@ R≤max {x} {y} =
 maxLUB : {x a b : ℝ} → a ≤ x → b ≤ x → max a b ≤ x
 maxLUB {x} {a} {b} a≤x b≤x =
   max (max a b) x
-    ≡⟨ sym (maxAssoc a b x) ⟩
+    ≡⟨ sym $ maxAssoc a b x ⟩
   max a (max b x)
     ≡⟨ cong (max a) b≤x ⟩
   max a x
@@ -185,7 +185,7 @@ isProp< x y = squash₁
       ( λ ((s , t) , ratq≤rats , s<t , ratt≤ratr) →
         ℚ.isTrans≤< q s r
           ( invEq (≤≃rat≤ {q} {s}) ratq≤rats)
-          ( ℚ.isTrans<≤ s t r s<t (invEq (≤≃rat≤ {t} {r}) ratt≤ratr))))
+          ( ℚ.isTrans<≤ s t r s<t $ invEq (≤≃rat≤ {t} {r}) ratt≤ratr)))
 
 <Weaken≤ : {x y : ℝ} → x < y → x ≤ y
 <Weaken≤ {x} {y} =
@@ -276,7 +276,7 @@ rat∼→≤rat+ {q} {ε} {w} = Elimℭ-Prop.go e w
       ( ℝPremetricSpace)
       ( Δ)
       ( NE→presLim
-          ( maxⁿ[ rat (q ℚ.+ ⟨ ε ⟩₊) ])
+          ( maxⁿ[ rat $ q ℚ.+ ⟨ ε ⟩₊ ])
           ( y)
           ( lim y yIsCauchy)
           ( isLimitLim y yIsCauchy))
@@ -291,8 +291,8 @@ rat∼→≤rat+ {q} {ε} {w} = Elimℭ-Prop.go e w
     eventuallyConstant :
       IsEventuallyConstantAt
         ( ℝPremetricSpace)
-        ( flip max (rat (q ℚ.+ ⟨ ε ⟩₊)) ∘ y)
-        ( rat (q ℚ.+ ⟨ ε ⟩₊))
+        ( flip max (rat $ q ℚ.+ ⟨ ε ⟩₊) ∘ y)
+        ( rat $ q ℚ.+ ⟨ ε ⟩₊)
         ( Δ)
     eventuallyConstant δ δ<Δ =
       hypothesis δ
@@ -313,13 +313,13 @@ rat∼→≤rat+ {q} {ε} {w} = Elimℭ-Prop.go e w
     equivFun
       ( ≤≃rat≤ {s} {q ℚ.+ ⟨ ε ⟩₊})
       ( ℚ.<Weaken≤ s (q ℚ.+ ⟨ ε ⟩₊)
-        ( absΔ<→<+ {q} {s} {⟨ ε ⟩₊} (equivFun ∼≃B ratq∼rats)))
+        ( absΔ<→<+ {q} {s} {⟨ ε ⟩₊} $ equivFun ∼≃B ratq∼rats))
   Elimℭ-Prop.limA e y yIsCauchy hypothesis ratq∼limy =
     PT.rec
-      ( isProp≤ (lim y yIsCauchy) (rat (q ℚ.+ ⟨ ε ⟩₊)))
+      ( isProp≤ (lim y yIsCauchy) (rat $ q ℚ.+ ⟨ ε ⟩₊))
       ( limitCase y yIsCauchy hypothesis)
       ( isRounded∼ (rat q) (lim y yIsCauchy) ε ratq∼limy)
-  Elimℭ-Prop.isPropA e w = isProp→ (isProp≤ w (rat (q ℚ.+ ⟨ ε ⟩₊)))
+  Elimℭ-Prop.isPropA e w = isProp→ $ isProp≤ w $ rat $ q ℚ.+ ⟨ ε ⟩₊
 
 ≤rat→∼→≤rat+ :
   {x y : ℝ} {q : ℚ} {ε : ℚ₊} →
@@ -327,10 +327,10 @@ rat∼→≤rat+ {q} {ε} {w} = Elimℭ-Prop.go e w
   x ∼[ ε ] y →
   y ≤ rat (q ℚ.+ ⟨ ε ⟩₊)
 ≤rat→∼→≤rat+ {x} {y} {q} {ε} x≤ratq x∼y =
-  isTrans≤ y (max y (rat q)) (rat (q ℚ.+ ⟨ ε ⟩₊))
+  isTrans≤ y (max y $ rat q) (rat $ q ℚ.+ ⟨ ε ⟩₊)
     ( L≤max {y} {rat q})
-    ( rat∼→≤rat+ {q} {ε} {max y (rat q)}
-      ( subst≈L x≤ratq (IsNonExpansive.pres≈ (snd maxⁿ[ rat q ]) x y ε x∼y)))
+    ( rat∼→≤rat+ {q} {ε} {max y $ rat q}
+      ( subst≈L x≤ratq $ IsNonExpansive.pres≈ (snd maxⁿ[ rat q ]) x y ε x∼y))
 
 <rat→∼→<rat+ :
   {x y : ℝ} {q : ℚ} {ε : ℚ₊} →
@@ -339,12 +339,12 @@ rat∼→≤rat+ {q} {ε} {w} = Elimℭ-Prop.go e w
   y < rat (q ℚ.+ ⟨ ε ⟩₊)
 <rat→∼→<rat+ {x} {y} {q} {ε} x<ratq x∼y =
   PT.rec
-    ( isProp< y (rat (q ℚ.+ ⟨ ε ⟩₊)))
+    ( isProp< y $ rat $ q ℚ.+ ⟨ ε ⟩₊)
     ( λ ((r , s) , x≤ratr , r<s , rats≤ratq) →
       ∣ (r ℚ.+ ⟨ ε ⟩₊ , s ℚ.+ ⟨ ε ⟩₊) ,
         ≤rat→∼→≤rat+ {x} {y} {r} {ε} x≤ratr x∼y ,
         ℚ.<-+o r s ⟨ ε ⟩₊ r<s ,
         equivFun
           ( ≤≃rat≤ {s ℚ.+ ⟨ ε ⟩₊} {q ℚ.+ ⟨ ε ⟩₊})
-          ( ℚ.≤-+o s q ⟨ ε ⟩₊ (invEq (≤≃rat≤ {s} {q}) rats≤ratq)) ∣₁)
+          ( ℚ.≤-+o s q ⟨ ε ⟩₊ $ invEq (≤≃rat≤ {s} {q}) rats≤ratq) ∣₁)
     ( x<ratq)

@@ -92,8 +92,8 @@ module _
           N.isCauchy (g ∘ (_/ L))
         isCauchyReindex g gCauchy ε δ =
           N.subst≈
-            ( g (ε / L))
-            ( g (δ / L))
+            ( g $ ε / L)
+            ( g $ δ / L)
             ( distributeCancel)
             ( gCauchy (ε / L) (δ / L))
           where
@@ -116,56 +116,56 @@ module _
 
         r : RecℭSym ⟨ N ⟩ (λ s t ε → s N.≈[ L ·₊ ε ] t)
         r .ιA = f
-        r .limA g gCauchy = fst (limitReindex g gCauchy)
+        r .limA g gCauchy = fst $ limitReindex g gCauchy
         r .eqA s t h =
-          N.isSeparated≈ s t (λ ε → N.subst≈ s t (·/ L ε) (h (ε / L)))
+          N.isSeparated≈ s t $ λ ε → N.subst≈ s t (·/ L ε) (h $ ε / L)
         r .ι-ι-B = IsLipschitzWith.pres≈ fLipschitz
         r .ι-lim-B a g ε δ gCauchy =
-          N.subst≈ (f a) (fst (limitReindex g gCauchy)) factorConstant ∘
+          N.subst≈ (f a) (fst $ limitReindex g gCauchy) factorConstant ∘
           N.isLim≈+
             ( f a)
             ( g ∘ (_/ L))
-            ( fst (limitReindex g gCauchy))
+            ( fst $ limitReindex g gCauchy)
             ( L ·₊ δ)
             ( L ·₊ ε)
-            ( snd (limitReindex g gCauchy)) ∘
-          N.subst≈R (cong g (ℚ₊≡ (reindex δ)))
+            ( snd $ limitReindex g gCauchy) ∘
+          N.subst≈R (cong g $ ℚ₊≡ $ reindex δ)
           where
           factorConstant : ⟨ L ·₊ δ +₊ L ·₊ ε ⟩₊ ≡ ⟨ L ·₊ (ε +₊ δ) ⟩₊
           factorConstant = ℚ!
         r .lim-lim-B g h ε δ η gCauchy hCauchy =
           N.subst≈
-            ( fst (limitReindex g gCauchy))
-            ( fst (limitReindex h hCauchy))
+            ( fst $ limitReindex g gCauchy)
+            ( fst $ limitReindex h hCauchy)
             ( factorConstant) ∘
           N.isLim≈+₂
             ( g ∘ (_/ L))
             ( h ∘ (_/ L))
-            ( fst (limitReindex g gCauchy))
-            ( fst (limitReindex h hCauchy))
+            ( fst $ limitReindex g gCauchy)
+            ( fst $ limitReindex h hCauchy)
             ( L ·₊ ε)
             ( L ·₊ δ)
             ( L ·₊ η)
-            ( snd (limitReindex g gCauchy))
-            ( snd (limitReindex h hCauchy)) ∘
-          N.subst≈L (cong g (ℚ₊≡ (reindex δ))) ∘
-          N.subst≈R (cong h (ℚ₊≡ (reindex η)))
+            ( snd $ limitReindex g gCauchy)
+            ( snd $ limitReindex h hCauchy) ∘
+          N.subst≈L (cong g $ ℚ₊≡ $ reindex δ) ∘
+          N.subst≈R (cong h $ ℚ₊≡ $ reindex η)
           where
           factorConstant :
             ⟨ L ·₊ δ +₊ (L ·₊ η +₊ L ·₊ ε) ⟩₊ ≡ ⟨ L ·₊ (ε +₊ (δ +₊ η)) ⟩₊
           factorConstant = ℚ!
-        r .isSymB s t ε = N.isSym≈ s t (L ·₊ ε)
-        r .isPropB s t ε = N.isProp≈ s t (L ·₊ ε)
+        r .isSymB s t ε = N.isSym≈ s t $ L ·₊ ε
+        r .isPropB s t ε = N.isProp≈ s t $ L ·₊ ε
 
     liftLipschitzWith :
       (L : ℚ₊) (f : ⟨ M ⟩ → ⟨ N ⟩) →
       IsLipschitzWith (snd M) f (snd N) L →
       Σ[ f' ∈ (⟨ ℭM ⟩ → ⟨ N ⟩) ] IsLipschitzWith (snd ℭM) f' (snd N) L
     fst (liftLipschitzWith L f fLipschitz) =
-      RecℭSym.go (liftLipschitzWithRec L f fLipschitz)
+      RecℭSym.go $ liftLipschitzWithRec L f fLipschitz
     snd (liftLipschitzWith L f fLipschitz) =
       islipschitzwith
-        ( λ _ _ _ → RecℭSym.go∼ (liftLipschitzWithRec L f fLipschitz))
+        ( λ _ _ _ → RecℭSym.go∼ $ liftLipschitzWithRec L f fLipschitz)
 
     liftLipschitzWith∘ι :
       (L : ℚ₊) (f : ⟨ M ⟩ → ⟨ N ⟩)

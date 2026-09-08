@@ -44,7 +44,7 @@ module _
     IsLipschitzWith (snd M) (g ∘ f) (snd O) (R ·₊ L)
   IsLipschitzWith.pres≈
     (composeIsLipschitzWith g f R L gLipschitz fLipschitz) x y ε =
-    subst≈ (g (f x)) (g (f y)) (ℚ.·Assoc ⟨ R ⟩₊ ⟨ L ⟩₊ ⟨ ε ⟩₊) ∘
+    subst≈ (g $ f x) (g $ f y) (ℚ.·Assoc ⟨ R ⟩₊ ⟨ L ⟩₊ ⟨ ε ⟩₊) ∘
     gLipschitz .pres≈ (f x) (f y) (L ·₊ ε) ∘
     fLipschitz .pres≈ x y ε
     where

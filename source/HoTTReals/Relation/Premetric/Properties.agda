@@ -1,6 +1,7 @@
 module HoTTReals.Relation.Premetric.Properties where
 
 open import Cubical.Foundations.Prelude
+open import Cubical.Foundations.Function
 open import Cubical.Foundations.SIP using (⟨_⟩)
 
 open import Cubical.Algebra.OrderedCommRing.Instances.Rationals
@@ -33,8 +34,8 @@ module _ (M : PremetricSpace ℓ ℓ') where
     close ε =
       isSym≈ c l ε
         ( subst≈L
-          ( isEventuallyConstant δ (min/2₊<L θ ε))
-          ( isLimit≈< x l lIsLimit δ ε (min/2₊<R θ ε)))
+          ( isEventuallyConstant δ $ min/2₊<L θ ε)
+          ( isLimit≈< x l lIsLimit δ ε $ min/2₊<R θ ε))
       where
       δ : ℚ₊
       δ = min₊ θ ε /2₊

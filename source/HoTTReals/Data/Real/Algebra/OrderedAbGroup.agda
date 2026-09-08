@@ -1,6 +1,7 @@
 module HoTTReals.Data.Real.Algebra.OrderedAbGroup where
 
 open import Cubical.Foundations.Prelude
+open import Cubical.Foundations.Function
 
 open import Cubical.Algebra.AbGroup
 
@@ -25,11 +26,11 @@ OrderedAbGroupStr.isOrderedAbGroup (snd ℝOrderedAbGroup) = isOrderedAbGroupℝ
   where
   isOrderedAbGroupℝ : IsOrderedAbGroup 0 _+_ -_ _<_ _≤_
   IsOrderedAbGroup.isAbGroup isOrderedAbGroupℝ =
-    AbGroupStr.isAbGroup (snd ℝAbGroup)
+    AbGroupStr.isAbGroup $ snd ℝAbGroup
   IsOrderedAbGroup.isPseudolattice isOrderedAbGroupℝ =
-    PseudolatticeStr.is-pseudolattice (snd ℝ≤Pseudolattice)
+    PseudolatticeStr.is-pseudolattice $ snd ℝ≤Pseudolattice
   IsOrderedAbGroup.isStrictOrder isOrderedAbGroupℝ =
-    StrictOrderStr.isStrictOrder (snd ℝ<StrictOrder)
+    StrictOrderStr.isStrictOrder $ snd ℝ<StrictOrder
   IsOrderedAbGroup.<-≤-weaken isOrderedAbGroupℝ = λ x y → <Weaken≤ {x} {y}
   IsOrderedAbGroup.≤≃¬> isOrderedAbGroupℝ = λ x y → ≤≃¬> {x} {y}
   IsOrderedAbGroup.+MonoR≤ isOrderedAbGroupℝ = λ x y z → +MonoR≤ {x} {y} {z}

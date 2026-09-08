@@ -1,6 +1,7 @@
 module HoTTReals.Relation.Premetric.Instances.Rationals where
 
 open import Cubical.Foundations.Prelude
+open import Cubical.Foundations.Function
 
 open import Cubical.Data.Rationals using (min ; max)
 
@@ -21,13 +22,13 @@ open IsNonExpansive
 
 minNE₂ : NE₂[ ℚPremetricSpace , ℚPremetricSpace , ℚPremetricSpace ]
 fun minNE₂ = min
-pres≈ (lNE minNE₂ s) q r ε = ≤-<-trans _ _ _ (absΔ⊓≤R q r s)
-pres≈ (rNE minNE₂ q) r s ε = ≤-<-trans _ _ _ (absΔ⊓≤L q r s)
+pres≈ (lNE minNE₂ s) q r ε = ≤-<-trans _ _ _ $ absΔ⊓≤R q r s
+pres≈ (rNE minNE₂ q) r s ε = ≤-<-trans _ _ _ $ absΔ⊓≤L q r s
 
 maxNE₂ : NE₂[ ℚPremetricSpace , ℚPremetricSpace , ℚPremetricSpace ]
 fun maxNE₂ = max
-pres≈ (lNE maxNE₂ s) q r ε = ≤-<-trans _ _ _ (absΔ⊔≤R q r s)
-pres≈ (rNE maxNE₂ q) r s ε = ≤-<-trans _ _ _ (absΔ⊔≤L q r s)
+pres≈ (lNE maxNE₂ s) q r ε = ≤-<-trans _ _ _ $ absΔ⊔≤R q r s
+pres≈ (rNE maxNE₂ q) r s ε = ≤-<-trans _ _ _ $ absΔ⊔≤L q r s
 
 minⁿ : NE[ ℚPremetricSpace , NE[ ℚPremetricSpace , ℚPremetricSpace ]PrSpace ]
 minⁿ = makeNE₂ minNE₂

@@ -65,7 +65,7 @@ minComm =
     ( _)
     ( minⁿ)
     ( flipNE minⁿ)
-    ( λ q r → cong rat (ℚ.minComm q r))
+    ( λ q r → cong rat $ ℚ.minComm q r)
 
 maxComm : (x y : ℝ) → max x y ≡ max y x
 maxComm =
@@ -75,7 +75,7 @@ maxComm =
     ( _)
     ( maxⁿ)
     ( flipNE maxⁿ)
-    ( λ q r → cong rat (ℚ.maxComm q r))
+    ( λ q r → cong rat $ ℚ.maxComm q r)
 
 maxIdem : (x : ℝ) → max x x ≡ x
 maxIdem =
@@ -100,7 +100,7 @@ minAssoc x =
         ( _)
         ( minⁿ[ min (rat r) (rat s) ])
         ( minⁿ[ rat s ] ∘NE minⁿ[ rat r ])
-        ( λ q → cong rat (ℚ.minAssoc q r s))
+        ( λ q → cong rat $ ℚ.minAssoc q r s)
         ( x))
 
 maxAssoc : (x y z : ℝ) → max x (max y z) ≡ max (max x y) z
@@ -117,7 +117,7 @@ maxAssoc x =
         ( _)
         ( maxⁿ[ max (rat r) (rat s) ])
         ( maxⁿ[ rat s ] ∘NE maxⁿ[ rat r ])
-        ( λ q → cong rat (ℚ.maxAssoc q r s))
+        ( λ q → cong rat $ ℚ.maxAssoc q r s)
         ( x))
 
 minAbsorbLMax : (x y : ℝ) → min x (max x y) ≡ x
@@ -126,13 +126,13 @@ minAbsorbLMax =
     ( _)
     ( _)
     ( _)
-    ( λ x y → min x (max x y))
+    ( λ x y → min x $ max x y)
     ( λ x _ → x)
-    ( λ x → snd (NE→C ([ x ]minⁿ ∘NE [ x ]maxⁿ)))
-    ( λ y → snd (L→C (composeNE₂ _ _ _ idⁿ maxⁿ[ y ] minNE₂)))
-    ( λ x → snd (NE→C (constⁿ x)))
-    ( λ _ → snd (NE→C idⁿ))
-    ( λ q r → cong rat (ℚ.minAbsorbLMax q r))
+    ( λ x → snd $ NE→C $ [ x ]minⁿ ∘NE [ x ]maxⁿ)
+    ( λ y → snd $ L→C $ composeNE₂ _ _ _ idⁿ maxⁿ[ y ] minNE₂)
+    ( λ x → snd $ NE→C $ constⁿ x)
+    ( λ _ → snd $ NE→C idⁿ)
+    ( λ q r → cong rat $ ℚ.minAbsorbLMax q r)
 
 maxAbsorbLMin : (x y : ℝ) → max x (min x y) ≡ x
 maxAbsorbLMin =
@@ -140,13 +140,13 @@ maxAbsorbLMin =
     ( _)
     ( _)
     ( _)
-    ( λ x y → max x (min x y))
+    ( λ x y → max x $ min x y)
     ( λ x _ → x)
-    ( λ x → snd (NE→C ([ x ]maxⁿ ∘NE [ x ]minⁿ)))
-    ( λ y → snd (L→C (composeNE₂ _ _ _ idⁿ minⁿ[ y ] maxNE₂)))
-    ( λ x → snd (NE→C (constⁿ x)))
-    ( λ _ → snd (NE→C idⁿ))
-    ( λ q r → cong rat (ℚ.maxAbsorbLMin q r))
+    ( λ x → snd $ NE→C $ [ x ]maxⁿ ∘NE [ x ]minⁿ)
+    ( λ y → snd $ L→C $ composeNE₂ _ _ _ idⁿ minⁿ[ y ] maxNE₂)
+    ( λ x → snd $ NE→C $ constⁿ x)
+    ( λ _ → snd $ NE→C idⁿ)
+    ( λ q r → cong rat $ ℚ.maxAbsorbLMin q r)
 
 minAbsorbRMax : (x y : ℝ) → min (max x y) x ≡ x
 minAbsorbRMax x y = minComm (max x y) x ∙ minAbsorbLMax x y

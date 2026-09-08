@@ -112,8 +112,8 @@ module _
             ( 1)
             ( 1)
             ( 1)
-            ( isNonExpansive→isLipschitzWith1 _ _ _ (snd f))
-            ( isNonExpansive→isLipschitzWith1 _ _ _ (snd g))
+            ( isNonExpansive→isLipschitzWith1 _ _ _ $ snd f)
+            ( isNonExpansive→isLipschitzWith1 _ _ _ $ snd g)
             ( isNonExpansive→isLipschitzWith1 _ _ _ ∘
               NE₂[_,_,_].lNE h)
             ( isNonExpansive→isLipschitzWith1 _ _ _ ∘
@@ -127,7 +127,7 @@ module _
   uncurryIsLipschitzWith h R₁ R₂ leftLipschitz rightLipschitz =
     subst
       ( IsLipschitzWith
-        ( snd (M ×PrSp N))
+        ( snd $ M ×PrSp N)
         ( uncurry h)
         ( snd X))
       ( ℚ₊≡ dropUnits)
@@ -139,8 +139,8 @@ module _
         ( 1)
         ( R₁)
         ( R₂)
-        ( isNonExpansive→isLipschitzWith1 _ _ _ (snd (projⁿ₁ M N)))
-        ( isNonExpansive→isLipschitzWith1 _ _ _ (snd (projⁿ₂ M N)))
+        ( isNonExpansive→isLipschitzWith1 _ _ _ $ snd $ projⁿ₁ M N)
+        ( isNonExpansive→isLipschitzWith1 _ _ _ $ snd $ projⁿ₂ M N)
         ( leftLipschitz)
         ( rightLipschitz))
     where
@@ -153,7 +153,7 @@ module _
     ∣ 2 ,
       subst
         ( IsLipschitzWith
-          ( snd (M ×PrSp N))
+          ( snd $ M ×PrSp N)
           ( uncurry fun)
           ( snd X))
         ( ℚ₊≡ refl)

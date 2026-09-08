@@ -79,7 +79,7 @@ record OrderedAbGroupStr (ℓ' : Level) (G : Type ℓ) :
   infix 4 _<_ _≤_
 
 OrderedAbGroup : (ℓ ℓ' : Level) → Type (ℓ-suc (ℓ-max ℓ ℓ'))
-OrderedAbGroup ℓ ℓ' = TypeWithStr ℓ (OrderedAbGroupStr ℓ')
+OrderedAbGroup ℓ ℓ' = TypeWithStr ℓ $ OrderedAbGroupStr ℓ'
 
 module _
   {G : Type ℓ} {0g : G} {_+_ : G → G → G} { -_ : G → G}
@@ -226,7 +226,7 @@ isPropIsOrderedAbGroup 0g _+_ -_ _<_ _≤_ =
       ( isPropΠ2 λ x y →
         isOfHLevel≃ 1
           ( IsPoset.is-prop-valued (IsPseudolattice.isPoset isPL) x y)
-          ( isProp¬ (y < x))) $
+          ( isProp¬ $ y < x)) $
     isProp×
       ( isPropΠ5 λ _ _ _ _ _ → isSO .IsStrictOrder.is-prop-valued _ _) $
     isProp×

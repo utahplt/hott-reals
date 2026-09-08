@@ -26,7 +26,7 @@ module MeetProperties (L≤ : Pseudolattice ℓ ℓ') where
   ∧Mono a≤b c≤d = ∧GLB (is-trans _ _ _ ∧≤L a≤b) (is-trans _ _ _ ∧≤R c≤d)
 
   ∧MonoR : {a b c : L} → a ≤ b → a ∧l c ≤ b ∧l c
-  ∧MonoR a≤b = ∧Mono a≤b (is-refl _)
+  ∧MonoR a≤b = ∧Mono a≤b $ is-refl _
 
   ∧MonoL : {a b c : L} → a ≤ b → c ∧l a ≤ c ∧l b
   ∧MonoL a≤b = ∧Mono (is-refl _) a≤b
@@ -48,19 +48,19 @@ module _
     module M = PseudolatticeStr (M≤ .snd)
     module ML = PseudolatticeProperties.MeetProperties L≤
     module MM = PseudolatticeProperties.MeetProperties M≤
-    f = equivFun (e .fst)
-    g = invEq (e .fst)
+    f = equivFun $ e .fst
+    g = invEq $ e .fst
 
   ≤equivFun≃invEq≤ : {m : ⟨ M≤ ⟩} {x : ⟨ L≤ ⟩} → m M.≤ f x ≃ g m L.≤ x
   ≤equivFun≃invEq≤ {m} {x} =
     compEquiv
-      ( substEquiv (M._≤ f x) (sym (secEq (e .fst) m)))
-      ( invEquiv (IsPseudolatticeEquiv.pres≤ (e .snd) (g m) x))
+      ( substEquiv (M._≤ f x) (sym $ secEq (e .fst) m))
+      ( invEquiv $ IsPseudolatticeEquiv.pres≤ (e .snd) (g m) x)
 
   pres∧ : (a b : ⟨ L≤ ⟩) → f (a L.∧l b) ≡ f a M.∧l f b
   pres∧ a b = sym $
     MM.isMeet→≡∧
-      ( f (a L.∧l b))
+      ( f $ a L.∧l b)
       ( λ m≤a∧b →
         invEq ≤equivFun≃invEq≤
           ( equivFun ML.isMeet∧ (equivFun ≤equivFun≃invEq≤ m≤a∧b) .fst))
@@ -78,7 +78,7 @@ DualPseudolatticeEquiv :
   PseudolatticeEquiv (DualPseudolattice L≤) (DualPseudolattice M≤)
 DualPseudolatticeEquiv e =
   e .fst ,
-    ispseudolatticeequiv (flip $ IsPseudolatticeEquiv.pres≤ (e .snd))
+    ispseudolatticeequiv (flip $ IsPseudolatticeEquiv.pres≤ $ e .snd)
 
 module _
   {L≤ : Pseudolattice ℓ ℓ'} {M≤ : Pseudolattice ℓ'' ℓ'''}
@@ -87,7 +87,7 @@ module _
   private
     module L = PseudolatticeStr (L≤ .snd)
     module M = PseudolatticeStr (M≤ .snd)
-    f = equivFun (e .fst)
+    f = equivFun $ e .fst
 
   pres∨ : (a b : ⟨ L≤ ⟩) → f (a L.∨l b) ≡ f a M.∨l f b
-  pres∨ = pres∧ (DualPseudolatticeEquiv e)
+  pres∨ = pres∧ $ DualPseudolatticeEquiv e

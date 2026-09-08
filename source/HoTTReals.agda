@@ -6,9 +6,6 @@ import HoTTReals.Algebra.AbGroup.Properties
 
 import HoTTReals.Algebra.ArchimedeanOrderedField.Base
 
-import HoTTReals.Algebra.ArchimedeanRing.Base
-import HoTTReals.Algebra.ArchimedeanRing.Properties
-
 import HoTTReals.Algebra.CommRing.Properties
 
 import HoTTReals.Algebra.HeytingField.Base

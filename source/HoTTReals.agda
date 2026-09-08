@@ -15,6 +15,7 @@ import HoTTReals.Data.Real.Algebra.Addition
 import HoTTReals.Data.Real.Algebra.Lattice
 import HoTTReals.Data.Real.Algebra.Multiplication
 import HoTTReals.Data.Real.Algebra.OrderedAbGroup
+import HoTTReals.Data.Real.Algebra.OrderedCommRing
 
 import HoTTReals.Data.Real.Order.Addition
 import HoTTReals.Data.Real.Order.Base

@@ -19,6 +19,7 @@ import HoTTReals.Data.Real.Algebra.OrderedAbGroup
 import HoTTReals.Data.Real.Order.Addition
 import HoTTReals.Data.Real.Order.Base
 import HoTTReals.Data.Real.Order.Magnitude
+import HoTTReals.Data.Real.Order.Multiplication
 
 import HoTTReals.Relation.Binary.Order.Proset.Properties
 

@@ -28,11 +28,15 @@ OrderedAbGroupStr.isOrderedAbGroup (snd ℝOrderedAbGroup) = isOrderedAbGroupℝ
     AbGroupStr.isAbGroup (snd ℝAbGroup)
   IsOrderedAbGroup.isPseudolattice isOrderedAbGroupℝ =
     PseudolatticeStr.is-pseudolattice (snd ℝ≤Pseudolattice)
-  IsOrderedAbGroup.isStrictOrder isOrderedAbGroupℝ = {!!}
-  IsOrderedAbGroup.<-≤-weaken isOrderedAbGroupℝ = {!!}
-  IsOrderedAbGroup.≤≃¬> isOrderedAbGroupℝ = {!!}
-  IsOrderedAbGroup.+MonoR≤ isOrderedAbGroupℝ = {!!}
-  IsOrderedAbGroup.+MonoR< isOrderedAbGroupℝ = {!!}
-  IsOrderedAbGroup.posSum→pos∨pos isOrderedAbGroupℝ = {!!}
-  IsOrderedAbGroup.<-≤-trans isOrderedAbGroupℝ = {!!}
-  IsOrderedAbGroup.≤-<-trans isOrderedAbGroupℝ = {!!}
+  IsOrderedAbGroup.isStrictOrder isOrderedAbGroupℝ =
+    StrictOrderStr.isStrictOrder (snd ℝ<StrictOrder)
+  IsOrderedAbGroup.<-≤-weaken isOrderedAbGroupℝ = λ x y → <Weaken≤ {x} {y}
+  IsOrderedAbGroup.≤≃¬> isOrderedAbGroupℝ = λ x y → ≤≃¬> {x} {y}
+  IsOrderedAbGroup.+MonoR≤ isOrderedAbGroupℝ = λ x y z → +MonoR≤ {x} {y} {z}
+  IsOrderedAbGroup.+MonoR< isOrderedAbGroupℝ = λ x y z → +MonoR< {x} {y} {z}
+  IsOrderedAbGroup.posSum→pos∨pos isOrderedAbGroupℝ =
+    λ x y → posSum→pos∨pos {x} {y}
+  IsOrderedAbGroup.<-≤-trans isOrderedAbGroupℝ =
+    λ x y z → isTrans<≤ {x} {y} {z}
+  IsOrderedAbGroup.≤-<-trans isOrderedAbGroupℝ =
+    λ x y z → isTrans≤< {x} {y} {z}

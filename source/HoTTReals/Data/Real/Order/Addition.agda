@@ -50,9 +50,9 @@ open import HoTTReals.Relation.Premetric.Mappings
 open BinaryRelation
 open PositiveRationals
 open PositiveHalvesℚ
-open OrderedCommRingTheory ℚOrderedCommRing using
-  ( <→0<Δ ; 0<Δ→< ; 0≤→abs≡id ; abs)
-open OrderedAbGroupTheory ℚOrderedAbGroup using (-⊓ ; +DistL⊔)
+open OrderedCommRingTheory ℚOrderedCommRing using (<→0<Δ ; 0<Δ→<)
+open OrderedAbGroupTheory ℚOrderedAbGroup using (-⊓ ; +DistL⊔ ; 0≤→abs≡id)
+  renaming (abs to absℚ)
 open AbGroupStr (snd ℝAbGroup) using (+InvL)
 open GroupTheory (AbGroup→Group ℝAbGroup) using (invDistr ; invInv)
 open PremetricTheory ℝPremetricSpace using (isLimit≈<)
@@ -456,11 +456,11 @@ posSum→pos∨pos {x} {y} 0<x+y =
     dropZero : 0 ℚ.- (ℚ.- ⟨ η ⟩₊) ≡ ⟨ η ⟩₊
     dropZero = ℚ!
 
-    radius : abs (0 ℚ.- (ℚ.- ⟨ η ⟩₊)) ≡ ⟨ η ⟩₊
+    radius : absℚ (0 ℚ.- (ℚ.- ⟨ η ⟩₊)) ≡ ⟨ η ⟩₊
     radius =
-      cong abs dropZero ∙ 0≤→abs≡id ⟨ η ⟩₊ (ℚ.<Weaken≤ 0 ⟨ η ⟩₊ (snd η))
+      cong absℚ dropZero ∙ 0≤→abs≡id (ℚ.<Weaken≤ 0 ⟨ η ⟩₊ (snd η))
 
-    ballBelow : abs (0 ℚ.- (ℚ.- ⟨ η ⟩₊)) ℚ.< ⟨ ε ⟩₊
+    ballBelow : absℚ (0 ℚ.- (ℚ.- ⟨ η ⟩₊)) ℚ.< ⟨ ε ⟩₊
     ballBelow = subst (ℚ._< ⟨ ε ⟩₊) (sym radius) (/2₊<id ε)
 
     shift : x ∼[ ε ] (x - rat ⟨ η ⟩₊)

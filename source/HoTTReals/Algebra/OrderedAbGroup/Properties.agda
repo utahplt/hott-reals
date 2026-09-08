@@ -97,6 +97,12 @@ module _ (G' : OrderedAbGroup ℓ ℓ') where
     +DistL⊔ : (x y z : G) → (x ⊔ y) + z ≡ (x + z) ⊔ (y + z)
     +DistL⊔ x y z = pres∨ (+PseudolatticeEquivR z) x y
 
+    +CancelR≤ : {x y z : G} → x + z ≤ y + z → x ≤ y
+    +CancelR≤ {x} {y} {z} = {!!}
+
+    +CancelR< : {x y z : G} → x + z < y + z → x < y
+    +CancelR< {x} {y} {z} = {!!}
+
     -Flip≤ : {x y : G} → x ≤ y → - y ≤ - x
     -Flip≤ {x} {y} x≤y = begin≤
       - y

@@ -18,6 +18,8 @@ import HoTTReals.Algebra.OrderedAbGroup.Properties
 
 import HoTTReals.Algebra.OrderedCommRing.Properties
 
+import HoTTReals.Algebra.OrderedField.Base
+
 import HoTTReals.Data.Real.Algebra.Addition
 
 import HoTTReals.Data.Real.Algebra.Lattice

@@ -4,6 +4,8 @@ open import Cubical.Relation.Premetric.Completion.Instances.HIITReals
 
 import HoTTReals.Algebra.AbGroup.Properties
 
+import HoTTReals.Algebra.ArchimedeanRing.Base
+
 import HoTTReals.Algebra.CommRing.Properties
 
 import HoTTReals.Algebra.HeytingField.Base

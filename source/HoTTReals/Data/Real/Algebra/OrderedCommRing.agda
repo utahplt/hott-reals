@@ -33,14 +33,18 @@ OrderedCommRingStr.isOrderedCommRing (snd ℝOrderedCommRing) = isOrderedCommRin
     CommRingStr.isCommRing $ snd ℝCommRing
   IsOrderedCommRing.isPseudolattice isOrderedCommRingℝ =
     PseudolatticeStr.is-pseudolattice $ snd ℝ≤Pseudolattice
-  IsOrderedCommRing.isStrictOrder isOrderedCommRingℝ = {!!}
-  IsOrderedCommRing.<-≤-weaken isOrderedCommRingℝ = {!!}
-  IsOrderedCommRing.≤≃¬> isOrderedCommRingℝ = {!!}
-  IsOrderedCommRing.+MonoR≤ isOrderedCommRingℝ = {!!}
-  IsOrderedCommRing.+MonoR< isOrderedCommRingℝ = {!!}
-  IsOrderedCommRing.posSum→pos∨pos isOrderedCommRingℝ = {!!}
-  IsOrderedCommRing.<-≤-trans isOrderedCommRingℝ = {!!}
-  IsOrderedCommRing.≤-<-trans isOrderedCommRingℝ = {!!}
-  IsOrderedCommRing.·MonoR≤ isOrderedCommRingℝ = {!!}
-  IsOrderedCommRing.·MonoR< isOrderedCommRingℝ = {!!}
-  IsOrderedCommRing.0<1 isOrderedCommRingℝ = {!!}
+  IsOrderedCommRing.isStrictOrder isOrderedCommRingℝ =
+    StrictOrderStr.isStrictOrder $ snd ℝ<StrictOrder
+  IsOrderedCommRing.<-≤-weaken isOrderedCommRingℝ = λ x y → <Weaken≤ {x} {y}
+  IsOrderedCommRing.≤≃¬> isOrderedCommRingℝ = λ x y → ≤≃¬> {x} {y}
+  IsOrderedCommRing.+MonoR≤ isOrderedCommRingℝ = λ x y z → +MonoR≤ {x} {y} {z}
+  IsOrderedCommRing.+MonoR< isOrderedCommRingℝ = λ x y z → +MonoR< {x} {y} {z}
+  IsOrderedCommRing.posSum→pos∨pos isOrderedCommRingℝ =
+    λ x y → posSum→pos∨pos {x} {y}
+  IsOrderedCommRing.<-≤-trans isOrderedCommRingℝ =
+    λ x y z → isTrans<≤ {x} {y} {z}
+  IsOrderedCommRing.≤-<-trans isOrderedCommRingℝ =
+    λ x y z → isTrans≤< {x} {y} {z}
+  IsOrderedCommRing.·MonoR≤ isOrderedCommRingℝ = λ x y z → ·MonoR≤ {x} {y} {z}
+  IsOrderedCommRing.·MonoR< isOrderedCommRingℝ = λ x y z → ·MonoR< {x} {y} {z}
+  IsOrderedCommRing.0<1 isOrderedCommRingℝ = 0<1

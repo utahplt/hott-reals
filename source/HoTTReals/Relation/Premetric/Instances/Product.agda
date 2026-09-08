@@ -4,7 +4,7 @@ open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.SIP using (⟨_⟩)
 
-open import Cubical.HITs.PropositionalTruncation using (∣_∣₁)
+open import Cubical.HITs.PropositionalTruncation as PT using (∣_∣₁ ; squash₁)
 
 open import Cubical.Algebra.OrderedCommRing.Instances.Rationals
 
@@ -118,6 +118,24 @@ module _
               NE₂[_,_,_].lNE h)
             ( isNonExpansive→isLipschitzWith1 _ _ _ ∘
               NE₂[_,_,_].rNE h)) ∣₁
+
+    composeL₂ :
+      L[ K , M ] →
+      L[ K , N ] →
+      NE₂[ M , N , X ] →
+      L[ K , X ]
+    fst (composeL₂ f g h) x =
+      NE₂[_,_,_].fun h (fst f x) (fst g x)
+    snd (composeL₂ f g h) = {!!}
+
+    composeC₂ :
+      C[ K , M ] →
+      C[ K , N ] →
+      NE₂[ M , N , X ] →
+      C[ K , X ]
+    fst (composeC₂ f g h) x =
+      NE₂[_,_,_].fun h (fst f x) (fst g x)
+    snd (composeC₂ f g h) = {!!}
 
   uncurryIsLipschitzWith :
     (h : ⟨ M ⟩ → ⟨ N ⟩ → ⟨ X ⟩) (R₁ R₂ : ℚ₊) →

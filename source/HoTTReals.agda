@@ -9,6 +9,7 @@ import HoTTReals.Algebra.OrderedAbGroup.Properties
 import HoTTReals.Data.Real.Algebra.Addition
 
 import HoTTReals.Data.Real.Algebra.Lattice
+import HoTTReals.Data.Real.Algebra.OrderedAbGroup
 
 import HoTTReals.Data.Real.Order.Addition
 import HoTTReals.Data.Real.Order.Base

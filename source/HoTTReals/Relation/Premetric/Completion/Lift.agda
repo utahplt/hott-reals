@@ -4,16 +4,21 @@ open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.SIP using (⟨_⟩)
 
+open import Cubical.Algebra.OrderedCommRing.Instances.Rationals
+
 open import Cubical.Relation.Premetric
 open import Cubical.Relation.Premetric.Mappings
 open import Cubical.Relation.Premetric.Completion.Base using (ι)
 open import Cubical.Relation.Premetric.Completion.Properties renaming
   (ℭPremetricSpace to ℭ)
-open import Cubical.Relation.Premetric.Completion.Lift
+open import Cubical.Relation.Premetric.Completion.Lift using (continuous≡)
+
+open PositiveRationals
+open PremetricTheory using (isComplete)
 
 private
   variable
-    ℓA ℓA' ℓB ℓB' ℓN ℓN' : Level
+    ℓA ℓA' ℓB ℓB' ℓM ℓM' ℓN ℓN' : Level
 
 module _
   (A : PremetricSpace ℓA (ℓ-max ℓA ℓA'))
@@ -53,3 +58,24 @@ module _
           ( flip g (ι b) , gContinuousL (ι b))
           ( flip fιι≡gιι b)
           ( u))
+
+module _
+  (M : PremetricSpace ℓM (ℓ-max ℓM ℓM'))
+  (N : PremetricSpace ℓN' ℓN) where
+  private
+    ℭM = ℭ ℓM' M
+
+  module LiftCompleteCodomain (N-com : isComplete N) where
+
+    liftLipschitzWith :
+      (L : ℚ₊) (f : ⟨ M ⟩ → ⟨ N ⟩) →
+      IsLipschitzWith (snd M) f (snd N) L →
+      Σ[ f' ∈ (⟨ ℭM ⟩ → ⟨ N ⟩) ] IsLipschitzWith (snd ℭM) f' (snd N) L
+    fst (liftLipschitzWith L f fLipschitz) = {!!}
+    snd (liftLipschitzWith L f fLipschitz) = {!!}
+
+    liftLipschitzWith∘ι :
+      (L : ℚ₊) (f : ⟨ M ⟩ → ⟨ N ⟩)
+      (fLipschitz : IsLipschitzWith (snd M) f (snd N) L) →
+      fst (liftLipschitzWith L f fLipschitz) ∘ ι ≡ f
+    liftLipschitzWith∘ι L f fLipschitz = {!!}

@@ -16,6 +16,8 @@ open import Cubical.Relation.Premetric.Instances.Product
 open import Cubical.Tactics.CommRingSolver.Specialised.Rationals
 
 open PositiveRationals
+open 1/2∈ℚ using (/2+/2≡id)
+open PositiveHalvesℚ using (_/2₊)
 
 private
   variable
@@ -126,7 +128,27 @@ module _
       L[ K , X ]
     fst (composeL₂ f g h) x =
       NE₂[_,_,_].fun h (fst f x) (fst g x)
-    snd (composeL₂ f g h) = {!!}
+    snd (composeL₂ f g h) =
+      PT.rec2
+        ( squash₁)
+        ( λ (L₁ , fLipschitz) (L₂ , gLipschitz) →
+          ∣ 1 ·₊ L₁ +₊ 1 ·₊ L₂ ,
+            composeIsLipschitzWith₂
+              ( fst f)
+              ( fst g)
+              ( NE₂[_,_,_].fun h)
+              ( L₁)
+              ( L₂)
+              ( 1)
+              ( 1)
+              ( fLipschitz)
+              ( gLipschitz)
+              ( isNonExpansive→isLipschitzWith1 _ _ _ ∘
+                NE₂[_,_,_].lNE h)
+              ( isNonExpansive→isLipschitzWith1 _ _ _ ∘
+                NE₂[_,_,_].rNE h) ∣₁)
+        ( snd f)
+        ( snd g)
 
     composeC₂ :
       C[ K , M ] →
@@ -135,7 +157,42 @@ module _
       C[ K , X ]
     fst (composeC₂ f g h) x =
       NE₂[_,_,_].fun h (fst f x) (fst g x)
-    snd (composeC₂ f g h) = {!!}
+    IsContinuousAt.pres≈ (snd (composeC₂ f g h) x) ε =
+      PT.rec2
+        ( squash₁)
+        ( λ (δ₁ , fClose) (δ₂ , gClose) →
+          ∣ min₊ δ₁ δ₂ ,
+            ( λ y x≈y →
+              subst≈
+                ( fun h (fst f x) (fst g x))
+                ( fun h (fst f y) (fst g y))
+                ( combineHalves)
+                ( isTriangular≈
+                  ( fun h (fst f x) (fst g x))
+                  ( fun h (fst f y) (fst g x))
+                  ( fun h (fst f y) (fst g y))
+                  ( ε /2₊)
+                  ( ε /2₊)
+                  ( IsNonExpansive.pres≈ (lNE h $ fst g x)
+                    ( fst f x)
+                    ( fst f y)
+                    ( ε /2₊)
+                    ( fClose y $ PK.isMonotone≈≤ (min₊≤L δ₁ δ₂) x≈y))
+                  ( IsNonExpansive.pres≈ (rNE h $ fst f y)
+                    ( fst g x)
+                    ( fst g y)
+                    ( ε /2₊)
+                    ( gClose y $ PK.isMonotone≈≤ (min₊≤R δ₁ δ₂) x≈y)))) ∣₁)
+        ( IsContinuousAt.pres≈ (snd f x) (ε /2₊))
+        ( IsContinuousAt.pres≈ (snd g x) (ε /2₊))
+      where
+      open NE₂[_,_,_]
+      open PremetricStr (snd X)
+      open PremetricTheory X
+      module PK = PremetricTheory K
+
+      combineHalves : ⟨ ε /2₊ +₊ ε /2₊ ⟩₊ ≡ ⟨ ε ⟩₊
+      combineHalves = /2+/2≡id ⟨ ε ⟩₊
 
   uncurryIsLipschitzWith :
     (h : ⟨ M ⟩ → ⟨ N ⟩ → ⟨ X ⟩) (R₁ R₂ : ℚ₊) →

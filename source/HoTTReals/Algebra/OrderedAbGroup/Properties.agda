@@ -118,16 +118,40 @@ module _ (G' : OrderedAbGroup ℓ ℓ') where
       - x ◾
 
     ≤→0≤Δ : (x y : G) → x ≤ y → 0g ≤ y - x
-    ≤→0≤Δ x y x≤y = {!!}
+    ≤→0≤Δ x y x≤y = begin≤
+      0g
+        ≡→≤⟨ sym $ +InvR x ⟩
+      x - x
+        ≤⟨ x≤y ≤+[ - x ] ⟩
+      y - x ◾
 
     0≤Δ→≤ : (x y : G) → 0g ≤ y - x → x ≤ y
-    0≤Δ→≤ x y 0≤y-x = {!!}
+    0≤Δ→≤ x y 0≤y-x = begin≤
+      x
+        ≡→≤⟨ sym $ +IdL x ⟩
+      0g + x
+        ≤⟨ 0≤y-x ≤+[ x ] ⟩
+      (y - x) + x
+        ≡→≤⟨ subAddCancel y x ⟩
+      y ◾
 
     <→0<Δ : (x y : G) → x < y → 0g < y - x
-    <→0<Δ x y x<y = {!!}
+    <→0<Δ x y x<y = begin<
+      0g
+        ≡→≤⟨ sym $ +InvR x ⟩
+      x - x
+        <⟨ x<y <+[ - x ] ⟩
+      y - x ◾
 
     0<Δ→< : (x y : G) → 0g < y - x → x < y
-    0<Δ→< x y 0<y-x = {!!}
+    0<Δ→< x y 0<y-x = begin<
+      x
+        ≡→≤⟨ sym $ +IdL x ⟩
+      0g + x
+        <⟨ 0<y-x <+[ x ] ⟩
+      (y - x) + x
+        ≡→≤⟨ subAddCancel y x ⟩
+      y ◾
 
     -PseudolatticeEquiv : PseudolatticeEquiv G≤ (DualPseudolattice G≤)
     fst (fst -PseudolatticeEquiv) = -_

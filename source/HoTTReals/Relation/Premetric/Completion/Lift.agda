@@ -92,7 +92,37 @@ module _
       f (ι a) (ι b) (ι c) ≡ g (ι a) (ι b) (ι c)) →
     (u : ⟨ ℭA ⟩) (v : ⟨ ℭB ⟩) (w : ⟨ ℭC ⟩) →
     f u v w ≡ g u v w
-  continuous₃≡ = {!!}
+  continuous₃≡
+    ( f)
+    ( g)
+    ( fContinuous₃)
+    ( fContinuous₂)
+    ( fContinuous₁)
+    ( gContinuous₃)
+    ( gContinuous₂)
+    ( gContinuous₁)
+    ( fιιι≡gιιι)
+    ( u)
+    ( v) =
+    continuous≡
+      ( C)
+      ( N)
+      ( f u v , fContinuous₃ u v)
+      ( g u v , gContinuous₃ u v)
+      ( λ c →
+        continuous₂≡
+          ( A)
+          ( B)
+          ( N)
+          ( λ u' v' → f u' v' (ι c))
+          ( λ u' v' → g u' v' (ι c))
+          ( λ u' → fContinuous₂ u' (ι c))
+          ( λ v' → fContinuous₁ v' (ι c))
+          ( λ u' → gContinuous₂ u' (ι c))
+          ( λ v' → gContinuous₁ v' (ι c))
+          ( λ a b → fιιι≡gιιι a b c)
+          ( u)
+          ( v))
 
 module _
   (M : PremetricSpace ℓM (ℓ-max ℓM ℓM'))

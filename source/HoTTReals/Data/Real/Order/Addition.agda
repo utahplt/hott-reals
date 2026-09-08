@@ -39,6 +39,7 @@ open import Cubical.Relation.Premetric.Completion.Instances.HIITReals
 
 open import Cubical.Tactics.CommRingSolver.Specialised.Rationals using (ℚ!)
 
+import HoTTReals.Algebra.AbGroup.Properties as AbGroupProperties
 open import HoTTReals.Algebra.OrderedAbGroup.Properties
 open import HoTTReals.Algebra.OrderedAbGroup.Instances.Rationals
 open import HoTTReals.Data.Real.Algebra.Addition
@@ -53,8 +54,9 @@ open PositiveHalvesℚ
 open OrderedCommRingTheory ℚOrderedCommRing using (<→0<Δ ; 0<Δ→<)
 open OrderedAbGroupTheory ℚOrderedAbGroup using (-⊓ ; +DistL⊔ ; 0≤→abs≡id)
   renaming (abs to absℚ)
-open AbGroupStr (snd ℝAbGroup) using (+InvL)
-open GroupTheory (AbGroup→Group ℝAbGroup) using (invDistr ; invInv)
+open AbGroupProperties.AbGroupTheory ℝAbGroup using
+  ( negAdd ; negAddCancelLeft ; subAddCancel)
+open GroupTheory (AbGroup→Group ℝAbGroup) using (invInv)
 open PremetricTheory ℝPremetricSpace using (isLimit≈<)
 
 -DistMin : (x y : ℝ) → - min x y ≡ max (- x) (- y)
@@ -147,7 +149,7 @@ open PremetricTheory ℝPremetricSpace using (isLimit≈<)
 
 ∼→≤+rat : {x y : ℝ} {ε : ℚ₊} → x ∼[ ε ] y → y ≤ x + rat ⟨ ε ⟩₊
 ∼→≤+rat {x} {y} {ε} x∼y =
-  subst2 _≤_ cancelTranslation commuteTranslation
+  subst2 _≤_ (subAddCancel y x) commuteTranslation
     ( +MonoR≤ {y - x} {rat (0 ℚ.+ ⟨ ε ⟩₊)} {x}
       ( rat∼→≤rat+ {0} {ε} {y - x}
         ( subst
@@ -155,16 +157,6 @@ open PremetricTheory ℝPremetricSpace using (isLimit≈<)
           ( +InvR x)
           ( IsNonExpansive.pres≈ (snd +ⁿ[ - x ]) x y ε x∼y))))
   where
-  cancelTranslation : (y - x) + x ≡ y
-  cancelTranslation =
-    (y - x) + x
-      ≡⟨ sym (+Assoc y (- x) x) ⟩
-    y + ((- x) + x)
-      ≡⟨ cong (y +_) (+InvL x) ⟩
-    y + 0
-      ≡⟨ +IdR y ⟩
-    y ∎
-
   commuteTranslation : rat (0 ℚ.+ ⟨ ε ⟩₊) + x ≡ x + rat ⟨ ε ⟩₊
   commuteTranslation =
     +Comm (rat (0 ℚ.+ ⟨ ε ⟩₊)) x ∙ cong (λ q → x + rat q) (ℚ.+IdL ⟨ ε ⟩₊)
@@ -191,13 +183,8 @@ open PremetricTheory ℝPremetricSpace using (isLimit≈<)
   where
   negateTranslation : - ((- x) + rat ⟨ ε ⟩₊) ≡ x - rat ⟨ ε ⟩₊
   negateTranslation =
-    - ((- x) + rat ⟨ ε ⟩₊)
-      ≡⟨ invDistr (- x) (rat ⟨ ε ⟩₊) ⟩
-    (- rat ⟨ ε ⟩₊) + (- (- x))
-      ≡⟨ cong ((- rat ⟨ ε ⟩₊) +_) (invInv x) ⟩
-    (- rat ⟨ ε ⟩₊) + x
-      ≡⟨ +Comm (- rat ⟨ ε ⟩₊) x ⟩
-    x - rat ⟨ ε ⟩₊ ∎
+    negAdd (- x) (rat ⟨ ε ⟩₊) ∙
+      cong (_+ (- rat ⟨ ε ⟩₊)) (invInv x)
 
 <→rat<∨<rat : {q r : ℚ} (x : ℝ) → q ℚ.< r → (rat q < x) ⊔′ (x < rat r)
 <→rat<∨<rat {q} {r} x q<r = Elimℭ-Prop.go e x q r q<r
@@ -417,19 +404,9 @@ StrictOrderStr.isStrictOrder (snd ℝ<StrictOrder) =
 +ReflectL< : {x y a : ℝ} → a + x < a + y → x < y
 +ReflectL< {x} {y} {a} a+x<a+y =
   subst2 _<_
-    ( cancelTranslation x)
-    ( cancelTranslation y)
+    ( negAddCancelLeft a x)
+    ( negAddCancelLeft a y)
     ( +MonoL< {a + x} {a + y} { - a} a+x<a+y)
-  where
-  cancelTranslation : (b : ℝ) → (- a) + (a + b) ≡ b
-  cancelTranslation b =
-    (- a) + (a + b)
-      ≡⟨ +Assoc (- a) a b ⟩
-    ((- a) + a) + b
-      ≡⟨ cong (_+ b) (+InvL a) ⟩
-    0 + b
-      ≡⟨ +IdL b ⟩
-    b ∎
 
 posSum→pos∨pos : {x y : ℝ} → 0 < x + y → (0 < x) ⊔′ (0 < y)
 posSum→pos∨pos {x} {y} 0<x+y =
@@ -486,16 +463,7 @@ posSum→pos∨pos {x} {y} 0<x+y =
               ( ⊎.rec (idfun (x - rat ⟨ ε ⟩₊ < y)) (⊥.rec ∘ ¬y<x))
               ( isWeaklyLinear< (x - rat ⟨ ε ⟩₊) x y (below ε)))))
   where
-  restoreTranslation : (ε : ℚ₊) → (x - rat ⟨ ε ⟩₊) + rat ⟨ ε ⟩₊ ≡ x
-  restoreTranslation ε =
-    (x - rat ⟨ ε ⟩₊) + rat ⟨ ε ⟩₊
-      ≡⟨ sym (+Assoc x (- rat ⟨ ε ⟩₊) (rat ⟨ ε ⟩₊)) ⟩
-    x + ((- rat ⟨ ε ⟩₊) + rat ⟨ ε ⟩₊)
-      ≡⟨ cong (x +_) (+InvL (rat ⟨ ε ⟩₊)) ⟩
-    x + 0
-      ≡⟨ +IdR x ⟩
-    x ∎
-
   below : (ε : ℚ₊) → x - rat ⟨ ε ⟩₊ < x
   below ε =
-    subst (x - rat ⟨ ε ⟩₊ <_) (restoreTranslation ε) (<+rat (x - rat ⟨ ε ⟩₊) ε)
+    subst (x - rat ⟨ ε ⟩₊ <_) (subAddCancel x (rat ⟨ ε ⟩₊))
+      ( <+rat (x - rat ⟨ ε ⟩₊) ε)

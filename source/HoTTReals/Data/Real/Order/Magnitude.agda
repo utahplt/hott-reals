@@ -13,7 +13,6 @@ open import Cubical.Data.Rationals.Order as ℚ using ()
 open import Cubical.HITs.PropositionalTruncation as PT using (∣_∣₁ ; squash₁)
 
 open import Cubical.Algebra.AbGroup
-open import Cubical.Algebra.Group.Properties
 open import Cubical.Algebra.OrderedCommRing.Instances.Rationals
 
 open import Cubical.Relation.Premetric
@@ -28,6 +27,7 @@ open import Cubical.Relation.Premetric.Completion.Instances.HIITReals
 
 open import Cubical.Tactics.CommRingSolver.Specialised.Rationals using (ℚ!)
 
+import HoTTReals.Algebra.AbGroup.Properties as AbGroupProperties
 open import HoTTReals.Algebra.OrderedAbGroup.Properties
 open import HoTTReals.Algebra.OrderedAbGroup.Instances.Rationals
 open import HoTTReals.Data.Real.Algebra.Addition
@@ -41,8 +41,8 @@ open PositiveHalvesℚ
 open OrderedAbGroupTheory ℝOrderedAbGroup using
   ( abs ; 0≤abs ; abs≤≃ ; absΔabs≤ ; abs<→< ; abs<→-<)
 open OrderedAbGroupTheory ℚOrderedAbGroup using () renaming (abs to absℚ)
-open AbGroupStr (snd ℝAbGroup) using (+InvL)
-open GroupTheory (AbGroup→Group ℝAbGroup) using (invDistr ; invInv)
+open AbGroupProperties.AbGroupTheory ℝAbGroup using
+  ( addSubCancelLeft ; addSubCancelRight ; negSub ; subAddCancel)
 open PremetricTheory ℝPremetricSpace using (isLimit≈<)
 
 abs∘rat : (q : ℚ) → abs (rat q) ≡ rat (absℚ q)
@@ -52,20 +52,8 @@ abs∘rat q = refl
 ∼→Δ≤rat {x} {y} {ε} x∼y =
   subst
     ( (y - x) ≤_)
-    ( cancelTranslation)
+    ( addSubCancelLeft x (rat ⟨ ε ⟩₊))
     ( +MonoR≤ {y} {x + rat ⟨ ε ⟩₊} { - x} (∼→≤+rat {x} {y} {ε} x∼y))
-  where
-  cancelTranslation : (x + rat ⟨ ε ⟩₊) - x ≡ rat ⟨ ε ⟩₊
-  cancelTranslation =
-    (x + rat ⟨ ε ⟩₊) - x
-      ≡⟨ +Comm (x + rat ⟨ ε ⟩₊) (- x) ⟩
-    (- x) + (x + rat ⟨ ε ⟩₊)
-      ≡⟨ +Assoc (- x) x (rat ⟨ ε ⟩₊) ⟩
-    ((- x) + x) + rat ⟨ ε ⟩₊
-      ≡⟨ cong (_+ rat ⟨ ε ⟩₊) (+InvL x) ⟩
-    0 + rat ⟨ ε ⟩₊
-      ≡⟨ +IdL (rat ⟨ ε ⟩₊) ⟩
-    rat ⟨ ε ⟩₊ ∎
 
 -rat<→<rat→∼0 :
   {d : ℝ} {ε : ℚ₊} → - rat ⟨ ε ⟩₊ < d → d < rat ⟨ ε ⟩₊ → d ∼[ ε ] 0
@@ -162,22 +150,11 @@ abs∘rat q = refl
       δ : ℚ₊
       δ = η /2₊
 
-      cancelTranslation :
-        (lim y yIsCauchy + rat ⟨ η₁ ⟩₊) - rat ⟨ η₁ ⟩₊ ≡ lim y yIsCauchy
-      cancelTranslation =
-        (lim y yIsCauchy + rat ⟨ η₁ ⟩₊) - rat ⟨ η₁ ⟩₊
-          ≡⟨ sym (+Assoc (lim y yIsCauchy) (rat ⟨ η₁ ⟩₊) (- rat ⟨ η₁ ⟩₊)) ⟩
-        lim y yIsCauchy + (rat ⟨ η₁ ⟩₊ - rat ⟨ η₁ ⟩₊)
-          ≡⟨ cong (lim y yIsCauchy +_) (+InvR (rat ⟨ η₁ ⟩₊)) ⟩
-        lim y yIsCauchy + 0
-          ≡⟨ +IdR (lim y yIsCauchy) ⟩
-        lim y yIsCauchy ∎
-
       limitBelowShifted : lim y yIsCauchy ≤ rat (⟨ ε ⟩₊ ℚ.- ⟨ η₁ ⟩₊)
       limitBelowShifted =
         subst
           ( _≤ rat (⟨ ε ⟩₊ ℚ.- ⟨ η₁ ⟩₊))
-          ( cancelTranslation)
+          ( addSubCancelRight (lim y yIsCauchy) (rat ⟨ η₁ ⟩₊))
           ( +MonoR≤
               { lim y yIsCauchy + rat ⟨ η₁ ⟩₊}
               { rat ⟨ ε ⟩₊}
@@ -266,14 +243,6 @@ abs∘rat q = refl
         ( isRounded∼ x y ε x∼y))
     ( backward)
   where
-  negateDifference : y - x ≡ - (x - y)
-  negateDifference =
-    y - x
-      ≡⟨ cong (_- x) (sym (invInv y)) ⟩
-    (- (- y)) - x
-      ≡⟨ sym (invDistr x (- y)) ⟩
-    - (x - y) ∎
-
   forward :
     Σ[ θ ∈ ℚ₊ ] (θ <₊ ε) × (x ∼[ θ ] y) → abs (x - y) < rat ⟨ ε ⟩₊
   forward (θ , θ<ε , x∼y) =
@@ -281,22 +250,13 @@ abs∘rat q = refl
       ( invEq
         ( abs≤≃ {x - y} {rat ⟨ θ ⟩₊})
         ( ∼→Δ≤rat {y} {x} {θ} (isSym∼ x y θ x∼y) ,
-          subst (_≤ rat ⟨ θ ⟩₊) negateDifference (∼→Δ≤rat {x} {y} {θ} x∼y)))
+          subst (_≤ rat ⟨ θ ⟩₊) (sym (negSub x y))
+            ( ∼→Δ≤rat {x} {y} {θ} x∼y)))
       ( equivFun (<≃rat< {⟨ θ ⟩₊} {⟨ ε ⟩₊}) θ<ε)
-
-  restoreTranslation : (x - y) + y ≡ x
-  restoreTranslation =
-    (x - y) + y
-      ≡⟨ sym (+Assoc x (- y) y) ⟩
-    x + ((- y) + y)
-      ≡⟨ cong (x +_) (+InvL y) ⟩
-    x + 0
-      ≡⟨ +IdR x ⟩
-    x ∎
 
   backward : abs (x - y) < rat ⟨ ε ⟩₊ → x ∼[ ε ] y
   backward ∣x-y∣<ratε =
-    subst2 (_∼[ ε ]_) restoreTranslation (+IdL y)
+    subst2 (_∼[ ε ]_) (subAddCancel x y) (+IdL y)
       ( IsNonExpansive.pres≈ (snd +ⁿ[ y ]) (x - y) 0 ε
         ( -rat<→<rat→∼0 {x - y} {ε}
           ( abs<→-< {x - y} {rat ⟨ ε ⟩₊} ∣x-y∣<ratε)

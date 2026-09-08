@@ -2,6 +2,8 @@ module HoTTReals where
 
 open import Cubical.Relation.Premetric.Completion.Instances.HIITReals
 
+import HoTTReals.Algebra.AbGroup.Properties
+
 import HoTTReals.Algebra.OrderedAbGroup.Base
 import HoTTReals.Algebra.OrderedAbGroup.Instances.Rationals
 import HoTTReals.Algebra.OrderedAbGroup.Properties

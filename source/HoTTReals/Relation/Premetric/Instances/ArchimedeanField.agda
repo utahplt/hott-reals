@@ -113,3 +113,9 @@ module _ (F : ArchimedeanField ℓ ℓ') where
   isPropIsCauchyComplete : isProp IsCauchyComplete
   isPropIsCauchyComplete =
     PremetricTheory.isPropIsComplete inducedPremetricSpace
+
+IsCauchyCompleteArchimedeanOrderedField :
+  OrderedField ℓ ℓ' → Type (ℓ-max ℓ ℓ')
+IsCauchyCompleteArchimedeanOrderedField F =
+  Σ[ isArchimedeanOrderedField ∈ IsArchimedeanOrderedField F ]
+    IsCauchyComplete (OrderedField→ArchimedeanField F isArchimedeanOrderedField)

@@ -24,6 +24,7 @@ import HoTTReals.Algebra.OrderedField.Book
 import HoTTReals.Algebra.OrderedField.Instances.Rationals
 import HoTTReals.Algebra.OrderedField.Properties
 
+import HoTTReals.Categories.Instances.CauchyCompleteArchimedeanFields
 import HoTTReals.Categories.Instances.OrderedFields
 
 import HoTTReals.Data.Real.Algebra.Addition

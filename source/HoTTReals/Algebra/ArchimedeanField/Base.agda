@@ -79,3 +79,13 @@ ArchimedeanField→OrderedField F =
 ArchimedeanField→HeytingField : ArchimedeanField ℓ ℓ' → HeytingField ℓ ℓ'
 ArchimedeanField→HeytingField =
   OrderedField→HeytingField ∘ ArchimedeanField→OrderedField
+
+IsArchimedeanOrderedField : OrderedField ℓ ℓ' → Type (ℓ-max ℓ ℓ')
+IsArchimedeanOrderedField F =
+  Σ[ ι ∈ (ℚ → ⟨ F ⟩) ] IsArchimedeanField 0f 1f _+_ _·_ -_ _<_ _≤_ ι
+  where open OrderedFieldStr (snd F)
+
+OrderedField→ArchimedeanField :
+  (F : OrderedField ℓ ℓ') → IsArchimedeanOrderedField F → ArchimedeanField ℓ ℓ'
+OrderedField→ArchimedeanField F (ι , isArchimedeanField) =
+  fst F , archimedeanfieldstr _ _ _ _ _ _ _ ι isArchimedeanField

@@ -85,3 +85,9 @@ inducedPremetricSpaceℝ≡ i .snd = premetricstr (≈≡ i) (isPremetric≡ i)
 isCauchyCompleteℝ : IsCauchyComplete ℝArchimedeanField
 isCauchyCompleteℝ =
   subst PremetricTheory.isComplete (sym inducedPremetricSpaceℝ≡) isCompleteℝ
+
+isCauchyCompleteArchimedeanOrderedFieldℝ :
+  IsCauchyCompleteArchimedeanOrderedField ℝOrderedField
+isCauchyCompleteArchimedeanOrderedFieldℝ =
+  ( rat , ArchimedeanFieldStr.isArchimedeanField (snd ℝArchimedeanField))
+  , isCauchyCompleteℝ

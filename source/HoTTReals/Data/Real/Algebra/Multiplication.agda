@@ -38,11 +38,15 @@ open import HoTTReals.Algebra.OrderedAbGroup.Instances.Rationals
 open import HoTTReals.Data.Real.Algebra.Addition
 open import HoTTReals.Data.Real.Algebra.OrderedAbGroup
 open import HoTTReals.Data.Real.Order.Base
+open import HoTTReals.Data.Real.Order.Addition
 open import HoTTReals.Data.Real.Order.Magnitude
 open import HoTTReals.Relation.Premetric.Completion.Lift
 open import HoTTReals.Relation.Premetric.Instances.Product
 
 open PositiveRationals
+open ℚ₊Inverse
+open PositiveHalvesℚ
+open 1/2∈ℚ using (/2+/2≡id)
 open OrderedCommRingTheory ℚOrderedCommRing using
   ( ·MonoL< ; ≤SumLeftNonNeg ; <SumLeftPos ; 0≤1)
 open HoTTRealsOrderedCommRingProperties.OrderedCommRingTheory ℚOrderedCommRing
@@ -436,7 +440,112 @@ _·ᶜ_ :
   C[ M , ℝPremetricSpace ] → C[ M , ℝPremetricSpace ] →
   C[ M , ℝPremetricSpace ]
 fst (f ·ᶜ g) a = fst f a · fst g a
-snd (f ·ᶜ g) = {!!}
+IsContinuousAt.pres≈ (snd (_·ᶜ_ {ℓM} {ℓM'} {M} f g) a) ε =
+  PT.rec2 squash₁ bounded (∃abs≤rat $ fst f a) (∃abs≤rat $ fst g a)
+  where
+  open PremetricStr (snd M) using (_≈[_]_)
+  open PremetricTheory M using (isMonotone≈≤)
+
+  Modulus : ℚ₊ → Type (ℓ-max ℓM ℓM')
+  Modulus δ =
+    (b : fst M) → a ≈[ δ ] b →
+    (fst f a · fst g a) ∼[ ε ] (fst f b · fst g b)
+
+  bounded :
+    Σ[ A ∈ ℚ₊ ] (abs (fst f a) ≤ rat ⟨ A ⟩₊) →
+    Σ[ K ∈ ℚ₊ ] (abs (fst g a) ≤ rat ⟨ K ⟩₊) →
+    ∃[ δ ∈ ℚ₊ ] Modulus δ
+  bounded (A , ∣fa∣≤A) (K , ∣ga∣≤K) =
+    PT.rec3
+      ( squash₁)
+      ( moduli)
+      ( IsContinuousAt.pres≈ (snd g a) 1)
+      ( IsContinuousAt.pres≈ (snd f a) ((ε /2₊) / (K +₊ 1)))
+      ( IsContinuousAt.pres≈ (snd g a) ((ε /2₊) / A))
+    where
+    moduli :
+      Σ[ δ₁ ∈ ℚ₊ ]
+        ((b : fst M) → a ≈[ δ₁ ] b → fst g a ∼[ 1 ] fst g b) →
+      Σ[ δ₂ ∈ ℚ₊ ]
+        ((b : fst M) → a ≈[ δ₂ ] b →
+          fst f a ∼[ (ε /2₊) / (K +₊ 1) ] fst f b) →
+      Σ[ δ₃ ∈ ℚ₊ ]
+        ((b : fst M) → a ≈[ δ₃ ] b → fst g a ∼[ (ε /2₊) / A ] fst g b) →
+      ∃[ δ ∈ ℚ₊ ] Modulus δ
+    moduli (δ₁ , a≈δ₁b→∼1) (δ₂ , a≈δ₂b→∼ε/2/K+1) (δ₃ , a≈δ₃b→∼ε/2/A) =
+      ∣ min₊ (min₊ δ₁ δ₂) δ₃ , close ∣₁
+      where
+      belowUnitModulus : min₊ (min₊ δ₁ δ₂) δ₃ ≤₊ δ₁
+      belowUnitModulus =
+        ℚ.isTrans≤ ⟨ min₊ (min₊ δ₁ δ₂) δ₃ ⟩₊ ⟨ min₊ δ₁ δ₂ ⟩₊ ⟨ δ₁ ⟩₊
+          ( min₊≤L (min₊ δ₁ δ₂) δ₃)
+          ( min₊≤L δ₁ δ₂)
+
+      belowFirstModulus : min₊ (min₊ δ₁ δ₂) δ₃ ≤₊ δ₂
+      belowFirstModulus =
+        ℚ.isTrans≤ ⟨ min₊ (min₊ δ₁ δ₂) δ₃ ⟩₊ ⟨ min₊ δ₁ δ₂ ⟩₊ ⟨ δ₂ ⟩₊
+          ( min₊≤L (min₊ δ₁ δ₂) δ₃)
+          ( min₊≤R δ₁ δ₂)
+
+      belowSecondModulus : min₊ (min₊ δ₁ δ₂) δ₃ ≤₊ δ₃
+      belowSecondModulus = min₊≤R (min₊ δ₁ δ₂) δ₃
+
+      close : Modulus (min₊ (min₊ δ₁ δ₂) δ₃)
+      close b a≈b =
+        subst∼
+          ( fst f a · fst g a)
+          ( fst f b · fst g b)
+          ( /2+/2≡id ⟨ ε ⟩₊)
+          ( isTriangular∼
+            ( fst f a · fst g a)
+            ( fst f a · fst g b)
+            ( fst f b · fst g b)
+            ( ε /2₊)
+            ( ε /2₊)
+            ( closeInSecondFactor)
+            ( closeInFirstFactor))
+        where
+        closeAtUnit : fst g a ∼[ 1 ] fst g b
+        closeAtUnit = a≈δ₁b→∼1 b $ isMonotone≈≤ belowUnitModulus a≈b
+
+        boundNearby : abs (fst g b) ≤ rat ⟨ K +₊ 1 ⟩₊
+        boundNearby =
+          isTrans≤
+            ( abs (fst g b))
+            ( abs (fst g a) + rat ⟨ 1₊ ⟩₊)
+            ( rat ⟨ K +₊ 1 ⟩₊)
+            ( ∼→≤+rat { abs (fst g a)} { abs (fst g b)} { 1}
+              ( IsNonExpansive.pres≈ (snd absⁿ) (fst g a) (fst g b) 1
+                ( closeAtUnit)))
+            ( +MonoR≤ { abs (fst g a)} { rat ⟨ K ⟩₊} { rat ⟨ 1₊ ⟩₊} ∣ga∣≤K)
+
+        closeInSecondFactor :
+          (fst f a · fst g a) ∼[ ε /2₊ ] (fst f a · fst g b)
+        closeInSecondFactor =
+          subst∼
+            ( fst f a · fst g a)
+            ( fst f a · fst g b)
+            ( ·/ A (ε /2₊))
+            ( IsLipschitzWith.pres≈
+              ( ·IsLipschitzWithL A (fst f a) ∣fa∣≤A)
+              ( fst g a)
+              ( fst g b)
+              ( (ε /2₊) / A)
+              ( a≈δ₃b→∼ε/2/A b $ isMonotone≈≤ belowSecondModulus a≈b))
+
+        closeInFirstFactor :
+          (fst f a · fst g b) ∼[ ε /2₊ ] (fst f b · fst g b)
+        closeInFirstFactor =
+          subst∼
+            ( fst f a · fst g b)
+            ( fst f b · fst g b)
+            ( ·/ (K +₊ 1) (ε /2₊))
+            ( IsLipschitzWith.pres≈
+              ( ·IsLipschitzWithR (K +₊ 1) (fst g b) boundNearby)
+              ( fst f a)
+              ( fst f b)
+              ( (ε /2₊) / (K +₊ 1))
+              ( a≈δ₂b→∼ε/2/K+1 b $ isMonotone≈≤ belowFirstModulus a≈b))
 
 infixl 7 _·ᶜ_
 

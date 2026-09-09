@@ -423,16 +423,9 @@ IsLipschitzWith.pres≈ (·IsLipschitzWithL L u ∣u∣≤L) v w δ v∼w =
 
 [_]·ᶜ : ℝ → C[ ℝPremetricSpace , ℝPremetricSpace ]
 fst [ u ]·ᶜ = u ·_
-snd [ u ]·ᶜ =
-  PT.rec
-    ( isPropIsContinuous (snd ℝPremetricSpace) (u ·_) (snd ℝPremetricSpace))
-    ( λ (L , ∣u∣≤L) →
-      isLipschitz→isContinuous
-        ( snd ℝPremetricSpace)
-        ( u ·_)
-        ( snd ℝPremetricSpace)
-        ( ∣ L , ·IsLipschitzWithL L u ∣u∣≤L ∣₁))
-    ( ∃abs≤rat u)
+snd [ u ]·ᶜ = isLipschitz→isContinuous _ (u ·_) _ $ PT.map
+  ( λ (L , ∣u∣≤L) → (L , ·IsLipschitzWithL L u ∣u∣≤L))
+  ( ∃abs≤rat u)
 
 ·Comm : (x y : ℝ) → x · y ≡ y · x
 ·Comm x y =

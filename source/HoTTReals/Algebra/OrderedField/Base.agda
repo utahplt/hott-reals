@@ -8,6 +8,7 @@ open import Cubical.Foundations.SIP
 
 open import Cubical.Algebra.CommRing
 open import HoTTReals.Algebra.HeytingField.Base
+open import HoTTReals.Algebra.OrderedCommRing.Morphisms
 open import Cubical.Algebra.OrderedCommRing
 open import Cubical.Algebra.OrderedCommRing.Morphisms
 
@@ -97,6 +98,16 @@ module _ {A : Type ℓ} {B : Type ℓ'} where
     (snd (OrderedField→OrderedCommRing (_ , F)))
     f
     (snd (OrderedField→OrderedCommRing (_ , K)))
+
+OrderedFieldHom : OrderedField ℓ ℓ<≤ → OrderedField ℓ' ℓ<≤' → Type _
+OrderedFieldHom F K = Σ[ f ∈ (⟨ F ⟩ → ⟨ K ⟩) ] IsOrderedFieldHom (F .snd) f (K .snd)
+
+module _
+  {ℓ ℓ' ℓ'' ℓ<≤ ℓ<≤' ℓ<≤'' : Level}
+  {F : OrderedField ℓ ℓ<≤} {K : OrderedField ℓ' ℓ<≤'} {H : OrderedField ℓ'' ℓ<≤''}
+  where
+  _∘of_ : OrderedFieldHom K H → OrderedFieldHom F K → OrderedFieldHom F H
+  _∘of_ = flip compOrderedCommRingMono
 
 {-
 -- ??

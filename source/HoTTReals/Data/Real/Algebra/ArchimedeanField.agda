@@ -14,58 +14,40 @@ open import Cubical.Algebra.OrderedCommRing.Instances.Rationals using
 
 open import Cubical.Relation.Premetric.Base
 open import Cubical.Relation.Premetric.Properties
-open import Cubical.Relation.Premetric.Completion.Instances.HIITReals
+open import Cubical.Relation.Premetric.Completion.Instances.HIITReals as ℝ hiding (
+  _+_ ; -_)
 
 open import HoTTReals.Algebra.ArchimedeanField.Base
 open import HoTTReals.Algebra.OrderedField.Base
-open import HoTTReals.Data.Real.Algebra.Addition
-open import HoTTReals.Data.Real.Algebra.Multiplication
-open import HoTTReals.Data.Real.Algebra.OrderedCommRing
-open import HoTTReals.Data.Real.Algebra.OrderedField
-open import HoTTReals.Data.Real.Order.Base
-open import HoTTReals.Data.Real.Order.Magnitude
+open import HoTTReals.Data.Real.Algebra.Addition as ℝ
+open import HoTTReals.Data.Real.Algebra.Multiplication as ℝ hiding (_·_)
+open import HoTTReals.Data.Real.Algebra.OrderedCommRing as ℝ
+open import HoTTReals.Data.Real.Algebra.OrderedField as ℝ
+open import HoTTReals.Data.Real.Order.Base as ℝ hiding (_<_ ; _≤_)
+open import HoTTReals.Data.Real.Order.Magnitude as ℝ
 open import HoTTReals.Relation.Premetric.Instances.ArchimedeanField
+
+open ArchimedeanFieldStr
 
 ℝArchimedeanField : ArchimedeanField ℓ-zero ℓ-zero
 fst ℝArchimedeanField = ℝ
-ArchimedeanFieldStr.0f (snd ℝArchimedeanField) = 0
-ArchimedeanFieldStr.1f (snd ℝArchimedeanField) = 1
-ArchimedeanFieldStr._+_ (snd ℝArchimedeanField) = _+_
-ArchimedeanFieldStr._·_ (snd ℝArchimedeanField) = _·_
-ArchimedeanFieldStr.-_ (snd ℝArchimedeanField) = -_
-ArchimedeanFieldStr._<_ (snd ℝArchimedeanField) = _<_
-ArchimedeanFieldStr._≤_ (snd ℝArchimedeanField) = _≤_
-ArchimedeanFieldStr.ι (snd ℝArchimedeanField) = rat
-ArchimedeanFieldStr.isArchimedeanField (snd ℝArchimedeanField) =
-  isArchimedeanFieldℝ
+0f  (snd ℝArchimedeanField) = 0
+1f  (snd ℝArchimedeanField) = 1
+_+_ (snd ℝArchimedeanField) = ℝ._+_
+_·_ (snd ℝArchimedeanField) = ℝ._·_
+-_  (snd ℝArchimedeanField) = ℝ.-_
+_<_ (snd ℝArchimedeanField) = ℝ._<_
+_≤_ (snd ℝArchimedeanField) = ℝ._≤_
+ι   (snd ℝArchimedeanField) = ℝ.rat
+isArchimedeanField (snd ℝArchimedeanField) = isArchimedeanFieldℝ
   where
-  isCommRingHomrat : IsCommRingHom (snd ℚCommRing) rat (snd ℝCommRing)
-  IsCommRingHom.pres0 isCommRingHomrat = refl
-  IsCommRingHom.pres1 isCommRingHomrat = refl
-  IsCommRingHom.pres+ isCommRingHomrat = λ q r → refl
-  IsCommRingHom.pres· isCommRingHomrat = λ q r → sym (rat·rat q r)
-  IsCommRingHom.pres- isCommRingHomrat = λ q → refl
+  open IsArchimedeanField
+  open OrderedFieldStr (snd ℝOrderedField) renaming (isOrderedField to isOFℝ)
 
-  isOrderedCommRingHomrat :
-    IsOrderedCommRingHom (snd ℚOrderedCommRing) rat (snd ℝOrderedCommRing)
-  IsOrderedCommRingHom.isCommRingHom isOrderedCommRingHomrat =
-    isCommRingHomrat
-  IsOrderedCommRingHom.pres≤ isOrderedCommRingHomrat =
-    λ q r → equivFun (≤≃rat≤ {q} {r})
-  IsOrderedCommRingHom.reflect< isOrderedCommRingHomrat =
-    λ q r → invEq (<≃rat< {q} {r})
-
-  isArchimedeanFieldℝ :
-    IsArchimedeanField 0 1 _+_ _·_ -_ _<_ _≤_ rat
-  IsArchimedeanField.isOrderedField isArchimedeanFieldℝ =
-    OrderedFieldStr.isOrderedField $ snd ℝOrderedField
-  IsOrderedCommRingMono.isOrderedCommRingHom
-    ( IsArchimedeanField.isOrderedFieldHom isArchimedeanFieldℝ) =
-    isOrderedCommRingHomrat
-  IsOrderedCommRingMono.pres<
-    ( IsArchimedeanField.isOrderedFieldHom isArchimedeanFieldℝ) =
-    λ q r → equivFun (<≃rat< {q} {r})
-  IsArchimedeanField.archimedeanProperty isArchimedeanFieldℝ = isArchimedean<
+  isArchimedeanFieldℝ : IsArchimedeanField _ _ _ _ _ _ _ _
+  isArchimedeanFieldℝ .isOrderedField      = isOFℝ
+  isArchimedeanFieldℝ .isOrderedFieldHom   = snd ratᶠ
+  isArchimedeanFieldℝ .archimedeanProperty = ℝ.isArchimedean<
 
 inducedPremetricSpaceℝ≡ :
   inducedPremetricSpace ℝArchimedeanField ≡ ℝPremetricSpace

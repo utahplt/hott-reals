@@ -68,6 +68,8 @@ module _ (F : OrderedField ℓ ℓ') (p : IsCauchyCompleteArchimedeanOrderedFiel
     ℝ' = OrderedField→OrderedCommRing ℝOrderedField
     Fcr = OrderedCommRing→CommRing F'
 
+    module rat = IsOrderedCommRingMono (snd ratᶠ)
+
     module F where
       open OrderedCommRingStr (snd F') public
       open OrderedCommRingTheory F' public
@@ -75,13 +77,13 @@ module _ (F : OrderedField ℓ ℓ') (p : IsCauchyCompleteArchimedeanOrderedFiel
 
   open ArchimedeanFieldStr (snd A) using
     ( ι ; archimedeanProperty ; ιpres1 ; ιpres+ ; ιpres· ; ιpres- ; ιpres< ;
-      ιreflect<)
+      ιreflect< ; isOrderedFieldHom)
   open ArchimedeanFieldTheory A using (ιpresAbs)
   open LiftCompleteCodomain ℚPremetricSpace N (snd p) using (liftNE)
 
   private
     ιpresΔ : (q r : ℚ) → ι (q ℚ.- r) ≡ ι q F.- ι r
-    ιpresΔ q r = ιpres+ q (ℚ.- r) ∙ cong (ι q F.+_) (ιpres- r)
+    ιpresΔ q r = ιpres+ q (ℚ.- r) ∙ congR F._+_ (ιpres- r)
 
     ιⁿ : NE[ ℚPremetricSpace , N ]
     fst ιⁿ = ι
@@ -195,21 +197,11 @@ module _ (F : OrderedField ℓ ℓ') (p : IsCauchyCompleteArchimedeanOrderedFiel
         f' = fst f
 
         f∘ratHom : CommRingHom ℚCommRing Fcr
-        fst f∘ratHom = f' ∘ rat
-        snd f∘ratHom =
-          makeIsCommRingHom {R = ℚCommRing} {S = Fcr} {f = f' ∘ rat}
-            ( f.pres1)
-            ( λ q r → f.pres+ (rat q) (rat r))
-            ( λ q r → cong f' (sym (rat·rat q r)) ∙ f.pres· (rat q) (rat r))
-
-        ιHom : CommRingHom ℚCommRing Fcr
-        fst ιHom = ι
-        snd ιHom =
-          makeIsCommRingHom {R = ℚCommRing} {S = Fcr} {f = ι}
-            ιpres1 ιpres+ ιpres·
+        f∘ratHom = (_ , f.isCommRingHom) ∘cr (_ , rat.isCommRingHom)
 
         f∘rat≡ι : (q : ℚ) → f' (rat q) ≡ ι q
-        f∘rat≡ι q = cong (λ h → fst h q) (CommRingHomℚ≡ Fcr f∘ratHom ιHom)
+        f∘rat≡ι = funExt⁻ $ cong fst $ CommRingHomℚ≡ Fcr f∘ratHom (ι , isCommRingHom)
+          where open IsOrderedCommRingMono isOrderedFieldHom
 
         f'presΔ : (x y : ℝ) → f' (x - y) ≡ f' x F.- f' y
         f'presΔ x y = f.pres+ x (- y) ∙ cong (f' x F.+_) (f.pres- y)

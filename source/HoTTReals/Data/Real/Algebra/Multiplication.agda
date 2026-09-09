@@ -305,16 +305,9 @@ rat·≡scale q x =
 
 ·ᶜ[_] : ℝ → C[ ℝPremetricSpace , ℝPremetricSpace ]
 fst ·ᶜ[ v ] = _· v
-snd ·ᶜ[ v ] =
-  PT.rec
-    ( isPropIsContinuous (snd ℝPremetricSpace) (_· v) (snd ℝPremetricSpace))
-    ( λ (L , ∣v∣≤L) →
-      isLipschitz→isContinuous
-        ( snd ℝPremetricSpace)
-        ( _· v)
-        ( snd ℝPremetricSpace)
-        ( ∣ L , ·IsLipschitzWithR L v ∣v∣≤L ∣₁))
-    ( ∃abs≤rat v)
+snd ·ᶜ[ v ] = isLipschitz→isContinuous _ (_· v) _ $ PT.map
+  ( λ (L , ∣v∣≤L) → (L , ·IsLipschitzWithR L v ∣v∣≤L))
+  ( ∃abs≤rat v)
 
 ·rat≡scale : (q : ℚ) (x : ℝ) → x · rat q ≡ scale q x
 ·rat≡scale q x =

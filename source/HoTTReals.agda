@@ -30,6 +30,7 @@ import HoTTReals.Categories.Instances.OrderedFields
 import HoTTReals.Data.Real.Algebra.Addition
 
 import HoTTReals.Data.Real.Algebra.ArchimedeanField
+import HoTTReals.Data.Real.Algebra.Initial
 import HoTTReals.Data.Real.Algebra.Lattice
 import HoTTReals.Data.Real.Algebra.Multiplication
 import HoTTReals.Data.Real.Algebra.OrderedAbGroup

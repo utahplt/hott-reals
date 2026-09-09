@@ -16,12 +16,15 @@ import HoTTReals.Algebra.OrderedAbGroup.Instances.Rationals
 import HoTTReals.Algebra.OrderedAbGroup.Properties
 
 import HoTTReals.Algebra.OrderedCommRing.Instances.Rationals
+import HoTTReals.Algebra.OrderedCommRing.Morphisms
 import HoTTReals.Algebra.OrderedCommRing.Properties
 
 import HoTTReals.Algebra.OrderedField.Base
 import HoTTReals.Algebra.OrderedField.Book
 import HoTTReals.Algebra.OrderedField.Instances.Rationals
 import HoTTReals.Algebra.OrderedField.Properties
+
+import HoTTReals.Categories.Instances.OrderedFields
 
 import HoTTReals.Data.Real.Algebra.Addition
 

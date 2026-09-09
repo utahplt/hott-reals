@@ -5,6 +5,7 @@ open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.Structure
 
+open import Cubical.Algebra.OrderedCommRing.Base
 open import Cubical.Algebra.OrderedCommRing.Morphisms
 
 open import Cubical.Data.Rationals using (ℚ)
@@ -80,12 +81,21 @@ ArchimedeanField→HeytingField : ArchimedeanField ℓ ℓ' → HeytingField ℓ
 ArchimedeanField→HeytingField =
   OrderedField→HeytingField ∘ ArchimedeanField→OrderedField
 
+ArchimedeanField→OrderedCommRing : ArchimedeanField ℓ ℓ' → OrderedCommRing ℓ ℓ'
+ArchimedeanField→OrderedCommRing =
+  OrderedField→OrderedCommRing ∘ ArchimedeanField→OrderedField
+
 IsArchimedeanOrderedField : OrderedField ℓ ℓ' → Type (ℓ-max ℓ ℓ')
 IsArchimedeanOrderedField F =
-  Σ[ ι ∈ (ℚ → ⟨ F ⟩) ] IsArchimedeanField 0f 1f _+_ _·_ -_ _<_ _≤_ ι
+  Σ[ ι ∈ (ℚ → ⟨ F ⟩) ]
+    IsOrderedFieldHom (snd ℚOrderedField) ι (snd F) ×
+    ((x y : ⟨ F ⟩) → x < y → ∃[ q ∈ ℚ ] (x < ι q) × (ι q < y))
   where open OrderedFieldStr (snd F)
 
 OrderedField→ArchimedeanField :
   (F : OrderedField ℓ ℓ') → IsArchimedeanOrderedField F → ArchimedeanField ℓ ℓ'
-OrderedField→ArchimedeanField F (ι , isArchimedeanField) =
-  fst F , archimedeanfieldstr _ _ _ _ _ _ _ ι isArchimedeanField
+OrderedField→ArchimedeanField F (ι , isOrderedFieldHom , archimedeanProperty) =
+  fst F ,
+  archimedeanfieldstr _ _ _ _ _ _ _ ι
+    ( isarchimedeanfield isOrderedField isOrderedFieldHom archimedeanProperty)
+  where open OrderedFieldStr (snd F)

@@ -89,5 +89,7 @@ isCauchyCompleteℝ =
 isCauchyCompleteArchimedeanOrderedFieldℝ :
   IsCauchyCompleteArchimedeanOrderedField ℝOrderedField
 isCauchyCompleteArchimedeanOrderedFieldℝ =
-  ( rat , ArchimedeanFieldStr.isArchimedeanField (snd ℝArchimedeanField))
+  ( rat
+  , ArchimedeanFieldStr.isOrderedFieldHom (snd ℝArchimedeanField)
+  , isArchimedean<)
   , isCauchyCompleteℝ

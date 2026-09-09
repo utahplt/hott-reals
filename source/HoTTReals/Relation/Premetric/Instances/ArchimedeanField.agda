@@ -14,9 +14,17 @@ open import Cubical.Data.Sigma
 open import Cubical.HITs.PropositionalTruncation as PT
 
 open import Cubical.Relation.Premetric.Base
+open import Cubical.Relation.Premetric.Mappings
 open import Cubical.Relation.Premetric.Properties
 
+open import Cubical.Tactics.CommRingSolver
+
 open import HoTTReals.Algebra.ArchimedeanField.Base
+open import HoTTReals.Algebra.ArchimedeanField.Properties
+open import HoTTReals.Algebra.OrderedAbGroup.Base
+open import HoTTReals.Algebra.OrderedAbGroup.Properties
+import HoTTReals.Algebra.OrderedCommRing.Properties as
+  HoTTRealsOrderedCommRingProperties
 open import HoTTReals.Algebra.OrderedField.Base
 
 open PositiveRationals using (ℚ₊ ; ⟨_⟩₊ ; _+₊_ ; _<₊_)
@@ -32,11 +40,16 @@ module _ (F : ArchimedeanField ℓ ℓ') where
     OrderedField→OrderedCommRing (ArchimedeanField→OrderedField F)
 
   open ArchimedeanFieldStr (snd F) using
-    ( ι ; archimedeanProperty ; ιpres0 ; ιpres+ ; ιpres< ; ιreflect<)
+    ( ι ; archimedeanProperty ; ιpres+ ; ιpres· ; ιreflect<)
+  open ArchimedeanFieldTheory F using (0<ι₊ ; ι₊ ; ∃abs<ι₊ ; <→-<→abs<)
   open OrderedCommRingStr (snd FOrderedCommRing)
   open OrderedCommRingReasoning FOrderedCommRing
   open OrderedCommRingTheory FOrderedCommRing
   open RingTheory (OrderedCommRing→Ring FOrderedCommRing)
+  open HoTTRealsOrderedCommRingProperties.OrderedCommRingTheory FOrderedCommRing
+    using (abs·)
+  open OrderedAbGroupTheory (OrderedCommRing→OrderedAbGroup FOrderedCommRing)
+    using (absΔabs≤)
 
   0<+Closed : (x y : ⟨ F ⟩) → 0r < x → 0r < y → 0r < x + y
   0<+Closed x y 0<x 0<y =
@@ -50,13 +63,6 @@ module _ (F : ArchimedeanField ℓ ℓ') where
 
   _≈ᶠ[_]_ : ⟨ F ⟩ → ℚ₊ → ⟨ F ⟩ → Type ℓ'
   x ≈ᶠ[ ε ] y = abs (x - y) < ι ⟨ ε ⟩₊
-
-  0<ι₊ : (ε : ℚ₊) → 0r < ι ⟨ ε ⟩₊
-  0<ι₊ ε = subst (_< ι ⟨ ε ⟩₊) ιpres0 $ ιpres< _ ⟨ ε ⟩₊ (snd ε)
-
-  ι₊ : (q : ℚ) → 0r < ι q → ℚ₊
-  fst (ι₊ q 0<ιq) = q
-  snd (ι₊ q 0<ιq) = ιreflect< _ q $ subst (_< ι q) (sym ιpres0) 0<ιq
 
   isPremetricᶠ : IsPremetric _≈ᶠ[_]_
   isPremetricᶠ = isPMᶠ where
@@ -113,6 +119,63 @@ module _ (F : ArchimedeanField ℓ ℓ') where
   isPropIsCauchyComplete : isProp IsCauchyComplete
   isPropIsCauchyComplete =
     PremetricTheory.isPropIsComplete inducedPremetricSpace
+
+  Δ<→≈ : (x y : ⟨ F ⟩) (ε : ℚ₊) → x - y < ι ⟨ ε ⟩₊ → - ι ⟨ ε ⟩₊ < x - y →
+    x ≈ᶠ[ ε ] y
+  Δ<→≈ x y ε Δ<ιε -ιε<Δ =
+    <→-<→abs< (x - y) (ι ⟨ ε ⟩₊) Δ<ιε $
+      subst (- (x - y) <_) (-Idempotent (ι ⟨ ε ⟩₊)) (-Flip< _ _ -ιε<Δ)
+
+  [_]+ⁿᶠ : ⟨ F ⟩ → NE[ inducedPremetricSpace , inducedPremetricSpace ]
+  fst [ z ]+ⁿᶠ = z +_
+  IsNonExpansive.pres≈ (snd [ z ]+ⁿᶠ) x y ε =
+    subst (_< ι ⟨ ε ⟩₊) (cong abs (sym cancel))
+    where
+    cancel : (z + x) - (z + y) ≡ x - y
+    cancel = solve! (OrderedCommRing→CommRing FOrderedCommRing)
+
+  +ⁿᶠ[_] : ⟨ F ⟩ → NE[ inducedPremetricSpace , inducedPremetricSpace ]
+  fst +ⁿᶠ[ z ] = _+ z
+  IsNonExpansive.pres≈ (snd +ⁿᶠ[ z ]) x y ε =
+    subst (_< ι ⟨ ε ⟩₊) (cong abs (sym cancel))
+    where
+    cancel : (x + z) - (y + z) ≡ x - y
+    cancel = solve! (OrderedCommRing→CommRing FOrderedCommRing)
+
+  absⁿᶠ : NE[ inducedPremetricSpace , inducedPremetricSpace ]
+  fst absⁿᶠ = abs
+  IsNonExpansive.pres≈ (snd absⁿᶠ) x y ε =
+    ≤-<-trans (abs (abs x - abs y)) (abs (x - y)) (ι ⟨ ε ⟩₊) (absΔabs≤ x y)
+
+  ·IsLipschitzWithLᶠ :
+    (M : ℚ₊) (z : ⟨ F ⟩) → abs z < ι ⟨ M ⟩₊ →
+    IsLipschitzWith
+      ( snd inducedPremetricSpace) (z ·_) (snd inducedPremetricSpace) M
+  IsLipschitzWith.pres≈ (·IsLipschitzWithLᶠ M z ∣z∣<ιM) x y ε ∣x-y∣<ιε =
+    subst (abs (z · x - z · y) <_) (sym $ ιpres· ⟨ M ⟩₊ ⟨ ε ⟩₊) $ begin<
+      abs (z · x - z · y)
+        ≡→≤⟨ cong abs (sym $ ·DistR- z x y) ∙ abs· z (x - y) ⟩
+      abs z · abs (x - y)
+        ≤⟨ ·MonoR≤ (abs z) (ι ⟨ M ⟩₊) (abs (x - y)) (0≤abs (x - y))
+             (<-≤-weaken (abs z) (ι ⟨ M ⟩₊) ∣z∣<ιM) ⟩
+      ι ⟨ M ⟩₊ · abs (x - y)
+        <⟨ ·MonoL< (abs (x - y)) (ι ⟨ ε ⟩₊) (ι ⟨ M ⟩₊) (0<ι₊ M) ∣x-y∣<ιε ⟩
+      ι ⟨ M ⟩₊ · ι ⟨ ε ⟩₊ ◾
+
+  [_]·ᶜᶠ : ⟨ F ⟩ → C[ inducedPremetricSpace , inducedPremetricSpace ]
+  fst [ z ]·ᶜᶠ = z ·_
+  snd [ z ]·ᶜᶠ =
+    isLipschitz→isContinuous _ (z ·_) _ $
+      PT.map (λ (M , ∣z∣<ιM) → M , ·IsLipschitzWithLᶠ M z ∣z∣<ιM) (∃abs<ι₊ z)
+
+  ·ᶜᶠ[_] : ⟨ F ⟩ → C[ inducedPremetricSpace , inducedPremetricSpace ]
+  fst ·ᶜᶠ[ z ] = _· z
+  snd ·ᶜᶠ[ z ] =
+    subst
+      ( λ f →
+        isContinuous (snd inducedPremetricSpace) f (snd inducedPremetricSpace))
+      ( funExt λ x → ·Comm z x)
+      ( snd [ z ]·ᶜᶠ)
 
 IsCauchyCompleteArchimedeanOrderedField :
   OrderedField ℓ ℓ' → Type (ℓ-max ℓ ℓ')

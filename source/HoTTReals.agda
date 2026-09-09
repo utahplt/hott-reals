@@ -5,7 +5,9 @@ open import Cubical.Relation.Premetric.Completion.Instances.HIITReals
 import HoTTReals.Algebra.AbGroup.Properties
 
 import HoTTReals.Algebra.ArchimedeanField.Base
+import HoTTReals.Algebra.ArchimedeanField.Properties
 
+import HoTTReals.Algebra.CommRing.Instances.Rationals
 import HoTTReals.Algebra.CommRing.Properties
 
 import HoTTReals.Algebra.HeytingField.Base

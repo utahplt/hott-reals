@@ -44,6 +44,8 @@ import HoTTReals.Relation.Binary.Order.Pseudolattice.Properties
 
 import HoTTReals.Relation.Premetric.Completion.Lift
 
+import HoTTReals.Relation.Premetric.Instances.ArchimedeanField
+
 import HoTTReals.Relation.Premetric.Instances.Product
 
 import HoTTReals.Relation.Premetric.Instances.Rationals

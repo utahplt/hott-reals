@@ -29,6 +29,7 @@ open import Cubical.Relation.Binary.Order.StrictOrder.Properties
 open import Cubical.Relation.Nullary
 
 open import HoTTReals.Algebra.OrderedAbGroup.Base
+import HoTTReals.Algebra.OrderedAbGroup.Properties as OrderedAbGroupProperties
 open import HoTTReals.Algebra.OrderedField.Base
 open import HoTTReals.Algebra.OrderedField.Properties
 
@@ -79,7 +80,10 @@ module _ {F : Type ℓ} {_<_ : F → F → Type ℓ'}
   (isStrictOrder : IsStrictOrder _<_) where
 
   <∨>≃<⊎> : (x y : F) → ((x < y) L.⊔′ (y < x)) ≃ ((x < y) ⊎ (y < x))
-  <∨>≃<⊎> x y = {!!}
+  <∨>≃<⊎> x y =
+    propTruncIdempotent≃
+      ( IsApartness.is-prop-valued
+        ( isStrictOrder→isApartnessSymClosure isStrictOrder) x y)
 
 module _ {F : Type ℓ} {0f 1f : F} {_+_ _·_ : F → F → F} { -_ : F → F}
   {_<_ _≤_ : F → F → Type ℓ'}
@@ -87,26 +91,71 @@ module _ {F : Type ℓ} {0f 1f : F} {_+_ _·_ : F → F → F} { -_ : F → F}
 
   open IsOrderedField f
 
+  private
+    FOrderedAbGroup : OrderedAbGroup ℓ ℓ'
+    FOrderedAbGroup =
+      OrderedCommRing→OrderedAbGroup
+        ( _ , orderedcommringstr _ _ _ _ _ _ _ isOrderedCommRing)
+
+    FOrderedField : OrderedField ℓ ℓ'
+    FOrderedField = _ , orderedfieldstr _ _ _ _ _ _ _ f
+
+  open OrderedAbGroupProperties.OrderedAbGroupTheory FOrderedAbGroup using
+    ( +CancelR≤ ; +CancelR<)
+  open OrderedFieldTheory FOrderedField using (·CancelR<)
+
   IsOrderedField→IsOrderedFieldBook :
     IsOrderedFieldBook 0f 1f _+_ -_ _·_ _⊓_ _⊔_ _≤_ _<_
       ( λ x y → (x < y) ⊎ (y < x))
-  IsOrderedFieldBook.isCommRing IsOrderedField→IsOrderedFieldBook = {!!}
-  IsOrderedFieldBook.isInv≃#0 IsOrderedField→IsOrderedFieldBook = {!!}
-  IsOrderedFieldBook.isPoset IsOrderedField→IsOrderedFieldBook = {!!}
-  IsOrderedFieldBook.isMeetMin IsOrderedField→IsOrderedFieldBook = {!!}
-  IsOrderedFieldBook.isJoinMax IsOrderedField→IsOrderedFieldBook = {!!}
-  IsOrderedFieldBook.isStrictOrder IsOrderedField→IsOrderedFieldBook = {!!}
-  IsOrderedFieldBook.isApartness IsOrderedField→IsOrderedFieldBook = {!!}
-  IsOrderedFieldBook.≤≃¬> IsOrderedField→IsOrderedFieldBook = {!!}
-  IsOrderedFieldBook.#≃<∨> IsOrderedField→IsOrderedFieldBook = {!!}
-  IsOrderedFieldBook.≤≃+≤ IsOrderedField→IsOrderedFieldBook = {!!}
-  IsOrderedFieldBook.<≃+< IsOrderedField→IsOrderedFieldBook = {!!}
-  IsOrderedFieldBook.posSum→pos∨pos IsOrderedField→IsOrderedFieldBook = {!!}
-  IsOrderedFieldBook.<-≤-trans IsOrderedField→IsOrderedFieldBook = {!!}
-  IsOrderedFieldBook.≤-<-trans IsOrderedField→IsOrderedFieldBook = {!!}
-  IsOrderedFieldBook.·MonoR≤ IsOrderedField→IsOrderedFieldBook = {!!}
-  IsOrderedFieldBook.0<→<≃·< IsOrderedField→IsOrderedFieldBook = {!!}
-  IsOrderedFieldBook.0<1 IsOrderedField→IsOrderedFieldBook = {!!}
+  IsOrderedFieldBook.isCommRing IsOrderedField→IsOrderedFieldBook = isCommRing
+  IsOrderedFieldBook.isInv≃#0 IsOrderedField→IsOrderedFieldBook =
+    λ x →
+      propBiimpl→Equiv
+        ( Units.inverseUniqueness (_ , commringstr _ _ _ _ _ isCommRing) x)
+        ( IsApartness.is-prop-valued
+          ( isStrictOrder→isApartnessSymClosure isStrictOrder) x 0f)
+        ( uncurry $ isInv→#0 x)
+        ( #0→isInv x)
+  IsOrderedFieldBook.isPoset IsOrderedField→IsOrderedFieldBook = isPoset
+  IsOrderedFieldBook.isMeetMin IsOrderedField→IsOrderedFieldBook =
+    λ x y → is-pseudolattice .fst x y .snd
+  IsOrderedFieldBook.isJoinMax IsOrderedField→IsOrderedFieldBook =
+    λ x y → is-pseudolattice .snd x y .snd
+  IsOrderedFieldBook.isStrictOrder IsOrderedField→IsOrderedFieldBook =
+    isStrictOrder
+  IsOrderedFieldBook.isApartness IsOrderedField→IsOrderedFieldBook =
+    isStrictOrder→isApartnessSymClosure isStrictOrder
+  IsOrderedFieldBook.≤≃¬> IsOrderedField→IsOrderedFieldBook = ≤≃¬>
+  IsOrderedFieldBook.#≃<∨> IsOrderedField→IsOrderedFieldBook =
+    λ x y → invEquiv $ <∨>≃<⊎> isStrictOrder x y
+  IsOrderedFieldBook.≤≃+≤ IsOrderedField→IsOrderedFieldBook =
+    λ x y z →
+      propBiimpl→Equiv
+        ( is-prop-valued≤ x y)
+        ( is-prop-valued≤ (x + z) (y + z))
+        ( +MonoR≤ x y z)
+        ( +CancelR≤)
+  IsOrderedFieldBook.<≃+< IsOrderedField→IsOrderedFieldBook =
+    λ x y z →
+      propBiimpl→Equiv
+        ( is-prop-valued< x y)
+        ( is-prop-valued< (x + z) (y + z))
+        ( +MonoR< x y z)
+        ( +CancelR<)
+  IsOrderedFieldBook.posSum→pos∨pos IsOrderedField→IsOrderedFieldBook =
+    posSum→pos∨pos
+  IsOrderedFieldBook.<-≤-trans IsOrderedField→IsOrderedFieldBook = <-≤-trans
+  IsOrderedFieldBook.≤-<-trans IsOrderedField→IsOrderedFieldBook = ≤-<-trans
+  IsOrderedFieldBook.·MonoR≤ IsOrderedField→IsOrderedFieldBook =
+    λ x y z x≤y 0≤z → ·MonoR≤ x y z 0≤z x≤y
+  IsOrderedFieldBook.0<→<≃·< IsOrderedField→IsOrderedFieldBook =
+    λ x y z 0<z →
+      propBiimpl→Equiv
+        ( is-prop-valued< x y)
+        ( is-prop-valued< (x · z) (y · z))
+        ( ·MonoR< x y z 0<z)
+        ( ·CancelR< x y z 0<z)
+  IsOrderedFieldBook.0<1 IsOrderedField→IsOrderedFieldBook = 0<1
 
 module _ {F : Type ℓ} {0f 1f : F} {_+_ : F → F → F} { -_ : F → F}
   {_·_ : F → F → F} {min max : F → F → F} {_≤_ _<_ _#_ : F → F → Type ℓ'}
@@ -115,25 +164,36 @@ module _ {F : Type ℓ} {0f 1f : F} {_+_ : F → F → F} { -_ : F → F}
   open IsOrderedFieldBook b
 
   <-≤-weaken : (x y : F) → x < y → x ≤ y
-  <-≤-weaken x y = {!!}
+  <-≤-weaken x y x<y = invEq (≤≃¬> x y) (is-asym x y x<y)
 
   IsOrderedFieldBook→IsOrderedField : IsOrderedField 0f 1f _+_ _·_ -_ _<_ _≤_
   IsOrderedField.isOrderedCommRing IsOrderedFieldBook→IsOrderedField =
     isOrderedCommRingBook
     where
     isOrderedCommRingBook : IsOrderedCommRing 0f 1f _+_ _·_ -_ _<_ _≤_
-    IsOrderedCommRing.isCommRing isOrderedCommRingBook = {!!}
-    IsOrderedCommRing.isPseudolattice isOrderedCommRingBook = {!!}
-    IsOrderedCommRing.isStrictOrder isOrderedCommRingBook = {!!}
-    IsOrderedCommRing.<-≤-weaken isOrderedCommRingBook = {!!}
-    IsOrderedCommRing.≤≃¬> isOrderedCommRingBook = {!!}
-    IsOrderedCommRing.+MonoR≤ isOrderedCommRingBook = {!!}
-    IsOrderedCommRing.+MonoR< isOrderedCommRingBook = {!!}
-    IsOrderedCommRing.posSum→pos∨pos isOrderedCommRingBook = {!!}
-    IsOrderedCommRing.<-≤-trans isOrderedCommRingBook = {!!}
-    IsOrderedCommRing.≤-<-trans isOrderedCommRingBook = {!!}
-    IsOrderedCommRing.·MonoR≤ isOrderedCommRingBook = {!!}
-    IsOrderedCommRing.·MonoR< isOrderedCommRingBook = {!!}
-    IsOrderedCommRing.0<1 isOrderedCommRingBook = {!!}
-  IsOrderedField.#0→isInv IsOrderedFieldBook→IsOrderedField = {!!}
-  IsOrderedField.isInv→#0 IsOrderedFieldBook→IsOrderedField = {!!}
+    IsOrderedCommRing.isCommRing isOrderedCommRingBook = isCommRing
+    IsOrderedCommRing.isPseudolattice isOrderedCommRingBook =
+      ispseudolattice isPoset
+        ( (λ x y → min x y , isMeetMin x y) ,
+          (λ x y → max x y , isJoinMax x y))
+    IsOrderedCommRing.isStrictOrder isOrderedCommRingBook = isStrictOrder
+    IsOrderedCommRing.<-≤-weaken isOrderedCommRingBook = <-≤-weaken
+    IsOrderedCommRing.≤≃¬> isOrderedCommRingBook = ≤≃¬>
+    IsOrderedCommRing.+MonoR≤ isOrderedCommRingBook =
+      λ x y z → equivFun $ ≤≃+≤ x y z
+    IsOrderedCommRing.+MonoR< isOrderedCommRingBook =
+      λ x y z → equivFun $ <≃+< x y z
+    IsOrderedCommRing.posSum→pos∨pos isOrderedCommRingBook = posSum→pos∨pos
+    IsOrderedCommRing.<-≤-trans isOrderedCommRingBook = <-≤-trans
+    IsOrderedCommRing.≤-<-trans isOrderedCommRingBook = ≤-<-trans
+    IsOrderedCommRing.·MonoR≤ isOrderedCommRingBook =
+      λ x y z 0≤z x≤y → ·MonoR≤ x y z x≤y 0≤z
+    IsOrderedCommRing.·MonoR< isOrderedCommRingBook =
+      λ x y z 0<z → equivFun $ 0<→<≃·< x y z 0<z
+    IsOrderedCommRing.0<1 isOrderedCommRingBook = 0<1
+  IsOrderedField.#0→isInv IsOrderedFieldBook→IsOrderedField =
+    λ x x#0 → invEq (isInv≃#0 x) (invEq (#≃<∨> x 0f) ∣ x#0 ∣₁)
+  IsOrderedField.isInv→#0 IsOrderedFieldBook→IsOrderedField =
+    λ x y xy≡1 →
+      equivFun (<∨>≃<⊎> isStrictOrder x 0f)
+        ( equivFun (#≃<∨> x 0f) (equivFun (isInv≃#0 x) (y , xy≡1)))

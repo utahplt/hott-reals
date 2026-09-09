@@ -3,6 +3,8 @@ module HoTTReals.Data.Real.Algebra.ArchimedeanField where
 open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.Equiv
 open import Cubical.Foundations.Function
+open import Cubical.Foundations.HLevels
+open import Cubical.Foundations.Univalence
 
 open import Cubical.Algebra.CommRing.Base
 open import Cubical.Algebra.CommRing.Instances.Rationals using (ℚCommRing)
@@ -10,6 +12,8 @@ open import Cubical.Algebra.OrderedCommRing.Morphisms
 open import Cubical.Algebra.OrderedCommRing.Instances.Rationals using
   ( ℚOrderedCommRing)
 
+open import Cubical.Relation.Premetric.Base
+open import Cubical.Relation.Premetric.Properties
 open import Cubical.Relation.Premetric.Completion.Instances.HIITReals
 
 open import HoTTReals.Algebra.ArchimedeanField.Base
@@ -19,6 +23,8 @@ open import HoTTReals.Data.Real.Algebra.Multiplication
 open import HoTTReals.Data.Real.Algebra.OrderedCommRing
 open import HoTTReals.Data.Real.Algebra.OrderedField
 open import HoTTReals.Data.Real.Order.Base
+open import HoTTReals.Data.Real.Order.Magnitude
+open import HoTTReals.Relation.Premetric.Instances.ArchimedeanField
 
 ℝArchimedeanField : ArchimedeanField ℓ-zero ℓ-zero
 fst ℝArchimedeanField = ℝ
@@ -60,3 +66,22 @@ ArchimedeanFieldStr.isArchimedeanField (snd ℝArchimedeanField) =
     ( IsArchimedeanField.isOrderedFieldHom isArchimedeanFieldℝ) =
     λ q r → equivFun (<≃rat< {q} {r})
   IsArchimedeanField.archimedeanProperty isArchimedeanFieldℝ = isArchimedean<
+
+inducedPremetricSpaceℝ≡ :
+  inducedPremetricSpace ℝArchimedeanField ≡ ℝPremetricSpace
+inducedPremetricSpaceℝ≡ i .fst = ℝ
+inducedPremetricSpaceℝ≡ i .snd = premetricstr (≈≡ i) (isPremetric≡ i)
+  where
+  ≈≡ : _≈ᶠ[_]_ ℝArchimedeanField ≡ PremetricStr._≈[_]_ (snd ℝPremetricSpace)
+  ≈≡ = funExt λ x → funExt λ ε → funExt λ y → sym $ ua (∼≃abs< {x} {y} {ε})
+
+  isPremetric≡ :
+    PathP
+      ( λ i → IsPremetric (≈≡ i))
+      ( isPremetricᶠ ℝArchimedeanField)
+      ( PremetricStr.isPremetric (snd ℝPremetricSpace))
+  isPremetric≡ = isProp→PathP (λ i → isPropIsPremetric (≈≡ i)) _ _
+
+isCauchyCompleteℝ : IsCauchyComplete ℝArchimedeanField
+isCauchyCompleteℝ =
+  subst PremetricTheory.isComplete (sym inducedPremetricSpaceℝ≡) isCompleteℝ

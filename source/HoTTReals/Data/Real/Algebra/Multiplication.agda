@@ -56,6 +56,10 @@ open OrderedAbGroupTheory ℚOrderedAbGroup using () renaming
 open GroupTheory (AbGroup→Group ℝAbGroup) using (invInv)
 open LiftCompleteCodomain ℚPremetricSpace ℝPremetricSpace isCompleteℝ
 
+private
+  variable
+    ℓM ℓM' : Level
+
 scaleBound : ℚ → ℚ₊
 fst (scaleBound q) = absℚ q ℚ.+ 1
 snd (scaleBound q) =
@@ -426,6 +430,15 @@ fst [ u ]·ᶜ = u ·_
 snd [ u ]·ᶜ = isLipschitz→isContinuous _ (u ·_) _ $ PT.map
   ( λ (L , ∣u∣≤L) → (L , ·IsLipschitzWithL L u ∣u∣≤L))
   ( ∃abs≤rat u)
+
+_·ᶜ_ :
+  {M : PremetricSpace ℓM ℓM'} →
+  C[ M , ℝPremetricSpace ] → C[ M , ℝPremetricSpace ] →
+  C[ M , ℝPremetricSpace ]
+fst (f ·ᶜ g) a = fst f a · fst g a
+snd (f ·ᶜ g) = {!!}
+
+infixl 7 _·ᶜ_
 
 ·Comm : (x y : ℝ) → x · y ≡ y · x
 ·Comm x y =

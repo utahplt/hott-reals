@@ -98,10 +98,14 @@ module _ (G' : OrderedAbGroup ℓ ℓ') where
     +DistL⊔ x y z = pres∨ (+PseudolatticeEquivR z) x y
 
     +CancelR≤ : {x y z : G} → x + z ≤ y + z → x ≤ y
-    +CancelR≤ {x} {y} {z} = {!!}
+    +CancelR≤ {x} {y} {z} x+z≤y+z =
+      subst2 _≤_ (addSubCancelRight x z) (addSubCancelRight y z)
+        ( +MonoR≤ (x + z) (y + z) (- z) x+z≤y+z)
 
     +CancelR< : {x y z : G} → x + z < y + z → x < y
-    +CancelR< {x} {y} {z} = {!!}
+    +CancelR< {x} {y} {z} x+z<y+z =
+      subst2 _<_ (addSubCancelRight x z) (addSubCancelRight y z)
+        ( +MonoR< (x + z) (y + z) (- z) x+z<y+z)
 
     -Flip≤ : {x y : G} → x ≤ y → - y ≤ - x
     -Flip≤ {x} {y} x≤y = begin≤

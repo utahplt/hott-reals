@@ -68,6 +68,8 @@ module _ (F : OrderedField ℓ ℓ') (p : IsCauchyCompleteArchimedeanOrderedFiel
     ℝ' = OrderedField→OrderedCommRing ℝOrderedField
     Fcr = OrderedCommRing→CommRing F'
 
+    module rat = IsOrderedCommRingMono (snd ratᶠ)
+
     module F where
       open OrderedCommRingStr (snd F') public
       open OrderedCommRingTheory F' public
@@ -195,15 +197,10 @@ module _ (F : OrderedField ℓ ℓ') (p : IsCauchyCompleteArchimedeanOrderedFiel
         f' = fst f
 
         f∘ratHom : CommRingHom ℚCommRing Fcr
-        fst f∘ratHom = f' ∘ rat
-        snd f∘ratHom =
-          makeIsCommRingHom {R = ℚCommRing} {S = Fcr} {f = f' ∘ rat}
-            ( f.pres1)
-            ( λ q r → f.pres+ (rat q) (rat r))
-            ( λ q r → cong f' (sym (rat·rat q r)) ∙ f.pres· (rat q) (rat r))
+        f∘ratHom = (_ , f.isCommRingHom) ∘cr (_ , rat.isCommRingHom)
 
         f∘rat≡ι : (q : ℚ) → f' (rat q) ≡ ι q
-        f∘rat≡ι q = cong (λ h → fst h q) (CommRingHomℚ≡ Fcr f∘ratHom (ι , isCommRingHom))
+        f∘rat≡ι = funExt⁻ $ cong fst $ CommRingHomℚ≡ Fcr f∘ratHom (ι , isCommRingHom)
           where open IsOrderedCommRingMono isOrderedFieldHom
 
         f'presΔ : (x y : ℝ) → f' (x - y) ≡ f' x F.- f' y

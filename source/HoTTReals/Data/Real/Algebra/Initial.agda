@@ -31,10 +31,13 @@ open import Cubical.Relation.Premetric.Completion.Lift using
 
 open import HoTTReals.Algebra.ArchimedeanField.Base
 open import HoTTReals.Algebra.ArchimedeanField.Properties
+open import HoTTReals.Algebra.ArchimedeanField.Instances.Rationals
 open import HoTTReals.Algebra.CommRing.Instances.Rationals
 open import HoTTReals.Algebra.OrderedAbGroup.Base
 open import HoTTReals.Algebra.OrderedAbGroup.Instances.Rationals
 open import HoTTReals.Algebra.OrderedAbGroup.Properties
+open import HoTTReals.Algebra.OrderedCommRing.Properties using (
+  module OrderedCommRingMorphismsProperties)
 open import HoTTReals.Algebra.OrderedField.Base
 open import HoTTReals.Categories.Instances.CauchyCompleteArchimedeanFields
 open import HoTTReals.Data.Real.Algebra.ArchimedeanField
@@ -47,6 +50,7 @@ open import HoTTReals.Data.Real.Order.Addition
 open import HoTTReals.Data.Real.Order.Magnitude
 open import HoTTReals.Relation.Premetric.Completion.Lift using (continuous₂≡)
 open import HoTTReals.Relation.Premetric.Instances.ArchimedeanField
+open import HoTTReals.Relation.Premetric.Instances.Rationals
 
 open PositiveRationals using (ℚ₊ ; ⟨_⟩₊)
 open OrderedAbGroupTheory ℝOrderedAbGroup using (abs ; abs<→< ; abs<→-<)
@@ -57,13 +61,60 @@ open OrderedCommRingTheory ℝOrderedCommRing using () renaming
 
 private
   variable
-    ℓ ℓ' : Level
+    ℓ ℓ<≤ ℓ' ℓ<≤' : Level
 
-module _ (F : OrderedField ℓ ℓ') (p : IsCauchyCompleteArchimedeanOrderedField F)
+module _ {F : ArchimedeanField ℓ ℓ<≤} {K : ArchimedeanField ℓ' ℓ<≤'} where
+
+  private
+    F≈ = ArchimedeanField→PremetricSpace F
+    K≈ = ArchimedeanField→PremetricSpace K
+    module F where
+      open ArchimedeanFieldStr       (snd F)                              public
+      open ArchimedeanFieldReasoning F                                    public
+      open OrderedCommRingTheory     (ArchimedeanField→OrderedCommRing F) public
+      open PremetricStr              (snd F≈)                             public
+
+      ιAF : ArchimedeanFieldHom ℚArchimedeanField F
+      fst ιAF = ι
+      snd ιAF = isOrderedFieldHom
+
+    module K where
+      open ArchimedeanFieldStr       (snd K)                              public
+      open ArchimedeanFieldReasoning K                                    public
+      open OrderedCommRingTheory     (ArchimedeanField→OrderedCommRing K) public
+      open PremetricStr              (snd K≈)                             public
+
+      ιAF : ArchimedeanFieldHom ℚArchimedeanField K
+      fst ιAF = ι
+      snd ιAF = isOrderedFieldHom
+
+  ArchimedeanFieldHom→NE : ArchimedeanFieldHom F K → NE[ F≈ , K≈ ]
+  fst (ArchimedeanFieldHom→NE fh@(f , isHom)) = f
+  snd (ArchimedeanFieldHom→NE fh@(f , isHom)) = f≈ where
+    open IsNonExpansive
+    open IsOrderedCommRingMono isHom
+    open OrderedCommRingMorphismsProperties
+      (snd (ArchimedeanField→OrderedCommRing F))
+      f
+      (snd (ArchimedeanField→OrderedCommRing K))
+
+    f∘ι : ArchimedeanFieldHom ℚArchimedeanField K
+    f∘ι = _∘af_ {F = ℚArchimedeanField} {K = F} {H = K} fh F.ιAF
+
+    f≈ : IsNonExpansive _ f _
+    f≈ .pres≈ x y ε x≈y = K.begin<
+      K.abs(f x K.- f y)  K.≡→≤⟨ sym $ cong K.abs $ pres+ _ _ ∙ congR K._+_ (pres- _) ⟩
+      K.abs(f (x F.- y))  K.≤⟨ absFun≤FunAbs isHom (x F.- y) ⟩
+      f (F.abs (x F.- y)) K.<⟨ pres< _ _ x≈y ⟩
+      f (F.ι ⟨ ε ⟩₊)       K.≡→≤⟨ isUniqueAFHomℚ→ K f∘ι K.ιAF ⟨ ε ⟩₊ ⟩
+      K.ι ⟨ ε ⟩₊           K.◾
+
+module UniversalPropertyℝ
+  (F : OrderedField ℓ ℓ') (p : IsCauchyCompleteArchimedeanOrderedField F)
   where
   private
     A = OrderedField→ArchimedeanField F (fst p)
-    N = inducedPremetricSpace A
+    N = ArchimedeanField→PremetricSpace A
     F' = OrderedField→OrderedCommRing F
     ℝ' = OrderedField→OrderedCommRing ℝOrderedField
     Fcr = OrderedCommRing→CommRing F'
@@ -81,18 +132,15 @@ module _ (F : OrderedField ℓ ℓ') (p : IsCauchyCompleteArchimedeanOrderedFiel
   open ArchimedeanFieldTheory A using (ιpresAbs)
   open LiftCompleteCodomain ℚPremetricSpace N (snd p) using (liftNE)
 
-  private
+  module Existence where
     ιpresΔ : (q r : ℚ) → ι (q ℚ.- r) ≡ ι q F.- ι r
     ιpresΔ q r = ιpres+ q (ℚ.- r) ∙ congR F._+_ (ιpres- r)
 
     ιⁿ : NE[ ℚPremetricSpace , N ]
     fst ιⁿ = ι
-    IsNonExpansive.pres≈ (snd ιⁿ) q r ε q≈r =
-      Δ<→≈ A (ι q) (ι r) ε
-        ( subst (F._< ι ⟨ ε ⟩₊) (ιpresΔ q r) $
-          ιpres< (q ℚ.- r) ⟨ ε ⟩₊ (abs<→<ℚ q≈r))
-        ( subst2 F._<_ (ιpres- ⟨ ε ⟩₊) (ιpresΔ q r) $
-          ιpres< (ℚ.- ⟨ ε ⟩₊) (q ℚ.- r) (abs<→-<ℚ q≈r))
+    snd ιⁿ = transport
+      (λ i → IsNonExpansive (snd (inducedPremetricSpaceℚ≡ i)) ι (snd N))
+      (snd (ArchimedeanFieldHom→NE (ι , isOrderedFieldHom)))
 
     eⁿ : NE[ ℝPremetricSpace , N ]
     eⁿ = liftNE ιⁿ
@@ -191,51 +239,44 @@ module _ (F : OrderedField ℓ ℓ') (p : IsCauchyCompleteArchimedeanOrderedFiel
     IsOrderedCommRingMono.isOrderedCommRingHom (snd eMono) = eHom
     IsOrderedCommRingMono.pres< (snd eMono) = epres<
 
-    module _ (f : OrderedCommRingMono ℝ' F') where
-      private
-        module f = IsOrderedCommRingMono (snd f)
-        f' = fst f
+  module Uniqueness (f g : OrderedCommRingMono ℝ' F') where
+    private
+      module f = IsOrderedCommRingMono (snd f)
+      f' = fst f
+      module g = IsOrderedCommRingMono (snd g)
+      g' = fst g
 
-        f∘ratHom : CommRingHom ℚCommRing Fcr
-        f∘ratHom = (_ , f.isCommRingHom) ∘cr (_ , rat.isCommRingHom)
+      f∘ratHom : ArchimedeanFieldHom ℚArchimedeanField A
+      f∘ratHom = _∘af_ {F = ℚArchimedeanField} {ℝArchimedeanField} {A} f ratᶠ
 
-        f∘rat≡ι : (q : ℚ) → f' (rat q) ≡ ι q
-        f∘rat≡ι = funExt⁻ $ cong fst $ CommRingHomℚ≡ Fcr f∘ratHom (ι , isCommRingHom)
-          where open IsOrderedCommRingMono isOrderedFieldHom
+      g∘ratHom : ArchimedeanFieldHom ℚArchimedeanField A
+      g∘ratHom = _∘af_ {F = ℚArchimedeanField} {ℝArchimedeanField} {A} g ratᶠ
 
-        f'presΔ : (x y : ℝ) → f' (x - y) ≡ f' x F.- f' y
-        f'presΔ x y = f.pres+ x (- y) ∙ cong (f' x F.+_) (f.pres- y)
+    pointwise : ∀ x → f' x ≡ g' x
+    pointwise = nonExpansive≡ ℚPremetricSpace (ArchimedeanField→PremetricSpace A)
+      ( fst f
+      , transport
+          (λ i → IsNonExpansive (snd (inducedPremetricSpaceℝ≡ i)) f' (snd N))
+          (snd (ArchimedeanFieldHom→NE f)))
+      ( fst g
+      , transport
+          (λ i → IsNonExpansive (snd (inducedPremetricSpaceℝ≡ i)) g' (snd N))
+          (snd (ArchimedeanFieldHom→NE g)))
+      (isUniqueAFHomℚ→ A f∘ratHom g∘ratHom)
 
-        fⁿ : NE[ ℝPremetricSpace , N ]
-        fst fⁿ = f'
-        IsNonExpansive.pres≈ (snd fⁿ) x y ε x∼y =
-          Δ<→≈ A (f' x) (f' y) ε
-            ( subst2 F._<_ (f'presΔ x y) (f∘rat≡ι ⟨ ε ⟩₊) $
-              f.pres< (x - y) (rat ⟨ ε ⟩₊) $
-                abs<→< {x - y} {rat ⟨ ε ⟩₊} ∣x-y∣<ε)
-            ( subst2 F._<_
-                ( f.pres- (rat ⟨ ε ⟩₊) ∙ cong F.-_ (f∘rat≡ι ⟨ ε ⟩₊))
-                ( f'presΔ x y) $
-              f.pres< (- rat ⟨ ε ⟩₊) (x - y) $
-                abs<→-< {x - y} {rat ⟨ ε ⟩₊} ∣x-y∣<ε)
-          where
-          ∣x-y∣<ε : abs (x - y) < rat ⟨ ε ⟩₊
-          ∣x-y∣<ε = equivFun (∼≃abs< {x} {y} {ε}) x∼y
-
-      f≡e : (x : ℝ) → f' x ≡ e x
-      f≡e = nonExpansive≡ ℚPremetricSpace N fⁿ eⁿ f∘rat≡ι
+    isProp[AFℝ,-] : f ≡ g
+    isProp[AFℝ,-] = OrderedCommRingMono≡ (funExt pointwise)
 
   isContrOrderedFieldHomℝ :
     isContr
       ( OrderedCommRingMono
         ( OrderedField→OrderedCommRing ℝOrderedField)
         ( OrderedField→OrderedCommRing F))
-  isContrOrderedFieldHomℝ =
-    eMono , λ f → OrderedCommRingMono≡ (sym (funExt (f≡e f)))
+  fst isContrOrderedFieldHomℝ = Existence.eMono
+  snd isContrOrderedFieldHomℝ = Uniqueness.isProp[AFℝ,-] Existence.eMono
 
 isInitialℝ :
   isInitial
     ( CauchyCompleteArchimedeanFieldsCategory {ℓ-zero} {ℓ-zero})
     ( ℝOrderedField , isCauchyCompleteArchimedeanOrderedFieldℝ)
-isInitialℝ (F , isCauchyCompleteArchimedeanOrderedField) =
-  isContrOrderedFieldHomℝ F isCauchyCompleteArchimedeanOrderedField
+isInitialℝ = uncurry UniversalPropertyℝ.isContrOrderedFieldHomℝ

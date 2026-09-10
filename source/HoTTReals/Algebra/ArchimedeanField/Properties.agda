@@ -5,6 +5,7 @@ open import Cubical.Foundations.Function
 open import Cubical.Foundations.Structure
 
 open import Cubical.Algebra.OrderedCommRing
+open import Cubical.Algebra.OrderedCommRing.Morphisms
 open import Cubical.Algebra.OrderedCommRing.Instances.Rationals
 open import Cubical.Algebra.Ring
 
@@ -16,6 +17,8 @@ open import Cubical.Data.Sum as ⊎ using ()
 open import Cubical.HITs.PropositionalTruncation as PT
 
 open import HoTTReals.Algebra.ArchimedeanField.Base
+open import HoTTReals.Algebra.ArchimedeanField.Instances.Rationals
+open import HoTTReals.Algebra.CommRing.Instances.Rationals
 open import HoTTReals.Algebra.OrderedField.Base
 
 open PositiveRationals using (ℚ₊ ; ⟨_⟩₊)
@@ -27,6 +30,7 @@ private
 module _ (F : ArchimedeanField ℓ ℓ') where
   private
     F' = ArchimedeanField→OrderedCommRing F
+    FCR = ArchimedeanField→CommRing F
 
   open ArchimedeanFieldStr (snd F) using
     ( ι ; archimedeanProperty ; ιpres0 ; ιpres- ; ιpres≤ ; ιpres< ; ιreflect<)
@@ -37,6 +41,8 @@ module _ (F : ArchimedeanField ℓ ℓ') where
   open OrderedCommRingTheory ℚOrderedCommRing using () renaming
     ( abs to absℚ ; 0≤→abs≡id to 0≤→absℚ≡id ; abs- to absℚ- ;
       ≤0→0≤- to ≤0→0≤-ℚ)
+
+  open module ArchimedeanFieldReasoning = OrderedCommRingReasoning F'
 
   module ArchimedeanFieldTheory where
 
@@ -100,3 +106,11 @@ module _ (F : ArchimedeanField ℓ ℓ') where
               ≡⟨ abs- (ι q) ⟩
             abs (ι q) ∎))
         ( ℚ.isTotal≤ 0ℚ q)
+
+  isUniqueAFHomℚ→ :
+    (f g : ArchimedeanFieldHom ℚArchimedeanField F) → ∀ x → fst f x ≡ fst g x
+  isUniqueAFHomℚ→ f g =
+    funExt⁻ (cong fst (CommRingHomℚ≡ FCR (_ , f.isCommRingHom) (_ , g.isCommRingHom)))
+    where
+      module f = IsOrderedCommRingMono (snd f)
+      module g = IsOrderedCommRingMono (snd g)

@@ -6,6 +6,7 @@ open import Cubical.Foundations.Structure
 
 open import Cubical.Algebra.CommRing
 open import Cubical.Algebra.OrderedCommRing.Base
+open import Cubical.Algebra.OrderedCommRing.Morphisms
 import Cubical.Algebra.OrderedCommRing.Properties as
   CubicalOrderedCommRingProperties
 open CubicalOrderedCommRingProperties using (OrderedCommRing→Apartness)
@@ -15,13 +16,14 @@ open import Cubical.Data.Nat   as ℕ using (ℕ ; zero ; suc)
 open import Cubical.Data.Sum
 
 open import Cubical.Relation.Binary.Order.Apartness
+open import Cubical.Relation.Binary.Order.Pseudolattice
 open import Cubical.Relation.Nullary
 
 open import Cubical.Tactics.CommRingSolver
 
 private
   variable
-    ℓ ℓ' : Level
+    ℓ ℓ' ℓ<≤ ℓ<≤' : Level
 
 module _ (R' : OrderedCommRing ℓ ℓ') where
   private
@@ -123,3 +125,29 @@ module _ (R' : OrderedCommRing ℓ ℓ') where
     _₀₊^_ : R₀₊ → ℕ → R₀₊
     (x ₀₊^ n) .fst = ⟨ x ⟩₀₊ ^ n
     (x ₀₊^ n) .snd = 0≤→0≤^ ⟨ x ⟩₀₊ n (snd x)
+
+module OrderedCommRingMorphismsProperties
+  {A : Type ℓ} {B : Type ℓ'}
+  (R : OrderedCommRingStr ℓ<≤ A)
+  (f : A → B)
+  (S : OrderedCommRingStr ℓ<≤' B)
+  where
+
+  private
+    module R where
+      open OrderedCommRingStr R public
+      open CubicalOrderedCommRingProperties.OrderedCommRingTheory (A , R) public
+      open PseudolatticeTheory (OrderedCommRing→PseudoLattice (A , R)) public
+    module S where
+      open OrderedCommRingStr S public
+      open CubicalOrderedCommRingProperties.OrderedCommRingTheory (B , S) public
+      open PseudolatticeTheory (OrderedCommRing→PseudoLattice (B , S)) public
+
+  ⊔fun≤fun⊔ : IsOrderedCommRingMono R f S → ∀ x y → (f x) S.⊔ (f y) S.≤ f (x R.⊔ y)
+  ⊔fun≤fun⊔ isHom _ _ = S.⊔LUB (pres≤ _ _ R.L≤⊔) (pres≤ _ _ R.R≤⊔)
+    where open IsOrderedCommRingMono isHom
+
+  absFun≤FunAbs : IsOrderedCommRingMono R f S → ∀ x → S.abs (f x) S.≤ f (R.abs x)
+  absFun≤FunAbs isHom x =
+    subst (S._≤ f (R.abs x)) (congR S._⊔_ (pres- x)) (⊔fun≤fun⊔ isHom x (R.- x))
+    where open IsOrderedCommRingMono isHom

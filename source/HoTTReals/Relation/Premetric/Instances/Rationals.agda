@@ -3,8 +3,9 @@ module HoTTReals.Relation.Premetric.Instances.Rationals where
 open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.Function
 
-open import Cubical.Data.Rationals using (min ; max)
+open import Cubical.Data.Rationals using (ℚ ; min ; max)
 
+open import Cubical.Relation.Premetric
 open import Cubical.Relation.Premetric.Mappings
 open import Cubical.Relation.Premetric.Instances.FunctionSpace
 open import Cubical.Relation.Premetric.Instances.Rationals
@@ -12,6 +13,10 @@ open import Cubical.Relation.Premetric.Instances.Rationals
 open import HoTTReals.Algebra.OrderedAbGroup.Base
 open import HoTTReals.Algebra.OrderedAbGroup.Properties
 open import HoTTReals.Algebra.OrderedAbGroup.Instances.Rationals
+open import HoTTReals.Algebra.ArchimedeanField.Base
+open import HoTTReals.Algebra.ArchimedeanField.Instances.Rationals
+
+open import HoTTReals.Relation.Premetric.Instances.ArchimedeanField
 
 open OrderedAbGroupStr (snd ℚOrderedAbGroup) using (≤-<-trans)
 open OrderedAbGroupTheory ℚOrderedAbGroup using
@@ -35,3 +40,14 @@ minⁿ = makeNE₂ minNE₂
 
 maxⁿ : NE[ ℚPremetricSpace , NE[ ℚPremetricSpace , ℚPremetricSpace ]PrSpace ]
 maxⁿ = makeNE₂ maxNE₂
+
+open PremetricStr
+
+inducedPremetricSpaceℚ≡ :
+  ArchimedeanField→PremetricSpace ℚArchimedeanField ≡ ℚPremetricSpace
+inducedPremetricSpaceℚ≡ i .fst = ℚ
+inducedPremetricSpaceℚ≡ i .snd =
+  premetricstr (_≈[_]_ (snd ℚPremetricSpace)) (isPremetric≡ i)
+  where
+  isPremetric≡ : (isPremetricᶠ ℚArchimedeanField) ≡ (isPremetric (snd ℚPremetricSpace))
+  isPremetric≡ = isPropIsPremetric (_≈[_]_ (snd ℚPremetricSpace)) _ _

@@ -5,8 +5,10 @@ open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.Structure
 
+open import Cubical.Algebra.CommRing
 open import Cubical.Algebra.OrderedCommRing.Base
 open import Cubical.Algebra.OrderedCommRing.Morphisms
+open import Cubical.Algebra.Ring
 
 open import Cubical.Data.Rationals using (ℚ)
 open import Cubical.Data.Sigma
@@ -14,12 +16,13 @@ open import Cubical.Data.Sigma
 open import Cubical.HITs.PropositionalTruncation as PT
 
 open import HoTTReals.Algebra.HeytingField.Base
+open import HoTTReals.Algebra.OrderedCommRing.Morphisms
 open import HoTTReals.Algebra.OrderedField.Base
 open import HoTTReals.Algebra.OrderedField.Instances.Rationals
 
 private
   variable
-    ℓ ℓ' : Level
+    ℓ ℓ' ℓ'' ℓ<≤ ℓ<≤' ℓ<≤'' : Level
 
 record IsArchimedeanField
   {F : Type ℓ}
@@ -85,6 +88,12 @@ ArchimedeanField→OrderedCommRing : ArchimedeanField ℓ ℓ' → OrderedCommRi
 ArchimedeanField→OrderedCommRing =
   OrderedField→OrderedCommRing ∘ ArchimedeanField→OrderedField
 
+ArchimedeanField→CommRing : ArchimedeanField ℓ ℓ' → CommRing ℓ
+ArchimedeanField→CommRing = OrderedCommRing→CommRing ∘ ArchimedeanField→OrderedCommRing
+
+ArchimedeanField→Ring : ArchimedeanField ℓ ℓ' → Ring ℓ
+ArchimedeanField→Ring = CommRing→Ring ∘ ArchimedeanField→CommRing
+
 IsArchimedeanOrderedField : OrderedField ℓ ℓ' → Type (ℓ-max ℓ ℓ')
 IsArchimedeanOrderedField F =
   Σ[ ι ∈ (ℚ → ⟨ F ⟩) ]
@@ -99,3 +108,23 @@ OrderedField→ArchimedeanField F (ι , isOrderedFieldHom , archimedeanProperty)
   archimedeanfieldstr _ _ _ _ _ _ _ ι
     ( isarchimedeanfield isOrderedField isOrderedFieldHom archimedeanProperty)
   where open OrderedFieldStr (snd F)
+
+module _ {A : Type ℓ} {B : Type ℓ'} where
+  IsArchimedeanFieldHom :
+    ArchimedeanFieldStr ℓ<≤ A → (A → B) → ArchimedeanFieldStr ℓ<≤' B → Type _
+  IsArchimedeanFieldHom F f K = IsOrderedCommRingMono
+    (snd (ArchimedeanField→OrderedCommRing (_ , F)))
+    f
+    (snd (ArchimedeanField→OrderedCommRing (_ , K)))
+
+ArchimedeanFieldHom : ArchimedeanField ℓ ℓ<≤ → ArchimedeanField ℓ' ℓ<≤' → Type _
+ArchimedeanFieldHom F K =
+  Σ[ f ∈ (⟨ F ⟩ → ⟨ K ⟩) ] IsArchimedeanFieldHom (F .snd) f (K .snd)
+
+module _
+  {F : ArchimedeanField ℓ ℓ<≤}
+  {K : ArchimedeanField ℓ' ℓ<≤'}
+  {H : ArchimedeanField ℓ'' ℓ<≤''}
+  where
+  _∘af_ : ArchimedeanFieldHom K H → ArchimedeanFieldHom F K → ArchimedeanFieldHom F H
+  _∘af_ = flip compOrderedCommRingMono

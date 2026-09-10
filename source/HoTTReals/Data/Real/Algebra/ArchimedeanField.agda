@@ -50,7 +50,7 @@ isArchimedeanField (snd ℝArchimedeanField) = isArchimedeanFieldℝ
   isArchimedeanFieldℝ .archimedeanProperty = ℝ.isArchimedean<
 
 inducedPremetricSpaceℝ≡ :
-  inducedPremetricSpace ℝArchimedeanField ≡ ℝPremetricSpace
+  ArchimedeanField→PremetricSpace ℝArchimedeanField ≡ ℝPremetricSpace
 inducedPremetricSpaceℝ≡ i .fst = ℝ
 inducedPremetricSpaceℝ≡ i .snd = premetricstr (≈≡ i) (isPremetric≡ i)
   where

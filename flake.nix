@@ -35,7 +35,10 @@
               buildInputs = [
                 agda
                 agda-interact'
+                pkgs.typst
               ];
+              TYPST_FONT_PATHS = "${pkgs.julia-mono}/share/fonts";
+              TYPST_IGNORE_SYSTEM_FONTS = "true";
             };
           }
       );

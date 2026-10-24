@@ -1,0 +1,9 @@
+\section{\texttt{Data.Real.Algebra.OrderedAbGroup}}
+
+\begin{theorem}[\agda{ℝOrderedAbGroup}]
+  \label{ROrderedAbGroup}
+  $(\R, 0, +, -, <, \le)$ is an ordered abelian group (\Cref{IsOrderedAbGroup}), with meet $\min$ and join $\max$.
+\end{theorem}
+\begin{proof}
+  $(\R, 0, +, -)$ is an abelian group (\Cref{RAbGroup}), $(\R, \le)$ is a lattice with meet $\min$ and join $\max$ (\Cref{RLePseudolattice}), and $<$ is a strict order (\Cref{RLtStrictOrder}). The compatibility axioms are \Cref{ltWeakenLeReal,leIffNotGtReal,isTransLtLeReal,isTransLeLtReal} for the two orders and \Cref{plusMonoRLeReal,plusMonoRLtReal,posSumPosOrPosReal} for addition.
+\end{proof}

@@ -1,0 +1,25 @@
+\section{\texttt{Data.Real.Algebra.ArchimedeanField}}
+
+\begin{theorem}[\agda{ℝArchimedeanField}; {\textcite[Theorem 11.3.48]{univalentfoundationsprogram2013}}]
+  \label{RArchimedeanField}
+  $\R$ is an Archimedean ordered field (\Cref{IsArchimedeanField}), with $\iota \colon \Q \to \R$ as its embedding of the rationals.
+\end{theorem}
+\begin{proof}
+  $\R$ is an ordered field (\Cref{ROrderedField}). That $\iota$ is a homomorphism of ordered fields is the computation rules of the lifted operations at rational points, together with \Cref{leIffRatLeReal} for $\le$ and \Cref{ltIffRatLtReal} for $<$ in both directions: $\iota$ preserves $0$ and $1$ because a numeral in $\R$ denotes the image of the rational numeral (\Cref{reals}), preserves $+$ and $-$ by the computation rules in \Cref{plusNReal,negNReal}, and preserves $\cdot$ by \Cref{ratMulRat}. The Archimedean property is \Cref{isArchimedeanLtReal}.
+\end{proof}
+
+\begin{lemma}[\agda{inducedPremetricSpaceℝ≡}]
+  \label{inducedPremetricSpaceRealEq}
+  The premetric space induced on $\R$ (\Cref{inducedPremetricSpace}) by \Cref{RArchimedeanField} is the premetric space $\R$ of \Cref{reals}.
+\end{lemma}
+\begin{proof}
+  A premetric space is a set together with a family of relations and a proof of the axioms of \Cref{IsPremetric}, so it suffices to show that the two carriers, the two families and the two proofs agree. Both carriers are $\R$. For the families, let $x, y : \R$ and $\varepsilon : \Qp$. The induced closeness is $\lvert x - y \rvert < \iota(\varepsilon)$, where the absolute value is that of the ordered commutative ring $\R$ (\Cref{ROrderedCommRing}), which is by definition that of the ordered abelian group $\R$ (\Cref{ROrderedAbGroup}); so it is equivalent to $x \cclose{\varepsilon} y$ by \Cref{closeIffAbsLtReal}, and the two families are equal by univalence and function extensionality. Finally, being a premetric space is a proposition (\Cref{isPropIsPremetric}), so the two proofs of the axioms agree over this equality.
+\end{proof}
+
+\begin{theorem}[\agda{isCauchyCompleteℝ}; {\textcite[Theorem 11.3.49]{univalentfoundationsprogram2013}}]
+  \label{isCauchyCompleteReal}
+  $\R$ is Cauchy complete (\Cref{IsCauchyComplete}).
+\end{theorem}
+\begin{proof}
+  The premetric space $\R$ is complete by \Cref{isCompleteCompletion}. Completeness transports along the equality of premetric spaces in \Cref{inducedPremetricSpaceRealEq} to the premetric space induced on $\R$, which is Cauchy completeness of $\R$ by definition (\Cref{IsCauchyComplete}).
+\end{proof}

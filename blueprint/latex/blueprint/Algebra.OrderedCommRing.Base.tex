@@ -1,0 +1,15 @@
+\section{\texttt{Algebra.OrderedCommRing.Base}}
+
+\begin{definition}[\agda{IsOrderedCommRing}]
+  \label{IsOrderedCommRing}
+  An \textbf{ordered commutative ring} is a set $R$ together with constants $0$, $1$, operations $-$, $+$, $\cdot$, $\sqcap$, $\sqcup$, and relations $\le$, $<$ such that:
+  \begin{itemize}
+  \item $(R, 0, 1, -, +, \cdot)$ is a commutative ring.
+  \item $(R, \le, \sqcap, \sqcup)$ is a lattice (\Cref{IsPseudolattice}).
+  \item $(R, <)$ is a strict order (irreflexive, transitive, and weakly linear).
+  \item The two orders are compatible: $x < y$ implies $x \le y$; $x \le y$ if and only if $\neg(y < x)$; and $x < y \le z$ or $x \le y < z$ implies $x < z$.
+  \item Both orders are compatible with addition: $x \le y$ implies $x + z \le y + z$, and likewise for $<$. Moreover, if $0 < x + y$ then $0 < x$ or $0 < y$.
+  \item Both orders are compatible with multiplication: for $0 \le z$, $x \le y$ implies $x \cdot z \le y \cdot z$, and for $0 < z$, $x < y$ implies $x \cdot z < y \cdot z$. Finally, $0 < 1$.
+  \end{itemize}
+  Monotonicity is only required on the right; the left versions follow from commutativity.
+\end{definition}

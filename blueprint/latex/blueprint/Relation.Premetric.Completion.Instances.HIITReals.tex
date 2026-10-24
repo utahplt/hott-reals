@@ -1,0 +1,17 @@
+\section{\texttt{Relation.Premetric.Completion.Instances.HIITReals}}
+
+\begin{definition}[\agda{ℝ}; {\textcite[\S~4.1]{gilbert2017}}]
+  \label{reals}
+  We define the \textbf{HoTT book reals} as the premetric completion $\R := \completion{\Q}$ of the rationals (\Cref{QPremetricSpace}). By \Cref{completionPremetricSpace,isCompleteCompletion}, $\R$ is a complete premetric space. We write $\iota \colon \Q \to \R$ for the inclusion of the rationals, which the HoTT book~\cite{univalentfoundationsprogram2013} and the Agda call $\mathsf{rat}$. We denote the limit and closeness relation by $\lim$ and $\cclose{\varepsilon}$, respectively. A numeral in $\R$ denotes the image of the rational numeral under $\iota$.
+\end{definition}
+% TODO: Make remark in the paper about why we follow Booij's naming convention
+
+\begin{definition}[\agda{-ⁿ}; {\textcite[\S~11.3.3]{univalentfoundationsprogram2013}}]
+  \label{negNReal}
+  Negation $- \colon \Q \to \Q$ is non-expansive (\Cref{negN}), so by \Cref{liftNE} it lifts to a map $- \colon \R \to \R$, again non-expansive, with $-\iota(q) = \iota(-q)$.
+\end{definition}
+
+\begin{definition}[\agda{+ⁿ}; {\textcite[\S~11.3.3]{univalentfoundationsprogram2013}}]
+  \label{plusNReal}
+  Addition $+ \colon \Q \to \Q \to \Q$ is non-expansive in each argument separately (\Cref{plusN}), so by \Cref{liftNE2} it lifts to a map $+ \colon \R \to \R \to \R$, again non-expansive in each argument separately, with $\iota(q) + \iota(r) = \iota(q + r)$. We write $x - y := (x + (-y))$.
+\end{definition}

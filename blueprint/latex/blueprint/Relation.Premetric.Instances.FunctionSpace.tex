@@ -1,0 +1,17 @@
+\section{\texttt{Relation.Premetric.Instances.FunctionSpace}}
+
+Throughout this section $M$, $N$ and $X$ are premetric spaces.
+
+\begin{definition}[\agda{NE[\_,\_]PrSpace}; {\textcite[Definition 2.14, Theorem 2.16]{gilbert2017}}]
+  \label{NEPrSpace}
+  The non-expansive maps from $M$ to $N$ form a premetric space. Two such maps $f$ and $g$ are $\varepsilon$-close if there merely exists $\delta : \Qp$ with $\delta < \varepsilon$ such that $f(x) \close{\delta} g(x)$ for every $x : M$.
+\end{definition}
+
+\begin{lemma}[\agda{makeNE₂}]
+  \label{makeNE2}
+  If $f \colon M \to N \to X$ is non-expansive in each argument separately, then its curried form
+  \[
+    x \mapsto (y \mapsto f(x,y))
+  \]
+  is a non-expansive map from $M$ into the premetric space of non-expansive maps from $N$ to $X$.
+\end{lemma}

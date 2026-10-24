@@ -1,0 +1,46 @@
+\section{\texttt{Relation.Premetric.Instances.Rationals}}
+
+\begin{definition}[\agda{ℚPremetricSpace}; {\textcite[Theorem 2.7]{gilbert2017}}]
+  \label{QPremetricSpace}
+  The rationals form a premetric space with
+  \[
+    q \close{\varepsilon} r := \lvert q - r \rvert < \varepsilon,
+  \]
+  where $\lvert q \rvert = q \sqcup (-q)$ is the absolute value (\Cref{abs}) of the ordered abelian group $\Q$ (\Cref{QOrderedAbGroup}). Its meet and join are $\min$ and $\max$, so $\lvert q \rvert = \max(q, -q)$.
+\end{definition}
+
+\begin{lemma}[\agda{-ⁿ}]
+  \label{negN}
+  Negation $- \colon \Q \to \Q$ is non-expansive.
+\end{lemma}
+
+\begin{lemma}[\agda{+ⁿ}]
+  \label{plusN}
+  Addition $+ \colon \Q \to \Q \to \Q$ is non-expansive in each argument separately.
+\end{lemma}
+
+\begin{lemma}[\agda{minNE₂}]
+  \label{minNE2}
+  The map $\min \colon \Q \to \Q \to \Q$ is non-expansive in each argument separately.
+\end{lemma}
+\begin{proof}
+  We show that $\min$ is non-expansive in its first argument; for the second argument, the same proof goes through with \Cref{absDeltaMeetL} in place of \Cref{absDeltaMeetR}.
+
+  Let $q, r, s : \Q$, $\varepsilon : \Qp$, and suppose $\lvert q - r \rvert < \varepsilon$. We must show that
+  \[
+    \lvert \min(q, s) - \min(r, s) \rvert < \varepsilon.
+  \]
+  \Cref{absDeltaMeetR} gives
+  \[
+    \lvert \min(q, s) - \min(r, s) \rvert \le \lvert q - r \rvert,
+  \]
+  and the claim follows by the mixed transitivity axiom of ordered abelian groups (\Cref{IsOrderedAbGroup}).
+\end{proof}
+
+\begin{lemma}[\agda{maxNE₂}; {\textcite[Lemma 2.4.2]{brough2026}}]
+  \label{maxNE2}
+  The map $\max \colon \Q \to \Q \to \Q$ is non-expansive in each argument separately.
+\end{lemma}
+\begin{proof}
+  Exactly as \Cref{minNE2}, with \Cref{absDeltaJoinR,absDeltaJoinL} in place of \Cref{absDeltaMeetR,absDeltaMeetL}.
+\end{proof}

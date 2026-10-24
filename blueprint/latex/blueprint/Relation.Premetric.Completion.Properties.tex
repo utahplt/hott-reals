@@ -1,0 +1,44 @@
+\section{\texttt{Relation.Premetric.Completion.Properties}}
+
+Throughout this section $M$ is a premetric space.
+
+\begin{lemma}[\agda{isSym∼}; {\textcite[Lemma 3.7]{gilbert2017}}]
+  \label{isSymClose}
+  The closeness relation $\cclose$ on $\completion{M}$ is symmetric (\Cref{IsPremetric}). That is, for all $u, v : \completion{M}$ and $\varepsilon : \Qp$, if $u \cclose{\varepsilon} v$ then $v \cclose{\varepsilon} u$.
+\end{lemma}
+
+\begin{lemma}[\agda{isTriangular∼}; {\textcite[Theorem 3.16]{gilbert2017}}]
+  \label{isTriangularClose}
+  The closeness relation $\cclose$ on $\completion{M}$ is triangular (\Cref{IsPremetric}). That is, for all $u, v, w : \completion{M}$ and $\varepsilon, \delta : \Qp$, if $u \cclose{\varepsilon} v$ and $v \cclose{\delta} w$, then $u \cclose{\varepsilon + \delta} w$.
+\end{lemma}
+
+\begin{lemma}[\agda{isRounded∼}; {\textcite[Theorem 3.16]{gilbert2017}}]
+  \label{isRoundedClose}
+  The closeness relation $\cclose$ on $\completion{M}$ is rounded (\Cref{IsPremetric}). That is, for all $u, v : \completion{M}$ and $\varepsilon : \Qp$, if $u \cclose{\varepsilon} v$, then there merely exists $\delta < \varepsilon$ such that $u \cclose{\delta} v$.
+\end{lemma}
+
+\begin{theorem}[\agda{ℭPremetricSpace}; {\textcite[Theorem 3.16]{gilbert2017}}]
+  \label{completionPremetricSpace}
+  $\completion{M}$ with the closeness relation of \Cref{completion} is a premetric space.
+\end{theorem}
+
+% TODO: Remove
+\begin{lemma}[\agda{ιⁿ}]
+  \label{iotaN}
+  The map $\iota \colon M \to \completion{M}$ is non-expansive.
+\end{lemma}
+
+\begin{lemma}[\agda{isInjectiveι}; {\textcite[Corollary 3.17]{gilbert2017}}]
+  \label{isInjectiveIota}
+  The map $\iota \colon M \to \completion{M}$ is injective.
+\end{lemma}
+
+\begin{theorem}[\agda{isLimitLim}; {\textcite[Theorem 3.18]{gilbert2017}}]
+  \label{isLimitLim}
+  For every Cauchy approximation $x$ in $\completion{M}$, $\lim x$ is a limit of $x$ (\Cref{isLimit}).
+\end{theorem}
+
+\begin{corollary}[\agda{isCompleteℭ}; {\textcite[Theorem 3.18]{gilbert2017}}]
+  \label{isCompleteCompletion}
+  $\completion{M}$ is complete (\Cref{isComplete}).
+\end{corollary}

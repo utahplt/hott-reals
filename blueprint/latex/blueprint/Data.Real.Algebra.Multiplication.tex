@@ -1,0 +1,336 @@
+\section{\texttt{Data.Real.Algebra.Multiplication}}
+
+Throughout this section $\lvert x \rvert$ is the absolute value of \Cref{abs} in the ordered abelian group $\R$ (\Cref{ROrderedAbGroup}) and, on $\Q$, in the ordered abelian group $\Q$ (\Cref{QOrderedAbGroup}), as in \texttt{Data.Real.Order.Magnitude}. Multiplication on $\Q$ has no Lipschitz constant uniform in either argument, so it cannot be lifted directly. Following \textcite[\S~4.3]{gilbert2017}, we first lift multiplication by a fixed rational, then multiplication by a real whose absolute value is bounded by a fixed rational, and finally remove the bound.
+
+\begin{lemma}[\agda{scaleRatIsLipschitzWith}; {\textcite[Lemma 2.4.18]{brough2026}}]
+  \label{scaleRatIsLipschitzWith}
+  Let $q : \Q$. The map $r \mapsto \iota(q \cdot r) \colon \Q \to \R$ is $(\lvert q \rvert + 1)$-Lipschitz.
+\end{lemma}
+\begin{proof}
+  Note first that $0 \le \lvert q \rvert$ (\Cref{absNonNeg}) and $0 < 1$, so $\lvert q \rvert + 1$ is a positive rational. Let $r, s : \Q$ and $\varepsilon : \Qp$ with $r \close{\varepsilon} s$, that is, $\lvert r - s \rvert < \varepsilon$ (\Cref{QPremetricSpace}). Then $\lvert q \cdot r - q \cdot s \rvert = \lvert q \cdot (r - s) \rvert$ by the ring laws of $\Q$, and $\lvert q \cdot (r - s) \rvert = \lvert q \rvert \cdot \lvert r - s \rvert$ by \Cref{absMul}. Since $\lvert q \rvert \le \lvert q \rvert + 1$ and $0 \le \lvert r - s \rvert$ (\Cref{absNonNeg}), monotonicity of multiplication on the right (\Cref{IsOrderedCommRing}) gives $\lvert q \rvert \cdot \lvert r - s \rvert \le (\lvert q \rvert + 1) \cdot \lvert r - s \rvert$, and since $0 < \lvert q \rvert + 1$, strict monotonicity on the left gives $(\lvert q \rvert + 1) \cdot \lvert r - s \rvert < (\lvert q \rvert + 1) \cdot \varepsilon$. So $\lvert q \cdot r - q \cdot s \rvert < (\lvert q \rvert + 1) \cdot \varepsilon$ by the mixed transitivity of \Cref{IsOrderedCommRing}, which is $q \cdot r \close{(\lvert q \rvert + 1)\varepsilon} q \cdot s$ in $\Q$, and $\iota(q \cdot r) \cclose{(\lvert q \rvert + 1)\varepsilon} \iota(q \cdot s)$ by \Cref{closeIffBall}.
+\end{proof}
+
+\begin{definition}[\agda{scale}, \agda{scaleIsLipschitzWith}, \agda{scale∘rat}; {\textcite[Definition 4.11]{gilbert2017}}]
+  \label{scale}
+  For $q : \Q$, the map $r \mapsto \iota(q \cdot r)$ is $(\lvert q \rvert + 1)$-Lipschitz (\Cref{scaleRatIsLipschitzWith}), so by \Cref{liftLipschitzWith} it lifts to a map $m_q \colon \R \to \R$, again $(\lvert q \rvert + 1)$-Lipschitz, with
+  \[
+    m_q(\iota(r)) = \iota(q \cdot r)
+  \]
+  for all $r : \Q$. We call $m_q(x)$ \textbf{multiplication of $x$ by the rational $q$}.
+\end{definition}
+\begin{proof}
+  Apply \Cref{liftLipschitzWith} to \Cref{scaleRatIsLipschitzWith}. The computation rule is that of \Cref{liftLipschitzWith}.
+\end{proof}
+
+\begin{lemma}[\agda{scaleDistL-}]
+  \label{scaleDistLSub}
+  For all $q, r : \Q$ and $u : \R$, $m_q(u) - m_r(u) = m_{q - r}(u)$.
+\end{lemma}
+\begin{proof}
+  The map $u \mapsto m_q(u) - m_r(u)$ is Lipschitz by \Cref{composeL2} applied to $m_q$, $m_r$ and subtraction, which is non-expansive in each argument (\Cref{plusNReal,negNReal}), and $m_{q-r}$ is Lipschitz (\Cref{scale}). So \Cref{lipschitzEq} reduces the claim to rational points, where the computation rule in \Cref{scale} and the ring laws of $\Q$ give
+  \[
+    m_q(\iota(s)) - m_r(\iota(s)) = \iota(q \cdot s) - \iota(r \cdot s) = \iota(q \cdot s - r \cdot s) = \iota((q - r) \cdot s) = m_{q-r}(\iota(s)).
+  \]
+\end{proof}
+
+\begin{lemma}[\agda{absScale}]
+  \label{absScale}
+  For all $q : \Q$ and $u : \R$, $\lvert m_q(u) \rvert = m_{\lvert q \rvert}(\lvert u \rvert)$.
+\end{lemma}
+\begin{proof}
+  Both sides are Lipschitz in $u$, as composites of Lipschitz maps (\Cref{composeIsLipschitzWith}): the absolute value is non-expansive (\Cref{absNReal}) and $m_q$ and $m_{\lvert q \rvert}$ are Lipschitz (\Cref{scale}). Thus \Cref{lipschitzEq} reduces the claim to rational points. There, $\lvert m_q(\iota(r)) \rvert = \lvert \iota(q \cdot r) \rvert = \iota(\lvert q \cdot r \rvert)$ by the computation rule and \Cref{absRatReal}, and $\lvert q \cdot r \rvert = \lvert q \rvert \cdot \lvert r \rvert$ in $\Q$ by \Cref{absMul}. Hence
+  \[
+    \lvert m_q(\iota(r)) \rvert = \iota(\lvert q \rvert \cdot \lvert r \rvert) = m_{\lvert q \rvert}(\iota(\lvert r \rvert)) = m_{\lvert q \rvert}(\lvert \iota(r) \rvert)
+  \]
+  by the computation rule and \Cref{absRatReal} again.
+\end{proof}
+
+\begin{lemma}[\agda{scaleDistR-}]
+  \label{scaleDistRSub}
+  For all $q : \Q$ and $u, w : \R$, $m_q(u - w) = m_q(u) - m_q(w)$.
+\end{lemma}
+\begin{proof}
+  Both sides are continuous in each argument separately. On the left, for fixed $w$ the map $u \mapsto m_q(u - w)$ is $m_q$ after the non-expansive translation $u \mapsto u - w$ (\Cref{plusNReal,negNReal}), and for fixed $u$ the map $w \mapsto m_q(u - w)$ is $m_q$ after $w \mapsto u - w$, likewise. Both are Lipschitz by \Cref{composeIsLipschitzWith}. On the right, for fixed $w$ the map $u \mapsto m_q(u) - m_q(w)$ is the translation by $-m_q(w)$ after $m_q$, and for fixed $u$ the map $w \mapsto m_q(u) - m_q(w)$ is $w \mapsto m_q(u) - w$ after $m_q$, both Lipschitz. So \Cref{continuous2Eq} reduces the claim to $u = \iota(r)$ and $w = \iota(s)$ for $r, s : \Q$, where the computation rule in \Cref{scale} and the ring laws of $\Q$ give
+  \[
+    m_q(\iota(r) - \iota(s)) = \iota(q \cdot (r - s)) = \iota(q \cdot r - q \cdot s) = m_q(\iota(r)) - m_q(\iota(s)).
+  \]
+\end{proof}
+
+\begin{lemma}[\agda{0≤scale}]
+  \label{scaleNonNeg}
+  For all $q : \Q$ and $u : \R$, if $0 \le q$ and $0 \le u$, then $0 \le m_q(u)$.
+\end{lemma}
+\begin{proof}
+  Since $0 \le q$ and $0 \le u$, $\lvert q \rvert = q$ and $\lvert u \rvert = u$ (\Cref{nonNegAbsEqId}, in $\Q$ and in $\R$), so
+  \[
+    m_q(u) = m_{\lvert q \rvert}(\lvert u \rvert) = \lvert m_q(u) \rvert
+  \]
+  by \Cref{absScale}, and $0 \le \lvert m_q(u) \rvert$ by \Cref{absNonNeg}.
+\end{proof}
+
+\begin{lemma}[\agda{scaleMono≤}]
+  \label{scaleMonoLe}
+  For all $q : \Q$ and $u, w : \R$, if $0 \le q$ and $u \le w$, then $m_q(u) \le m_q(w)$.
+\end{lemma}
+\begin{proof}
+  Adding $-u$ on the right to $u \le w$ and using the group laws gives $0 \le w - u$. Hence $0 \le m_q(w - u)$ by \Cref{scaleNonNeg}, and $m_q(w - u) = m_q(w) - m_q(u)$ by \Cref{scaleDistRSub}. Adding $m_q(u)$ on the right and using the group laws gives $m_q(u) \le m_q(w)$.
+\end{proof}
+
+\begin{lemma}[\agda{flipScaleIsLipschitzWith}; {\textcite[Lemma 2.4.19]{brough2026}}]
+  \label{flipScaleIsLipschitzWith}
+  Let $L : \Qp$ and let $v : \R$ satisfy $\lvert v \rvert \le \iota(L)$. Then the map $q \mapsto m_q(v) \colon \Q \to \R$ is $L$-Lipschitz.
+\end{lemma}
+\begin{proof}
+  Let $q, r : \Q$ and $\varepsilon : \Qp$ with $q \close{\varepsilon} r$, that is, $\lvert q - r \rvert < \varepsilon$ in $\Q$ (\Cref{QPremetricSpace}). By \Cref{closeIffAbsLtReal} it suffices to show $\lvert m_q(v) - m_r(v) \rvert < \iota(L \cdot \varepsilon)$. Now $m_q(v) - m_r(v) = m_{q-r}(v)$ by \Cref{scaleDistLSub}, so $\lvert m_q(v) - m_r(v) \rvert = m_{\lvert q-r \rvert}(\lvert v \rvert)$ by \Cref{absScale}. Since $0 \le \lvert q - r \rvert$ (\Cref{absNonNeg}) and $\lvert v \rvert \le \iota(L)$, \Cref{scaleMonoLe} gives $m_{\lvert q-r \rvert}(\lvert v \rvert) \le m_{\lvert q-r \rvert}(\iota(L)) = \iota(\lvert q - r \rvert \cdot L)$ by the computation rule in \Cref{scale}. Finally $\lvert q - r \rvert \cdot L < \varepsilon \cdot L = L \cdot \varepsilon$ in $\Q$ by strict monotonicity of multiplication by the positive $L$ (\Cref{IsOrderedCommRing}) and commutativity, so $\iota(\lvert q - r \rvert \cdot L) < \iota(L \cdot \varepsilon)$ by \Cref{ltIffRatLtReal}, and we conclude that
+  \[
+    \lvert m_q(v) - m_r(v) \rvert < \iota(L \cdot \varepsilon)
+  \]
+  by the identity above and mixed transitivity (\Cref{isTransLeLtReal}) applied to the two inequalities.
+\end{proof}
+
+\begin{definition}[\agda{boundedMul}, \agda{boundedMulIsLipschitzWith}, \agda{boundedMul∘rat}; {\textcite[Definition 4.12]{gilbert2017}}]
+  \label{boundedMul}
+  For $L : \Qp$ and $v : \R$ with $\lvert v \rvert \le \iota(L)$, the map $q \mapsto m_q(v)$ is $L$-Lipschitz (\Cref{flipScaleIsLipschitzWith}), so by \Cref{liftLipschitzWith} it lifts to a map $b_{L,v} \colon \R \to \R$, again $L$-Lipschitz, with
+  \[
+    b_{L,v}(\iota(q)) = m_q(v)
+  \]
+  for all $q : \Q$. We call $b_{L,v}(u)$ \textbf{bounded multiplication} of $u$ by $v$ under the bound $L$.
+\end{definition}
+\begin{proof}
+  Apply \Cref{liftLipschitzWith} to \Cref{flipScaleIsLipschitzWith}. The computation rule is that of \Cref{liftLipschitzWith}.
+\end{proof}
+
+\begin{corollary}[\agda{∃abs≤rat}]
+  \label{existsAbsLeRatReal}
+  For every $x : \R$ there merely exists $L : \Qp$ with $\lvert x \rvert \le \iota(L)$.
+\end{corollary}
+\begin{proof}
+  By \Cref{existsAbsLtRatReal} and \Cref{ltWeakenLeReal}.
+\end{proof}
+
+\begin{lemma}[\agda{boundedMul≡}; {\textcite[Lemma 2.4.22]{brough2026}}]
+  \label{boundedMulEq}
+  Let $L, M : \Qp$ and $v : \R$ with $\lvert v \rvert \le \iota(L)$ and $\lvert v \rvert \le \iota(M)$. Then $b_{L,v}(u) = b_{M,v}(u)$ for every $u : \R$.
+\end{lemma}
+\begin{proof}
+  Both $b_{L,v}$ and $b_{M,v}$ are Lipschitz (\Cref{boundedMul}), and they agree at rational points, since $b_{L,v}(\iota(q)) = m_q(v) = b_{M,v}(\iota(q))$ by the computation rule. So \Cref{lipschitzEq} gives $b_{L,v} = b_{M,v}$ pointwise.
+\end{proof}
+
+\begin{definition}[\agda{\_·\_}; {\textcite[Definition 4.15]{gilbert2017}}]
+  \label{mulReal}
+  For $u, v : \R$, consider the map
+  \[
+    h_{u,v} \colon \left(\textstyle\sum_{L : \Qp} \lvert v \rvert \le \iota(L)\right) \to \R, \qquad h_{u,v}(L, p) := b_{L,v}(u).
+  \]
+  By \Cref{boundedMulEq} it is weakly constant, and $\R$ is a set (\Cref{reals}), so by \Cref{recSet} it extends to the propositional truncation of its domain, which is inhabited by \Cref{existsAbsLeRatReal}. We define \textbf{multiplication} on $\R$ by taking $u \cdot v$ to be the value of that extension at the witness of \Cref{existsAbsLeRatReal}.
+\end{definition}
+
+\begin{lemma}[\agda{·≡boundedMul}; {\textcite[Lemma 4.16]{gilbert2017}}]
+  \label{mulEqBoundedMul}
+  For all $L : \Qp$ and $u, v : \R$ with $\lvert v \rvert \le \iota(L)$, $u \cdot v = b_{L,v}(u)$.
+\end{lemma}
+\begin{proof}
+  The extension of \Cref{recSet} takes the same value at every element of the truncation, since the truncation is a proposition, and at the element $\eta(L, p)$ its value is $h_{u,v}(L, p) = b_{L,v}(u)$ by the computation rule of \Cref{recSet}.
+\end{proof}
+
+\begin{lemma}[\agda{rat·rat}; {\textcite[Lemma 4.17]{gilbert2017}}]
+  \label{ratMulRat}
+  For all $q, r : \Q$, $\iota(q) \cdot \iota(r) = \iota(q \cdot r)$.
+\end{lemma}
+\begin{proof}
+  Since $\R$ is a set, the conclusion is a proposition, so by \Cref{existsAbsLeRatReal} we may assume $L : \Qp$ with $\lvert \iota(r) \rvert \le \iota(L)$. Then $\iota(q) \cdot \iota(r) = b_{L,\iota(r)}(\iota(q))$ by \Cref{mulEqBoundedMul}, which is $m_q(\iota(r)) = \iota(q \cdot r)$ by the computation rules in \Cref{boundedMul,scale}.
+\end{proof}
+
+\begin{lemma}[\agda{rat·≡scale}; {\textcite[Lemma 4.20]{gilbert2017}}]
+  \label{ratMulEqScale}
+  For all $q : \Q$ and $x : \R$, $\iota(q) \cdot x = m_q(x)$.
+\end{lemma}
+\begin{proof}
+  The conclusion is a proposition, so by \Cref{existsAbsLeRatReal} we may assume $L : \Qp$ with $\lvert x \rvert \le \iota(L)$. Then $\iota(q) \cdot x = b_{L,x}(\iota(q))$ by \Cref{mulEqBoundedMul}, and $b_{L,x}(\iota(q)) = m_q(x)$ by the computation rule in \Cref{boundedMul}.
+\end{proof}
+
+\begin{lemma}[\agda{·IsLipschitzWithR}; {\textcite[Lemma 4.18]{gilbert2017}}]
+  \label{mulIsLipschitzWithR}
+  Let $L : \Qp$ and let $v : \R$ satisfy $\lvert v \rvert \le \iota(L)$. Then the map $u \mapsto u \cdot v \colon \R \to \R$ is $L$-Lipschitz.
+\end{lemma}
+\begin{proof}
+  By \Cref{mulEqBoundedMul}, the map $u \mapsto u \cdot v$ is pointwise equal to $b_{L,v}$, which is $L$-Lipschitz by \Cref{boundedMul}.
+\end{proof}
+
+\begin{corollary}[\agda{·ᶜ[\_]}; {\textcite[Lemma 4.19]{gilbert2017}}]
+  \label{mulCR}
+  For every $v : \R$, the map $u \mapsto u \cdot v \colon \R \to \R$ is continuous.
+\end{corollary}
+\begin{proof}
+  Continuity is a proposition, so by \Cref{existsAbsLeRatReal} we may assume $L : \Qp$ with $\lvert v \rvert \le \iota(L)$; then $u \mapsto u \cdot v$ is $L$-Lipschitz by \Cref{mulIsLipschitzWithR}, and hence continuous.
+\end{proof}
+
+\begin{lemma}[\agda{·rat≡scale}]
+  \label{mulRatEqScale}
+  For all $q : \Q$ and $x : \R$, $x \cdot \iota(q) = m_q(x)$.
+\end{lemma}
+\begin{proof}
+  The map $x \mapsto x \cdot \iota(q)$ is continuous (\Cref{mulCR}) and $m_q$ is Lipschitz (\Cref{scale}), so \Cref{continuousEq} reduces the claim to $x = \iota(s)$ for $s : \Q$, where \Cref{ratMulRat}, commutativity of multiplication in $\Q$ and the computation rule in \Cref{scale} give \[
+    \iota(s) \cdot \iota(q) = \iota(s \cdot q) = \iota(q \cdot s) = m_q(\iota(s)).
+  \]
+\end{proof}
+
+\begin{lemma}[\agda{·DistR-}]
+  \label{mulDistRSubReal}
+  For all $x, y, z : \R$, $x \cdot (y - z) = x \cdot y - x \cdot z$.
+\end{lemma}
+\begin{proof}
+  Both sides are continuous in $x$. The left is \Cref{mulCR} at $y - z$, and the right is \Cref{composeC2} applied to \Cref{mulCR} at $y$, \Cref{mulCR} at $z$ and subtraction, which is non-expansive in each argument (\Cref{plusNReal,negNReal}). So \Cref{continuousEq} reduces the claim to $x = \iota(q)$ for $q : \Q$, where \Cref{ratMulEqScale} and \Cref{scaleDistRSub} give
+  \[
+    \iota(q) \cdot (y - z) = m_q(y - z) = m_q(y) - m_q(z) = \iota(q) \cdot y - \iota(q) \cdot z
+  \]
+\end{proof}
+
+\begin{lemma}[\agda{abs·}]
+  \label{absMulReal}
+  For all $x, y : \R$, $\lvert x \cdot y \rvert = \lvert x \rvert \cdot \lvert y \rvert$.
+\end{lemma}
+\begin{proof}
+  Both sides are continuous in $x$. The left is the absolute value, non-expansive (\Cref{absNReal}), after \Cref{mulCR} at $y$. The right is \Cref{mulCR} at $\lvert y \rvert$ after the absolute value. So \Cref{continuousEq} reduces the claim to $x = \iota(q)$ for $q : \Q$, where
+  \[
+    \lvert \iota(q) \cdot y \rvert = \lvert m_q(y) \rvert = m_{\lvert q \rvert}(\lvert y \rvert) = \iota(\lvert q \rvert) \cdot \lvert y \rvert = \lvert \iota(q) \rvert \cdot \lvert y \rvert
+  \]
+  by \Cref{ratMulEqScale}, \Cref{absScale}, \Cref{ratMulEqScale} again, and \Cref{absRatReal}.
+\end{proof}
+
+\begin{lemma}[\agda{0≤·}]
+  \label{mulNonNegReal}
+  For all $x, y : \R$, if $0 \le x$ and $0 \le y$, then $0 \le x \cdot y$.
+\end{lemma}
+\begin{proof}
+  Since $0 \le x$ and $0 \le y$, $\lvert x \rvert = x$ and $\lvert y \rvert = y$ (\Cref{nonNegAbsEqId}), so $x \cdot y = \lvert x \rvert \cdot \lvert y \rvert = \lvert x \cdot y \rvert$ by \Cref{absMulReal}, and $0 \le \lvert x \cdot y \rvert$ by \Cref{absNonNeg}.
+\end{proof}
+
+\begin{lemma}[\agda{·MonoL≤}]
+  \label{mulMonoLLeReal}
+  Multiplication on the left by a nonnegative real is monotone. For all $a, y, z : \R$, if $0 \le a$ and $y \le z$, then $a \cdot y \le a \cdot z$.
+\end{lemma}
+\begin{proof}
+  Adding $-y$ on the right to $y \le z$ and using the group laws gives $0 \le z - y$. Hence $0 \le a \cdot (z - y)$ by \Cref{mulNonNegReal}, and $a \cdot (z - y) = a \cdot z - a \cdot y$ by \Cref{mulDistRSubReal}. Adding $a \cdot y$ on the right and using the group laws gives $a \cdot y \le a \cdot z$.
+\end{proof}
+
+\begin{lemma}[\agda{·IsLipschitzWithL}; {\textcite[Lemma 2.4.25]{brough2026}}]
+  \label{mulIsLipschitzWithL}
+  Let $L : \Qp$ and let $u : \R$ satisfy $\lvert u \rvert \le \iota(L)$. Then the map $v \mapsto u \cdot v \colon \R \to \R$ is $L$-Lipschitz.
+\end{lemma}
+\begin{proof}
+  Let $v \cclose{\delta} w$. Since the conclusion is a proposition, by roundedness (\Cref{isRoundedClose}) we may assume $\theta < \delta$ with $v \cclose{\theta} w$. Then $\lvert v - w \rvert < \iota(\theta)$ by \Cref{closeIffAbsLtReal}. By \Cref{closeIffAbsLtReal} again it suffices to show $\lvert u \cdot v - u \cdot w \rvert < \iota(L \cdot \delta)$. Now $u \cdot v - u \cdot w = u \cdot (v - w)$ by \Cref{mulDistRSubReal}, so $\lvert u \cdot v - u \cdot w \rvert = \lvert u \rvert \cdot \lvert v - w \rvert$ by \Cref{absMulReal}. Since $0 \le \lvert u \rvert$ (\Cref{absNonNeg}) and $\lvert v - w \rvert \le \iota(\theta)$ (\Cref{ltWeakenLeReal}), \Cref{mulMonoLLeReal} gives $\lvert u \rvert \cdot \lvert v - w \rvert \le \lvert u \rvert \cdot \iota(\theta)$, and $\lvert u \rvert \cdot \iota(\theta) = m_\theta(\lvert u \rvert)$ by \Cref{mulRatEqScale}. Since $0 \le \theta$ and $\lvert u \rvert \le \iota(L)$, \Cref{scaleMonoLe} gives $m_\theta(\lvert u \rvert) \le m_\theta(\iota(L)) = \iota(\theta \cdot L)$ by the computation rule in \Cref{scale}. Finally $\theta \cdot L < \delta \cdot L = L \cdot \delta$ in $\Q$ by strict monotonicity of multiplication by the positive $L$ and commutativity, so $\iota(\theta \cdot L) < \iota(L \cdot \delta)$ by \Cref{ltIffRatLtReal}. Mixed transitivity now gives
+  \[
+    \lvert u \cdot v - u \cdot w \rvert < \iota(L \cdot \delta),
+  \]
+  as required.
+\end{proof}
+
+\begin{corollary}[\agda{[\_]·ᶜ}]
+  \label{mulCL}
+  For every $u : \R$, the map $v \mapsto u \cdot v \colon \R \to \R$ is continuous.
+\end{corollary}
+\begin{proof}
+  As \Cref{mulCR}, with \Cref{mulIsLipschitzWithL} in place of \Cref{mulIsLipschitzWithR}.
+\end{proof}
+
+\begin{lemma}[\agda{\_·ᶜ\_}; {\textcite[Theorem 4.23]{gilbert2017}}]
+  \label{mulC}
+  Let $M$ be a premetric space and $f, g \colon M \to \R$ be continuous. Then the pointwise product $a \mapsto f(a) \cdot g(a) \colon M \to \R$ is continuous.
+\end{lemma}
+\begin{proof}
+  Let $a : M$ and $\varepsilon : \Qp$. Since the conclusion is a proposition, by \Cref{existsAbsLeRatReal} we may assume $A, K : \Qp$ with $\lvert f(a) \rvert \le \iota(A)$ and $\lvert g(a) \rvert \le \iota(K)$. By continuity of $g$ at $a$ (\Cref{IsContinuousAt}) with tolerance $1$, we may assume $\delta_1 : \Qp$ such that $a \close{\delta_1} b$ gives $g(a) \cclose{1} g(b)$. By continuity of $f$ at $a$ with tolerance $(\varepsilon/2)/(K + 1)$, a $\delta_2 : \Qp$ such that $a \close{\delta_2} b$ gives $f(a) \cclose{(\varepsilon/2)/(K + 1)} f(b)$. Once more, by continuity of $g$ at $a$ with tolerance $(\varepsilon/2)/A$, a $\delta_3 : \Qp$ such that $a \close{\delta_3} b$ gives $g(a) \cclose{(\varepsilon/2)/A} g(b)$. Put $\delta := \min(\min(\delta_1, \delta_2), \delta_3)$ and suppose $a \close{\delta} b$. Then $a \close{\delta_1} b$, $a \close{\delta_2} b$ and $a \close{\delta_3} b$ by monotonicity of closeness in its tolerance.
+
+  We first bound $g$ near $a$. The absolute value is non-expansive (\Cref{absNReal}), so $g(a) \cclose{1} g(b)$ gives $\lvert g(a) \rvert \cclose{1} \lvert g(b) \rvert$, whence $\lvert g(b) \rvert \le \lvert g(a) \rvert + \iota(1)$ by \Cref{closeLeAddRatReal}. Adding $\iota(1)$ on the right to $\lvert g(a) \rvert \le \iota(K)$ (\Cref{plusMonoRLeReal}) and using transitivity gives
+  \[
+    \lvert g(b) \rvert \le \iota(K) + \iota(1) = \iota(K + 1).
+  \]
+
+  Now the map $v \mapsto f(a) \cdot v$ is $A$-Lipschitz (\Cref{mulIsLipschitzWithL}), since $\lvert f(a) \rvert \le \iota(A)$, so $g(a) \cclose{(\varepsilon/2)/A} g(b)$ gives
+  \[
+    f(a) \cdot g(a) \cclose{A \cdot ((\varepsilon/2)/A)} f(a) \cdot g(b),
+  \]
+  that is, $f(a) \cdot g(a) \cclose{\varepsilon/2} f(a) \cdot g(b)$. Likewise the map $u \mapsto u \cdot g(b)$ is $(K + 1)$-Lipschitz (\Cref{mulIsLipschitzWithR}), since $\lvert g(b) \rvert \le \iota(K + 1)$, so $f(a) \cclose{(\varepsilon/2)/(K + 1)} f(b)$ gives $f(a) \cdot g(b) \cclose{\varepsilon/2} f(b) \cdot g(b)$. Triangularity (\Cref{isTriangularClose}) now gives
+  \[
+    f(a) \cdot g(a) \cclose{\varepsilon/2 + \varepsilon/2} f(b) \cdot g(b),
+  \]
+  and $\varepsilon/2 + \varepsilon/2 = \varepsilon$.
+\end{proof}
+
+\begin{lemma}[\agda{·Comm}]
+  \label{mulCommReal}
+  For all $x, y : \R$, $x \cdot y = y \cdot x$.
+\end{lemma}
+\begin{proof}
+  Both sides are continuous in $x$ (\Cref{mulCR} at $y$ and \Cref{mulCL} at $y$), so \Cref{continuousEq} reduces the claim to $x = \iota(q)$ for $q : \Q$, where \Cref{ratMulEqScale} and \Cref{mulRatEqScale} give $\iota(q) \cdot y = m_q(y) = y \cdot \iota(q)$.
+\end{proof}
+
+\begin{lemma}[\agda{·Assoc}]
+  \label{mulAssocReal}
+  For all $x, y, z : \R$, $x \cdot (y \cdot z) = (x \cdot y) \cdot z$.
+\end{lemma}
+\begin{proof}
+  Each side is continuous in each argument separately. Therefore \Cref{continuous3Eq} reduces the claim to $x = \iota(q)$, $y = \iota(r)$ and $z = \iota(s)$ for $q, r, s : \Q$. On the rationals, \Cref{ratMulRat} three times and associativity of multiplication in $\Q$ give
+  \[
+    \iota(q) \cdot (\iota(r) \cdot \iota(s)) = \iota(q \cdot (r \cdot s)) = \iota((q \cdot r) \cdot s) = (\iota(q) \cdot \iota(r)) \cdot \iota(s).
+  \]
+\end{proof}
+
+\begin{lemma}[\agda{·IdR}]
+  \label{mulIdRReal}
+  For every $x : \R$, $x \cdot 1 = x$.
+\end{lemma}
+\begin{proof}
+  The map $x \mapsto x \cdot 1$ is continuous (\Cref{mulCR}) and so is the identity, so \Cref{continuousEq} reduces the claim to $x = \iota(q)$ for $q : \Q$, where \Cref{ratMulRat} and the unit law of $\Q$ give
+  \[
+    \iota(q) \cdot \iota(1) = \iota(q \cdot 1) = \iota(q).
+  \]
+\end{proof}
+
+\begin{corollary}[\agda{·AnnihilR}]
+  \label{mulAnnihilRReal}
+  For every $x : \R$, $x \cdot 0 = 0$.
+\end{corollary}
+\begin{proof}
+  Since $0 - 0 = 0$ (\Cref{+InvR}), \Cref{mulDistRSubReal} gives $x \cdot 0 = x \cdot (0 - 0) = x \cdot 0 - x \cdot 0 = 0$, the last step by \Cref{+InvR} again.
+\end{proof}
+
+\begin{corollary}[\agda{-DistR·}]
+  \label{negDistRMulReal}
+  For all $x, y : \R$, $x \cdot (-y) = -(x \cdot y)$.
+\end{corollary}
+\begin{proof}
+  By the abelian group laws (\Cref{RAbGroup}), $-y = 0 - y$, so
+  \[
+    x \cdot (-y) = x \cdot (0 - y) = x \cdot 0 - x \cdot y
+  \]
+  by \Cref{mulDistRSubReal}, and
+  \[
+    x \cdot 0 - x \cdot y = 0 - x \cdot y = -(x \cdot y)
+  \]
+  by \Cref{mulAnnihilRReal} and the group laws.
+\end{proof}
+
+\begin{corollary}[\agda{·DistR+}]
+  \label{mulDistRPlusReal}
+  For all $x, y, z : \R$, $x \cdot (y + z) = x \cdot y + x \cdot z$.
+\end{corollary}
+\begin{proof}
+  By the abelian group laws (\Cref{RAbGroup}), $y + z = y - (-z)$, so
+  \[
+    x \cdot (y + z) = x \cdot (y - (-z)) = x \cdot y - x \cdot (-z)
+  \]
+  by \Cref{mulDistRSubReal}, and $x \cdot (-z) = -(x \cdot z)$ by \Cref{negDistRMulReal}, so
+  \[
+    x \cdot y - x \cdot (-z) = x \cdot y - (-(x \cdot z)) = x \cdot y + x \cdot z
+  \]
+  by the group laws again.
+\end{proof}
+
+\begin{theorem}[\agda{ℝCommRing}; {\textcite[\S~11.3.3]{univalentfoundationsprogram2013}}]
+  \label{RCommRing}
+  $(\R, 0, 1, +, \cdot, -)$ is a commutative ring.
+\end{theorem}
+\begin{proof}
+  $\R$ is a set and $(\R, 0, +, -)$ is an abelian group (\Cref{RAbGroup}); multiplication is associative (\Cref{mulAssocReal}), has $1$ as a right unit (\Cref{mulIdRReal}), distributes over addition on the right (\Cref{mulDistRPlusReal}) and is commutative (\Cref{mulCommReal}). Together, these are the commutative-ring axioms.
+\end{proof}

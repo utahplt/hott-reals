@@ -1,0 +1,14 @@
+\section{\texttt{Algebra.HeytingField.Base}}
+
+\begin{definition}[\agda{IsHeytingField}]
+  \label{IsHeytingField}
+  A \textbf{Heyting field} is a set $F$ together with constants $0$, $1$, operations $+$, $\cdot$, $-$, and a relation $\#$ such that:
+  \begin{itemize}
+  \item $(F, 0, 1, +, -, \cdot)$ is a commutative ring.
+  \item $\#$ is an \textbf{apartness relation}. It is irreflexive, symmetric, and cotransitive, meaning $x \# y$ implies $x \# z$ or $y \# z$.
+  \item $\#$ is \textbf{tight}: if $\neg(x \# y)$ then $x = y$.
+  \item Addition respects apartness: $x \# y$ implies $x + z \# y + z$.
+  \item $x$ is invertible if and only if $x \# 0$.
+  \end{itemize}
+  An element $x$ is \textbf{invertible} when there is $y$ with $x \cdot y = 1$. Invertibility is a proposition, since inverses are unique.
+\end{definition}

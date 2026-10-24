@@ -1,0 +1,275 @@
+\section{\texttt{Data.Real.Order.Base}}
+
+\begin{definition}[\agda{\_≤\_}; {\textcite[\S~11.3.3]{univalentfoundationsprogram2013}}]
+  \label{leReal}
+  For $x, y : \R$, we define the \textbf{non-strict inequality relation} on reals as
+  \[
+    x \le y := (\max(x, y) = y).
+  \]
+\end{definition}
+
+\begin{lemma}[\agda{isProp≤}]
+  \label{isPropLeReal}
+  For all $x, y : \R$, the type $x \le y$ is a proposition.
+\end{lemma}
+\begin{proof}
+  By definition, $x \le y$ is the identity type $\max(x, y) = y$ in $\R$, and $\R$ is a set.
+\end{proof}
+
+\begin{lemma}[\agda{isRefl≤}]
+  \label{isReflLeReal}
+  For every $x : \R$, $x \le x$.
+\end{lemma}
+\begin{proof}
+  By definition, this reads $\max(x, x) = x$, which is \Cref{maxIdemReal}.
+\end{proof}
+
+\begin{lemma}[\agda{isAntisym≤}]
+  \label{isAntisymLeReal}
+  For all $x, y : \R$, if $x \le y$ and $y \le x$, then $x = y$.
+\end{lemma}
+\begin{proof}
+  Our hypotheses read as $\max(x, y) = y$ and $\max(y, x) = x$. By the commutativity of $\max$ (\Cref{maxCommReal}),
+  \[
+    x = \max(y, x) = \max(x, y) = y.
+  \]
+\end{proof}
+
+\begin{lemma}[\agda{isTrans≤}]
+  \label{isTransLeReal}
+  For all $x, y, z : \R$, if $x \le y$ and $y \le z$, then $x \le z$.
+\end{lemma}
+\begin{proof}
+  Our hypotheses read as $\max(x, y) = y$ and $\max(y, z) = z$. By the associativity of $\max$ (\Cref{maxAssocReal}),
+  \[
+    \max(x, z) = \max(x, \max(y, z)) = \max(\max(x, y), z) = \max(y, z) = z.
+  \]
+\end{proof}
+
+\begin{corollary}[\agda{ℝ≤Poset}]
+  \label{RLePoset}
+  $(\R, \le)$ is a partially ordered set.
+\end{corollary}
+\begin{proof}
+  $\R$ is a set, and $\le$ is propositionally valued, reflexive, antisymmetric and transitive by \Cref{isPropLeReal,isReflLeReal,isAntisymLeReal,isTransLeReal}.
+\end{proof}
+
+\begin{lemma}[\agda{≤≃min}]
+  \label{leIffMinReal}
+  For all $x, y : \R$, $x \le y$ if and only if $x = \min(x, y)$.
+\end{lemma}
+\begin{proof}
+  Suppose $\max(x, y) = y$. Then by \Cref{minAbsorbLMaxReal},
+  \[
+    \min(x, y) = \min(x, \max(x, y)) = x.
+  \]
+  Conversely, suppose $x = \min(x, y)$. Then by \Cref{minCommReal,maxAbsorbRMinReal},
+  \[
+    \max(x, y) = \max(\min(x, y), y) = \max(\min(y, x), y) = y.
+  \]
+\end{proof}
+
+\begin{lemma}[\agda{min≤L}]
+  \label{minLeLReal}
+  For all $x, y : \R$, $\min(x, y) \le x$.
+\end{lemma}
+\begin{proof}
+  This is $\max(\min(x, y), x) = x$, which is \Cref{maxAbsorbRMinReal}.
+\end{proof}
+
+\begin{lemma}[\agda{min≤R}]
+  \label{minLeRReal}
+  For all $x, y : \R$, $\min(x, y) \le y$.
+\end{lemma}
+\begin{proof}
+  By \Cref{minCommReal,minLeLReal},
+  \[
+    \max(\min(x, y), y) = \max(\min(y, x), y) = y.
+  \]
+\end{proof}
+
+\begin{lemma}[\agda{minGLB}]
+  \label{minGLBReal}
+  For all $x, a, b : \R$, if $x \le a$ and $x \le b$, then $x \le \min(a, b)$.
+\end{lemma}
+\begin{proof}
+  By \Cref{leIffMinReal} the hypotheses are equivalent to $x = \min(x, a)$ and $x = \min(x, b)$, and it suffices to show $x = \min(x, \min(a, b))$. Indeed, by \Cref{minAssocReal},
+  \[
+    x = \min(x, b) = \min(\min(x, a), b) = \min(x, \min(a, b)).
+  \]
+\end{proof}
+
+\begin{lemma}[\agda{L≤max}]
+  \label{LLeMaxReal}
+  For all $x, y : \R$, $x \le \max(x, y)$.
+\end{lemma}
+\begin{proof}
+  By \Cref{maxAssocReal,maxIdemReal},
+  \[
+    \max(x, \max(x, y)) = \max(\max(x, x), y) = \max(x, y).
+  \]
+\end{proof}
+
+\begin{lemma}[\agda{R≤max}]
+  \label{RLeMaxReal}
+  For all $x, y : \R$, $y \le \max(x, y)$.
+\end{lemma}
+\begin{proof}
+  By \Cref{maxCommReal,LLeMaxReal},
+  \[
+    \max(y, \max(x, y)) = \max(y, \max(y, x)) = \max(y, x) = \max(x, y).
+  \]
+\end{proof}
+
+\begin{lemma}[\agda{maxLUB}]
+  \label{maxLUBReal}
+  For all $x, a, b : \R$, if $a \le x$ and $b \le x$, then $\max(a, b) \le x$.
+\end{lemma}
+\begin{proof}
+  By \Cref{maxAssocReal} and the hypotheses,
+  \[
+    \max(\max(a, b), x) = \max(a, \max(b, x)) = \max(a, x) = x.
+  \]
+\end{proof}
+
+\begin{corollary}[\agda{ℝ≤Pseudolattice}]
+  \label{RLePseudolattice}
+  $(\R, \le)$ is a lattice (\Cref{IsPseudolattice}) with meet $\min$ and join $\max$.
+\end{corollary}
+\begin{proof}
+  Apply \Cref{makePseudolatticeFromPoset} to \Cref{RLePoset} with the operations $\min$ and $\max$; its six hypotheses are \Cref{minLeLReal,minLeRReal,minGLBReal,LLeMaxReal,RLeMaxReal,maxLUBReal}.
+\end{proof}
+
+\begin{definition}[\agda{\_<\_}; {\textcite[\S~11.3.3]{univalentfoundationsprogram2013}}]
+  \label{ltReal}
+  For $x, y : \R$, we define the \textbf{strict inequality relation} on reals as
+  \[
+    x < y := \exists q, r : \Q,
+    (x \le \iota(q)) \times (q < r) \times (\iota(r) \le y)
+  \]
+  where $q < r$ is the strict inequality on rationals.
+\end{definition}
+
+\begin{lemma}[\agda{isProp<}]
+  \label{isPropLtReal}
+  For all $x, y : \R$, the type $x < y$ is a proposition.
+\end{lemma}
+\begin{proof}
+  By definition, $x < y$ is a propositionally truncated existential, hence a proposition.
+\end{proof}
+
+\begin{lemma}[\agda{≤≃rat≤}]
+  \label{leIffRatLeReal}
+  For all $q, r : \Q$, $q \le r$ if and only if $\iota(q) \le \iota(r)$.
+\end{lemma}
+\begin{proof}
+  We have $q \le r$ if and only if $\max(q, r) = r$ in $\Q$, if and only if $\iota(\max(q, r)) = \iota(r)$ since $\iota$ is injective (\Cref{isInjectiveIota}), if and only if $\max(\iota(q), \iota(r)) = \iota(r)$ by the computation rule in \Cref{maxNReal}, which is $\iota(q) \le \iota(r)$ by definition.
+\end{proof}
+
+\begin{lemma}[\agda{<≃rat<}]
+  \label{ltIffRatLtReal}
+  For all $q, r : \Q$, $q < r$ if and only if $\iota(q) < \iota(r)$.
+\end{lemma}
+\begin{proof}
+  If $q < r$, then $q$ and $r$ themselves witness $\iota(q) < \iota(r)$. Indeed, we obtain $\iota(q) \le \iota(q)$ and $\iota(r) \le \iota(r)$ by reflexivity and $q < r$ by assumption. Conversely, suppose $\iota(q) < \iota(r)$. Since $q < r$ is a proposition, we may assume $s, t : \Q$ with $\iota(q) \le \iota(s)$, $s < t$, and $\iota(t) \le \iota(r)$. By \Cref{leIffRatLeReal}, the first and third imply $q \le s$ and $t \le r$, so $q \le s < t \le r$ and hence $q < r$.
+\end{proof}
+
+\begin{lemma}[\agda{<Weaken≤}]
+  \label{ltWeakenLeReal}
+  For all $x, y : \R$, if $x < y$ then $x \le y$.
+\end{lemma}
+\begin{proof}
+  Since $x \le y$ is a proposition (\Cref{isPropLeReal}), we may assume $q, r : \Q$ with $x \le \iota(q)$, $q < r$ and $\iota(r) \le y$. Then $q \le r$, so $\iota(q) \le \iota(r)$ by \Cref{leIffRatLeReal}, and $x \le \iota(q) \le \iota(r) \le y$ by transitivity.
+\end{proof}
+
+\begin{lemma}[\agda{isIrrefl<}]
+  \label{isIrreflLtReal}
+  For every $x : \R$, $x < x$ does not hold.
+\end{lemma}
+\begin{proof}
+  Suppose $x < x$. Since the empty type is a proposition, we may assume $q, r : \Q$ with $x \le \iota(q)$, $q < r$ and $\iota(r) \le x$. Then $\iota(r) \le \iota(q)$ by transitivity, so $r \le q$ by \Cref{leIffRatLeReal}, which contradicts $q < r$.
+\end{proof}
+
+\begin{lemma}[\agda{isTrans<}]
+  \label{isTransLtReal}
+  For all $x, y, z : \R$, if $x < y$ and $y < z$, then $x < z$.
+\end{lemma}
+\begin{proof}
+  Since $x < z$ is a proposition (\Cref{isPropLtReal}), we may assume $s, t : \Q$ with $y \le \iota(s)$, $s < t$ and $\iota(t) \le z$. By \Cref{ltWeakenLeReal}, $x \le y$, so $x \le \iota(s)$ by transitivity, and $s$ and $t$ witness $x < z$.
+\end{proof}
+
+\begin{corollary}[\agda{ℝ<Quoset}]
+  \label{RLtQuoset}
+  $(\R, <)$ is a set with a propositionally valued, irreflexive and transitive relation.\footnote{The Cubical Agda library calls this a \emph{quoset}.}
+\end{corollary}
+\begin{proof}
+  $\R$ is a set, and $<$ is propositionally valued, irreflexive and transitive by \Cref{isPropLtReal,isIrreflLtReal,isTransLtReal}.
+\end{proof}
+
+\begin{lemma}[\agda{isTrans≤<}]
+  \label{isTransLeLtReal}
+  For all $x, y, z : \R$, if $x \le y$ and $y < z$, then $x < z$.
+\end{lemma}
+\begin{proof}
+  Since $x < z$ is a proposition (\Cref{isPropLtReal}), we may assume $q, r : \Q$ with $y \le \iota(q)$, $q < r$ and $\iota(r) \le z$. Then $x \le \iota(q)$ by transitivity, and $q$ and $r$ witness $x < z$.
+\end{proof}
+
+\begin{lemma}[\agda{isTrans<≤}]
+  \label{isTransLtLeReal}
+  For all $x, y, z : \R$, if $x < y$ and $y \le z$, then $x < z$.
+\end{lemma}
+\begin{proof}
+  Since $x < z$ is a proposition (\Cref{isPropLtReal}), we may assume $q, r : \Q$ with $x \le \iota(q)$, $q < r$ and $\iota(r) \le y$. Then $\iota(r) \le z$ by \Cref{isTransLeReal}, and $q$ and $r$ witness $x < z$.
+\end{proof}
+
+\begin{lemma}[\agda{0<1}]
+  \label{zeroLtOneReal}
+  We have $0 < 1$ in $\R$.
+\end{lemma}
+\begin{proof}
+  By definition, the rationals $0$ and $1$ witness $0 < 1$ in $\R$: the two bounding inequalities hold by reflexivity, and $0 < 1$ in $\Q$.
+\end{proof}
+
+\begin{theorem}[\agda{isArchimedean<}; {\textcite[Theorem 11.3.41]{univalentfoundationsprogram2013}}]
+  \label{isArchimedeanLtReal}
+  For all $x, y : \R$ with $x < y$, there merely exists $q : \Q$ with $x < \iota(q) < y$.
+\end{theorem}
+\begin{proof}
+  Suppose $x < y$. Since the conclusion is a proposition, we may assume $r, s : \Q$ with $x \le \iota(r)$, $r < s$ and $\iota(s) \le y$. Let $q := (r + s)/2$, so that $r < q < s$. Then $x < \iota(q)$, witnessed by $r$ and $q$: $x \le \iota(r)$ by assumption, $r < q$, and $\iota(q) \le \iota(q)$ by \Cref{isReflLeReal}. Likewise $\iota(q) < y$, witnessed by $q$ and $s$: $\iota(q) \le \iota(q)$, $q < s$, and $\iota(s) \le y$ by assumption.
+\end{proof}
+
+\begin{lemma}[\agda{rat∼→≤rat+}]
+  \label{ratCloseLeRatPlusReal}
+  For all $q : \Q$, $\varepsilon : \Qp$ and $w : \R$, if $\iota(q) \cclose{\varepsilon} w$ then $w \le \iota(q + \varepsilon)$.
+\end{lemma}
+\begin{proof}
+  We proceed by induction on $w$ (\Cref{ElimCompletionProp}), with $q$ and $\varepsilon$ fixed, showing that $\iota(q) \cclose{\varepsilon} w$ implies $w \le \iota(q + \varepsilon)$. This is a proposition by \Cref{isPropLeReal}.
+
+  If $w = \iota(s)$ is rational, then $\iota(q) \cclose{\varepsilon} \iota(s)$ gives $q \close{\varepsilon} s$ in $\Q$ by \Cref{closeIffBall}, that is, $\lvert q - s \rvert < \varepsilon$ (\Cref{QPremetricSpace}). By \Cref{absDeltaLtLtPlus}, $s < q + \varepsilon$, so $s \le q + \varepsilon$, and $\iota(s) \le \iota(q + \varepsilon)$ by \Cref{leIffRatLeReal}.
+
+  If $w = \lim y$ for a Cauchy approximation $y$, assume inductively that $\iota(q) \cclose{\varepsilon} y_\delta$ implies $y_\delta \le \iota(q + \varepsilon)$ for every $\delta : \Qp$, and suppose $\iota(q) \cclose{\varepsilon} \lim y$. Since the conclusion is a proposition, by roundedness (\Cref{isRoundedClose}) we may assume $\theta < \varepsilon$ with $\iota(q) \cclose{\theta} \lim y$, and we write $\Delta := \varepsilon - \theta$. Our strategy is to show that the map $\delta \mapsto \max(y_\delta, \iota(q + \varepsilon))$ is eventually constant at $\iota(q + \varepsilon)$ below $\Delta$, and then to identify $\max(\lim y, \iota(q + \varepsilon))$ as its limit. So let $\delta < \Delta$. By \Cref{isLimitLim}, $\lim y$ is a limit of $y$, so $y_\delta \cclose{\Delta} \lim y$ by \Cref{isLimitApproxLt}, hence $\lim y \cclose{\Delta} y_\delta$ by symmetry (\Cref{isSymClose}). Then \Cref{isTriangularClose} gives $\iota(q) \cclose{\theta + \Delta} y_\delta$, that is, $\iota(q) \cclose{\varepsilon} y_\delta$. By the inductive hypothesis, $y_\delta \le \iota(q + \varepsilon)$, that is,
+  \[
+    \max(y_\delta, \iota(q + \varepsilon)) = \iota(q + \varepsilon).
+  \]
+  As $\delta < \Delta$ was arbitrary, the map is eventually constant at $\iota(q + \varepsilon)$ below $\Delta$ (\Cref{isEventuallyConstantAt}). Now $\max(-, \iota(q + \varepsilon))$ is non-expansive (\Cref{maxNReal}), so by \Cref{NEPresLim} its value $\max(\lim y, \iota(q + \varepsilon))$ at $\lim y$ is a limit of that map, and \Cref{isLimitEventuallyEq} gives
+  \[
+    \max(\lim y, \iota(q + \varepsilon)) = \iota(q + \varepsilon),
+  \]
+  which is $\lim y \le \iota(q + \varepsilon)$ by definition.
+\end{proof}
+
+\begin{lemma}[\agda{≤rat→∼→≤rat+}; {\textcite[Lemma 11.3.42]{univalentfoundationsprogram2013}}]
+  \label{leRatCloseLeRatPlusReal}
+  For all $x, y : \R$, $q : \Q$ and $\varepsilon : \Qp$, if $x \le \iota(q)$ and $x \cclose{\varepsilon} y$, then $y \le \iota(q + \varepsilon)$.
+\end{lemma}
+\begin{proof}
+  The map $\max(-, \iota(q))$ is non-expansive (\Cref{maxNReal}), so $x \cclose{\varepsilon} y$ gives $\max(x, \iota(q)) \cclose{\varepsilon} \max(y, \iota(q))$. By definition, the hypothesis $x \le \iota(q)$ reads as $\max(x, \iota(q)) = \iota(q)$, so $\iota(q) \cclose{\varepsilon} \max(y, \iota(q))$. Applying \Cref{ratCloseLeRatPlusReal} then gives $\max(y, \iota(q)) \le \iota(q + \varepsilon)$. Since $y \le \max(y, \iota(q))$ by \Cref{LLeMaxReal}, we obtain $y \le \iota(q + \varepsilon)$ by transitivity.
+\end{proof}
+
+\begin{lemma}[\agda{<rat→∼→<rat+}; {\textcite[Lemma 11.3.43(i)]{univalentfoundationsprogram2013}}]
+  \label{ltRatCloseLtRatPlusReal}
+  For all $x, y : \R$, $q : \Q$ and $\varepsilon : \Qp$, if $x < \iota(q)$ and $x \cclose{\varepsilon} y$, then $y < \iota(q + \varepsilon)$.
+\end{lemma}
+\begin{proof}
+  Since the conclusion is a proposition (\Cref{isPropLtReal}), we may assume $r, s : \Q$ with $x \le \iota(r)$, $r < s$ and $\iota(s) \le \iota(q)$. Since $x \le \iota(r)$ and $x \cclose{\varepsilon} y$, \Cref{leRatCloseLeRatPlusReal} gives $y \le \iota(r + \varepsilon)$. Next, $r + \varepsilon < s + \varepsilon$. Finally, $s \le q$ by \Cref{leIffRatLeReal}, so $s + \varepsilon \le q + \varepsilon$, and $\iota(s + \varepsilon) \le \iota(q + \varepsilon)$ by \Cref{leIffRatLeReal} again. Hence $r + \varepsilon$ and $s + \varepsilon$ witness that $y < \iota(q + \varepsilon)$.
+\end{proof}

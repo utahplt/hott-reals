@@ -1,0 +1,9 @@
+\section{\texttt{Algebra.OrderedAbGroup.Instances.Rationals}}
+
+\begin{theorem}[\agda{ℚOrderedAbGroup}]
+  \label{QOrderedAbGroup}
+  $(\Q, 0, +, -, <, \le)$ is an ordered abelian group (\Cref{IsOrderedAbGroup}), with meet $\min$ and join $\max$.
+\end{theorem}
+\begin{proof}
+  $\Q$ is an ordered commutative ring, so \Cref{OrderedCommRingToOrderedAbGroup} applies.
+\end{proof}

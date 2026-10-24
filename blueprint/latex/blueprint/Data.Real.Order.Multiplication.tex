@@ -1,0 +1,38 @@
+\section{\texttt{Data.Real.Order.Multiplication}}
+
+
+\begin{corollary}[\agda{·MonoR≤}]
+  \label{mulMonoRLeReal}
+  Multiplication on the right by a nonnegative real is monotone. For all $a, x, y : \R$, if $0 \le a$ and $x \le y$, then $x \cdot a \le y \cdot a$.
+\end{corollary}
+\begin{proof}
+  By commutativity of multiplication (\Cref{mulCommReal}), $x \cdot a = a \cdot x$ and $y \cdot a = a \cdot y$, so the claim is \Cref{mulMonoLLeReal}.
+\end{proof}
+
+\begin{lemma}[\agda{0<·}]
+  \label{mulPosReal}
+  For all $x, y : \R$, if $0 < x$ and $0 < y$, then $0 < x \cdot y$.
+\end{lemma}
+\begin{proof}
+  Since the conclusion is a proposition (\Cref{isPropLtReal}), by the Archimedean principle (\Cref{isArchimedeanLtReal}) applied to $0 < x$ and to $0 < y$ we may assume $q, r : \Q$ with $0 < \iota(q) < x$ and $0 < \iota(r) < y$. Then $0 < q$ and $0 < r$ in $\Q$ (\Cref{ltIffRatLtReal}), so $0 < q \cdot r$, since a product of positive rationals is positive, and $0 < \iota(q \cdot r)$ by \Cref{ltIffRatLtReal} again. Now $\iota(q \cdot r) = \iota(q) \cdot \iota(r)$ by \Cref{ratMulRat}; $\iota(q) \cdot \iota(r) \le x \cdot \iota(r)$ by \Cref{mulMonoRLeReal}, since $0 \le \iota(r)$ and $\iota(q) \le x$ (\Cref{ltWeakenLeReal}); and $x \cdot \iota(r) \le x \cdot y$ by \Cref{mulMonoLLeReal}, since $0 \le x$ and $\iota(r) \le y$ (\Cref{ltWeakenLeReal}). Hence
+  \[
+    0 < \iota(q \cdot r) = \iota(q) \cdot \iota(r) \le x \cdot \iota(r) \le x \cdot y,
+  \]
+  and $0 < x \cdot y$ by mixed transitivity (\Cref{isTransLtLeReal}).
+\end{proof}
+
+\begin{lemma}[\agda{·MonoL<}]
+  \label{mulMonoLLtReal}
+  Multiplication on the left by a positive real is strictly monotone. For all $a, y, z : \R$, if $0 < a$ and $y < z$, then $a \cdot y < a \cdot z$.
+\end{lemma}
+\begin{proof}
+  Adding $-y$ on the right to $y < z$ and using the group laws gives $0 < z - y$. Hence $0 < a \cdot (z - y)$ by \Cref{mulPosReal}, and $a \cdot (z - y) = a \cdot z - a \cdot y$ by \Cref{mulDistRSubReal}. Adding $a \cdot y$ on the right and using the group laws gives $a \cdot y < a \cdot z$.
+\end{proof}
+
+\begin{corollary}[\agda{·MonoR<}]
+  \label{mulMonoRLtReal}
+  Multiplication on the right by a positive real is strictly monotone. For all $a, x, y : \R$, if $0 < a$ and $x < y$, then $x \cdot a < y \cdot a$.
+\end{corollary}
+\begin{proof}
+  By commutativity of multiplication (\Cref{mulCommReal}), $x \cdot a = a \cdot x$ and $y \cdot a = a \cdot y$, so the claim is \Cref{mulMonoLLtReal}.
+\end{proof}

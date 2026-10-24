@@ -1,0 +1,103 @@
+\section{\texttt{Relation.Binary.Order.Pseudolattice.Properties}}
+
+Throughout this section $(L, \le)$ and $(M, \le)$ are lattices (\Cref{IsPseudolattice}).
+
+\begin{definition}[\agda{DualPseudolattice}]
+  \label{DualPseudolattice}
+  The \textbf{dual} $\op{L}$ of $L$ is the set $L$ with its order reversed: $x \le y$ in $\op{L}$ if and only if $y \le x$ in $L$. It is again a lattice, in which the meet is the join $\sqcup$ of $L$ and the join is the meet $\sqcap$ of $L$.
+\end{definition}
+
+\begin{lemma}[\agda{∧Mono}]
+  \label{meetMono}
+  If $x \le y$ and $z \le w$, then $x \sqcap z \le y \sqcap w$.
+\end{lemma}
+\begin{proof}
+  We have $x \sqcap z \le x \le y$, since $x \sqcap z$ is a lower bound of $x$ and $x \le y$ by assumption, and likewise $x \sqcap z \le z \le w$. So $x \sqcap z$ is a lower bound of both $y$ and $w$, hence lies below their greatest lower bound:
+  \[
+    x \sqcap z \le y \sqcap w.
+  \]
+\end{proof}
+
+\begin{corollary}[\agda{∧MonoR}]
+  \label{meetMonoR}
+  If $x \le y$, then $x \sqcap z \le y \sqcap z$.
+\end{corollary}
+\begin{proof}
+  \Cref{meetMono} with $z \le z$.
+\end{proof}
+
+\begin{corollary}[\agda{∧MonoL}]
+  \label{meetMonoL}
+  If $x \le y$, then $z \sqcap x \le z \sqcap y$.
+\end{corollary}
+\begin{proof}
+  \Cref{meetMono} with $z \le z$.
+\end{proof}
+
+\begin{lemma}[\agda{∨Mono}]
+  \label{joinMono}
+  If $x \le y$ and $z \le w$, then $x \sqcup z \le y \sqcup w$.
+\end{lemma}
+\begin{proof}
+  Apply \Cref{meetMono} in $\op{L}$, where the hypotheses become $y \le x$ and $w \le z$ and the meet is $\sqcup$. It gives $y \sqcup w \le x \sqcup z$ in $\op{L}$, which is $x \sqcup z \le y \sqcup w$ in $L$.
+\end{proof}
+
+\begin{corollary}[\agda{∨MonoR}]
+  \label{joinMonoR}
+  If $x \le y$, then $x \sqcup z \le y \sqcup z$.
+\end{corollary}
+\begin{proof}
+  \Cref{joinMono} with $z \le z$.
+\end{proof}
+
+\begin{corollary}[\agda{∨MonoL}]
+  \label{joinMonoL}
+  If $x \le y$, then $z \sqcup x \le z \sqcup y$.
+\end{corollary}
+\begin{proof}
+  \Cref{joinMono} with $z \le z$.
+\end{proof}
+
+\begin{lemma}[\agda{≤equivFun≃invEq≤}]
+  \label{leEquivFunIffInvEqLe}
+  If $e \colon L \to M$ is an order isomorphism (\Cref{IsPseudolatticeEquiv}), then for all $x : L$ and $m : M$, $m \le e(x)$ if and only if $e^{-1}(m) \le x$.
+\end{lemma}
+\begin{proof}
+  Since $m = e(e^{-1}(m))$, the inequality $m \le e(x)$ is $e(e^{-1}(m)) \le e(x)$, which holds if and only if $e^{-1}(m) \le x$ because $e$ preserves and reflects order.
+\end{proof}
+
+\begin{lemma}[\agda{pres∧}]
+  \label{presMeet}
+  If $e \colon L \to M$ is an order isomorphism, then $e(x \sqcap y) = e(x) \sqcap e(y)$ for all $x, y : L$.
+\end{lemma}
+\begin{proof}
+  For all $m : M$,
+  \begin{align*}
+    m \le e(x \sqcap y)
+    & \iff e^{-1}(m) \le x \sqcap y
+    && \text{by \Cref{leEquivFunIffInvEqLe}} \\
+    & \iff e^{-1}(m) \le x \text{ and } e^{-1}(m) \le y
+    && \text{by the universal property of meets in $L$} \\
+    & \iff m \le e(x) \text{ and } m \le e(y)
+    && \text{by \Cref{leEquivFunIffInvEqLe}.}
+  \end{align*}
+  Thus $e(x \sqcap y)$ has the universal property of the meet of $e(x)$ and $e(y)$ in $M$, and since meets are unique, $e(x \sqcap y) = e(x) \sqcap e(y)$.
+\end{proof}
+
+\begin{lemma}[\agda{DualPseudolatticeEquiv}]
+  \label{DualPseudolatticeEquiv}
+  If $e \colon L \to M$ is an order isomorphism, then so is $e \colon \op{L} \to \op{M}$.
+\end{lemma}
+\begin{proof}
+  For $x, y : L$, $x \le y$ in $\op{L}$ means $y \le x$, which holds if and only if $e(y) \le e(x)$, that is, $e(x) \le e(y)$ in $\op{M}$.
+\end{proof}
+
+\begin{lemma}[\agda{pres∨}]
+  \label{presJoin}
+  If $e \colon L \to M$ is an order isomorphism, then $e(x \sqcup y) = e(x) \sqcup e(y)$ for all $x, y : L$.
+\end{lemma}
+\begin{proof}
+  Apply \Cref{presMeet} to $e \colon \op{L} \to \op{M}$, an order isomorphism by \Cref{DualPseudolatticeEquiv}. Meets in $\op{L}$ and $\op{M}$ are joins in $L$ and $M$, so it reads $e(x \sqcup y) = e(x) \sqcup e(y)$.
+\end{proof}
+
+Taken together, \Cref{presMeet,presJoin} say that an order isomorphism is an isomorphism of lattices in the algebraic sense, a bijection preserving $\sqcap$ and $\sqcup$.

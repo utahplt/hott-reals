@@ -1,0 +1,98 @@
+\section{\texttt{Relation.Premetric.Instances.Product}}
+
+Throughout this section $K$, $M$, $N$ and $X$ are premetric spaces.
+
+\begin{definition}[\agda{\_×PrSp\_}]
+  \label{timesPrSp}
+  The product $M \times N$ of premetric spaces is a premetric space whose closeness relation is the conjunction of the component relations at the same tolerance:
+
+  \[
+    (x, y) \close{\varepsilon} (x', y') := x \close{\varepsilon} x' \text{ and } y \close{\varepsilon} y'.
+  \]
+\end{definition}
+
+\begin{lemma}[\agda{composeIsLipschitzWith₂}; {\textcite[Lemma 2.4.4]{brough2026}}]
+  \label{composeIsLipschitzWith2}
+  Let $L_1, L_2, R_1, R_2 : \Qp$, and suppose $f \colon K \to M$ is $L_1$-Lipschitz, $g \colon K \to N$ is $L_2$-Lipschitz, and $h \colon M \to N \to X$ is $R_1$-Lipschitz in its first argument and $R_2$-Lipschitz in its second argument. Then the map
+  \[
+    x \mapsto h(f(x), g(x))
+  \]
+  is $(R_1L_1 + R_2L_2)$-Lipschitz.
+\end{lemma}
+\begin{proof}
+  Let $x, y : K$, let $\varepsilon : \Qp$, and suppose that $x \close{\varepsilon} y$. Since $f$ and $g$ are Lipschitz with constants $L_1$ and $L_2$, respectively, we have
+  \[
+    f(x) \close{L_1\varepsilon} f(y)
+    \qquad\text{and}\qquad
+    g(x) \close{L_2\varepsilon} g(y).
+  \]
+  Fixing the second argument of $h$ at $g(x)$, the first-argument Lipschitz hypothesis gives
+  \[
+    h(f(x),g(x)) \close{R_1L_1\varepsilon} h(f(y),g(x)).
+  \]
+  Fixing the first argument at $f(y)$, the second-argument Lipschitz hypothesis gives
+  \[
+    h(f(y),g(x)) \close{R_2L_2\varepsilon} h(f(y),g(y)).
+  \]
+  The triangle inequality in $X$ now gives
+  \[
+    h(f(x),g(x)) \close{R_1L_1\varepsilon + R_2L_2\varepsilon} h(f(y),g(y)).
+  \]
+  Since
+  \[
+    R_1L_1\varepsilon + R_2L_2\varepsilon = (R_1L_1 + R_2L_2)\varepsilon,
+  \]
+  the result follows.
+\end{proof}
+
+\begin{corollary}[\agda{composeNE₂}]
+  \label{composeNE2}
+  Let $f \colon K \to M$ and $g \colon K \to N$ be non-expansive, and let $h \colon M \to N \to X$ be non-expansive in each argument. Then the map
+  \[
+    x \mapsto h(f(x), g(x))
+  \]
+  is $2$-Lipschitz.
+\end{corollary}
+\begin{proof}
+  Apply \Cref{composeIsLipschitzWith2} with $L_1 = L_2 = R_1 = R_2 = 1$.
+\end{proof}
+
+\begin{corollary}[\agda{composeL₂}]
+  \label{composeL2}
+  Let $f \colon K \to M$ and $g \colon K \to N$ be Lipschitz, and let $h \colon M \to N \to X$ be non-expansive in each argument. Then the map
+  \[
+    x \mapsto h(f(x), g(x))
+  \]
+  is Lipschitz.
+\end{corollary}
+\begin{proof}
+  The constants $L_1$ and $L_2$ of $f$ and $g$ merely exist, and the conclusion is a proposition, so we may assume them. Then applying \Cref{composeIsLipschitzWith2} with $R_1 = R_2 = 1$ gives the constant $L_1 + L_2$.
+\end{proof}
+
+\begin{lemma}[\agda{composeC₂}]
+  \label{composeC2}
+  Let $f \colon K \to M$ and $g \colon K \to N$ be continuous, and let $h \colon M \to N \to X$ be non-expansive in each argument. Then the map
+  \[
+    x \mapsto h(f(x), g(x))
+  \]
+  is continuous.
+\end{lemma}
+\begin{proof}
+  Let $x : K$ and $\varepsilon : \Qp$. Since the conclusion is a proposition, by continuity of $f$ and $g$ at $x$, applied with tolerance $\varepsilon/2$ (\Cref{IsContinuousAt}), we may assume $\delta_1, \delta_2 : \Qp$ such that $x \close{\delta_1} y$ gives $f(x) \close{\varepsilon/2} f(y)$ and $x \close{\delta_2} y$ gives $g(x) \close{\varepsilon/2} g(y)$. Put $\delta := \min(\delta_1, \delta_2)$ and suppose $x \close{\delta} y$. Then $x \close{\delta_1} y$ and $x \close{\delta_2} y$ by monotonicity of closeness in its tolerance, so $h(f(x), g(x)) \close{\varepsilon/2} h(f(y), g(x))$ by non-expansiveness of $h$ in its first argument, and $h(f(y), g(x)) \close{\varepsilon/2} h(f(y), g(y))$ by non-expansiveness in its second. The triangle inequality in $X$ gives $h(f(x), g(x)) \close{\varepsilon/2 + \varepsilon/2} h(f(y), g(y))$, and $\varepsilon/2 + \varepsilon/2 = \varepsilon$.
+\end{proof}
+
+\begin{lemma}[\agda{uncurryIsLipschitzWith}]
+  \label{uncurryIsLipschitzWith}
+  Let $h \colon M \to N \to X$ and $R_1, R_2 : \Qp$. Suppose $h(-, y)$ is $R_1$-Lipschitz for every $y$ and $h(x, -)$ is $R_2$-Lipschitz for every $x$. Then $\uncurry h \colon M \times N \to X$ is $(R_1 + R_2)$-Lipschitz.
+\end{lemma}
+\begin{proof}
+  Apply \Cref{composeIsLipschitzWith2} to the two projections $M \times N \to M$ and $M \times N \to N$, which are non-expansive and hence $1$-Lipschitz.
+\end{proof}
+
+\begin{corollary}[\agda{uncurryNE₂}]
+  \label{uncurryNE2}
+  If $h$ is non-expansive in each argument separately, then $\uncurry h$ is Lipschitz, with constant $2$.
+\end{corollary}
+\begin{proof}
+  Consequence of \Cref{uncurryIsLipschitzWith} with $R_1 = R_2 = 1$.
+\end{proof}

@@ -1,0 +1,12 @@
+\section{\texttt{Algebra.ArchimedeanField.Base}}
+
+% Note: We call it `ArchimedeanField` in the code because that is Lorenzo's name, but in the mathematics we still refer to one as an Archimedean ordered field.
+
+\begin{definition}[\agda{IsArchimedeanField}; {\textcite[\S~11.2.1]{univalentfoundationsprogram2013}}]
+  \label{IsArchimedeanField}
+  An \textbf{Archimedean ordered field} is an ordered field $F$ (\Cref{IsOrderedField}) together with a map $\iota \colon \Q \to F$ such that:
+  \begin{itemize}
+  \item $\iota$ is a homomorphism of ordered fields from $\Q$ (\Cref{QOrderedField}) to $F$, that is, a ring homomorphism which preserves $\le$ and both preserves and reflects $<$.
+  \item For all $x, y : F$ with $x < y$ there merely exists $q : \Q$ such that $x < \iota(q) < y$.
+  \end{itemize}
+\end{definition}

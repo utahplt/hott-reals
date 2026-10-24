@@ -1,0 +1,23 @@
+\section{\texttt{Algebra.OrderedCommRing.Instances.Rationals}}
+
+
+\begin{definition}[\agda{\_⁻¹₊}, \agda{⁻¹inverse}]
+  \label{invPos}
+  Every $\varepsilon : \Qp$ has a \textbf{reciprocal} $\varepsilon^{-1} : \Qp$, with $\varepsilon \cdot \varepsilon^{-1} = 1$.
+\end{definition}
+
+\begin{lemma}[\agda{⁻¹₊Flip≤}]
+  \label{invPosFlipLe}
+  The reciprocal on positive rationals is antitone. For all $\delta, \varepsilon : \Qp$, if $\delta \le \varepsilon$, then $\varepsilon^{-1} \le \delta^{-1}$.
+\end{lemma}
+\begin{proof}
+  Since $\delta \cdot \delta^{-1} = 1$ (\Cref{invPos}), the commutative ring laws give
+  \[
+    \varepsilon^{-1} = \varepsilon^{-1} \cdot (\delta \cdot \delta^{-1}) = (\varepsilon^{-1} \cdot \delta^{-1}) \cdot \delta.
+  \]
+  The product $\varepsilon^{-1} \cdot \delta^{-1}$ is a positive rational, hence nonnegative, so monotonicity of multiplication by it (\Cref{IsOrderedCommRing}) turns $\delta \le \varepsilon$ into
+  \[
+    (\varepsilon^{-1} \cdot \delta^{-1}) \cdot \delta \le (\varepsilon^{-1} \cdot \delta^{-1}) \cdot \varepsilon.
+  \]
+  Finally the commutative ring laws and \Cref{invPos} at $\varepsilon$ give $(\varepsilon^{-1} \cdot \delta^{-1}) \cdot \varepsilon = \delta^{-1} \cdot (\varepsilon \cdot \varepsilon^{-1}) = \delta^{-1}$, so $\varepsilon^{-1} \le \delta^{-1}$.
+\end{proof}

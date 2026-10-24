@@ -1,0 +1,20 @@
+\section{\texttt{Data.Real.Algebra.Addition}}
+
+\begin{lemma}[\agda{+InvR}]
+  \label{+InvR}
+  For every $x : \R$, $x + (-x) = 0$.
+\end{lemma}
+\begin{proof}
+  By \Cref{composeNE2} applied to the identity, negation and addition, the map $x \mapsto x + (-x)$ is $2$-Lipschitz. The constant map at $0$ is also Lipschitz, so \Cref{lipschitzEq} reduces the claim to rational points, where the computation rules in \Cref{liftNE,liftNE2} and the inverse law in $\Q$ give
+  \[
+    \iota(q) + (-\iota(q)) = \iota(q + (-q)) = \iota(0).
+  \]
+\end{proof}
+
+\begin{corollary}[\agda{ℝAbGroup}; {\textcite[\S~11.3.3]{univalentfoundationsprogram2013}}]
+  \label{RAbGroup}
+  $(\R, 0, +, -)$ is an abelian group.
+\end{corollary}
+\begin{proof}
+  $\R$ is a set, and addition is associative and commutative and satisfies the left and right unit laws with respect to $0$, each established alongside the definition of the operations by \Cref{nonExpansive2Eq}. Together with \Cref{+InvR} these are the abelian group axioms.
+\end{proof}

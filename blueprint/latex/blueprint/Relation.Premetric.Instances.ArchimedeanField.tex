@@ -1,0 +1,42 @@
+\section{\texttt{Relation.Premetric.Instances.ArchimedeanField}}
+
+Throughout this section $F$ is an Archimedean ordered field (\Cref{IsArchimedeanField}) with $\iota \colon \Q \to F$ its embedding of the rationals, and $\lvert x \rvert = x \sqcup (-x)$ is its absolute value (\Cref{abs}).
+
+\begin{definition}[\agda{inducedPremetricSpace}]
+  \label{inducedPremetricSpace}
+  $F$ is a premetric space (\Cref{IsPremetric}) with
+  \[
+    x \close{\varepsilon} y := \lvert x - y \rvert < \iota(\varepsilon).
+  \]
+  We call it the premetric space \textbf{induced} on $F$.
+\end{definition}
+\begin{proof}
+  $F$ is a set, and each $x \close{\varepsilon} y$ is a proposition since $<$ is a mere relation (\Cref{IsOrderedCommRing}). We verify the five axioms of \Cref{IsPremetric}.
+
+  Reflexivity. We have $x - x = 0$ by the group laws, so $\lvert x - x \rvert = \lvert 0 \rvert = 0$ by \Cref{absZero}, and $0 < \iota(\varepsilon)$ because $0 < \varepsilon$ and $\iota$ preserves $0$ and $<$ (\Cref{IsArchimedeanField}).
+
+  Symmetry. $\lvert x - y \rvert = \lvert y - x \rvert$ by \Cref{absSubComm}.
+
+  Separatedness. Suppose $x \close{\varepsilon} y$ for every $\varepsilon : \Qp$. By \Cref{selfSeparated} it suffices to show $\lvert x - y \rvert < z$ for every $z : F$ with $0 < z$. Since this is a proposition, by the Archimedean property (\Cref{IsArchimedeanField}) applied to $0 < z$ we may assume $q : \Q$ with $0 < \iota(q)$ and $\iota(q) < z$. Then $0 < q$ in $\Q$, because $\iota$ preserves $0$ and reflects $<$, so $q$ is a positive rational and the hypothesis at $q$ gives $\lvert x - y \rvert < \iota(q)$. Hence $\lvert x - y \rvert < z$ by transitivity.
+
+  Triangularity. Suppose $x \close{\varepsilon} y$ and $y \close{\delta} z$. Then
+  \[
+    \lvert x - z \rvert \le \lvert x - y \rvert + \lvert y - z \rvert < \iota(\varepsilon) + \iota(\delta) = \iota(\varepsilon + \delta)
+  \]
+  by \Cref{triangleSubLe}, then strict monotonicity of addition on the right and on the left (\Cref{IsOrderedCommRing}) applied to the two hypotheses, then additivity of $\iota$ (\Cref{IsArchimedeanField}). So $x \close{\varepsilon + \delta} z$ by mixed transitivity.
+
+  Roundedness. Suppose $x \close{\varepsilon} y$, that is, $\lvert x - y \rvert < \iota(\varepsilon)$. Since the conclusion is a proposition, by the Archimedean property we may assume $q : \Q$ with $\lvert x - y \rvert < \iota(q)$ and $\iota(q) < \iota(\varepsilon)$. Then $0 \le \lvert x - y \rvert < \iota(q)$ by \Cref{absNonNeg}, so $0 < \iota(q)$ by mixed transitivity and $0 < q$ in $\Q$ because $\iota$ preserves $0$ and reflects $<$; thus $q$ is a positive rational. Moreover $q < \varepsilon$ because $\iota$ reflects $<$, and $x \close{q} y$ is the first inequality.
+\end{proof}
+
+\begin{definition}[\agda{IsCauchyComplete}; {\textcite[\S~11.3.4]{univalentfoundationsprogram2013}}]
+  \label{IsCauchyComplete}
+  $F$ is \textbf{Cauchy complete} if the premetric space induced on $F$ (\Cref{inducedPremetricSpace}) is complete (\Cref{isComplete}).
+\end{definition}
+
+\begin{lemma}[\agda{isPropIsCauchyComplete}]
+  \label{isPropIsCauchyComplete}
+  Being Cauchy complete is a proposition.
+\end{lemma}
+\begin{proof}
+  Completeness of a premetric space is a proposition (\Cref{isPropIsComplete}).
+\end{proof}

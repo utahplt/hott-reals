@@ -1,0 +1,9 @@
+\section{\texttt{Data.Real.Algebra.OrderedCommRing}}
+
+\begin{theorem}[\agda{ℝOrderedCommRing}]
+  \label{ROrderedCommRing}
+  $(\R, 0, 1, +, \cdot, -, <, \le)$ is an ordered commutative ring (\Cref{IsOrderedCommRing}), with meet $\min$ and join $\max$.
+\end{theorem}
+\begin{proof}
+  $(\R, 0, 1, +, \cdot, -)$ is a commutative ring (\Cref{RCommRing}), $(\R, \le)$ is a lattice with meet $\min$ and join $\max$ (\Cref{RLePseudolattice}), and $<$ is a strict order (\Cref{RLtStrictOrder}). The compatibility axioms are \Cref{ltWeakenLeReal,leIffNotGtReal,isTransLtLeReal,isTransLeLtReal} for the two orders, \Cref{plusMonoRLeReal,plusMonoRLtReal,posSumPosOrPosReal} for addition, \Cref{mulMonoRLeReal,mulMonoRLtReal} for multiplication, and \Cref{zeroLtOneReal}.
+\end{proof}

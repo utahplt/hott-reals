@@ -1,0 +1,33 @@
+\section{\texttt{Relation.Premetric.Mappings}}
+
+For the next three definitions, let $M$ and $N$ be premetric spaces.
+
+\begin{definition}[\agda{IsNonExpansive}; {\textcite[Definition 2.11]{gilbert2017}}]
+  \label{IsNonExpansive}
+  A map $f \colon M \to N$ is \textbf{non-expansive} if $x \close{\varepsilon} y$ implies $f(x) \close{\varepsilon} f(y)$ for all $x, y : M$ and $\varepsilon : \Qp$.
+\end{definition}
+
+\begin{definition}[\agda{IsLipschitzWith}; {\textcite[Definition 2.11]{gilbert2017}}]
+  \label{IsLipschitzWith}
+  Given $L : \Qp$, a map $f \colon M \to N$ is \textbf{Lipschitz with constant} $L$, or \textbf{$L$-Lipschitz}, if $x \close{\varepsilon} y$ implies $f(x) \close{L \varepsilon} f(y)$ for all $x, y : M$ and $\varepsilon : \Qp$. It is \textbf{Lipschitz} if there merely exists some $L : \Qp$ for which it is $L$-Lipschitz.
+\end{definition}
+
+\begin{definition}[\agda{IsContinuousAt}; {\textcite[Definition 2.12]{gilbert2017}}]
+  \label{IsContinuousAt}
+  A map $f \colon M \to N$ is \textbf{continuous at} $x : M$ if for every $\varepsilon : \Qp$ there merely exists a $\delta : \Qp$ such that $x \close{\delta} y$ implies $f(x) \close{\varepsilon} f(y)$ for all $y : M$. It is \textbf{continuous} if it is continuous at every point.
+\end{definition}
+
+Non-expansive maps are exactly the $1$-Lipschitz maps, and since closeness is monotone, any $L$-Lipschitz map with $L \le 1$ is non-expansive. A Lipschitz map is continuous.
+
+\begin{lemma}[\agda{composeIsLipschitzWith}]
+  \label{composeIsLipschitzWith}
+  Let $M$, $N$ and $O$ be premetric spaces, $f \colon M \to N$ and $g \colon N \to O$ be maps, and $L, R : \Qp$. If $f$ is $L$-Lipschitz and $g$ is $R$-Lipschitz, then $g \circ f$ is $RL$-Lipschitz.
+\end{lemma}
+\begin{proof}
+  Let $x, y : M$ and $\varepsilon : \Qp$, and suppose $x \close{\varepsilon} y$. Since $f$ is $L$-Lipschitz, $f(x) \close{L \varepsilon} f(y)$, and since $g$ is $R$-Lipschitz, $g(f(x)) \close{R (L \varepsilon)} g(f(y))$, and $R (L \varepsilon) = (RL) \varepsilon$.
+\end{proof}
+
+\begin{lemma}[\agda{NE→presLim}]
+  \label{NEPresLim}
+  Let $M$ and $N$ be premetric spaces and $f \colon M \to N$ be non-expansive. If $l$ is a limit of $x \colon \Qp \to M$, then $f(l)$ is a limit of $f \circ x$.
+\end{lemma}

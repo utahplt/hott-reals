@@ -1,0 +1,9 @@
+\section{\texttt{Relation.Binary.Order.Proset.Properties}}
+
+\begin{lemma}[\agda{≡Weaken≤}]
+  \label{eqWeakenLe}
+  Let $(A, \preceq)$ be a preordered set. For all $x, y : A$, if $x = y$ then $x \preceq y$.
+\end{lemma}
+\begin{proof}
+  By reflexivity, $x \preceq x$. Transporting along $x = y$ gives $x \preceq y$.
+\end{proof}

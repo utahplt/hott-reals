@@ -1,0 +1,74 @@
+\newfontfamily\juliamono{JuliaMono-Regular.ttf}[
+  ItalicFont = JuliaMono-RegularItalic.ttf,
+  BoldFont = JuliaMono-Bold.ttf,
+  BoldItalicFont = JuliaMono-BoldItalic.ttf,
+  Scale = MatchLowercase,
+]
+\setmonofont{JuliaMono}[Extension = .ttf, Path = ./, UprightFont = *-Regular, ItalicFont = *-RegularItalic, Scale = MatchLowercase]
+\newcommand{\agda}[1]{{\juliamono #1}}
+
+\newcommand{\defn}[1]{\emph{#1}}
+
+% Number systems
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\Qp}{\Q_{+}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\RR}{\R}
+\newcommand{\QQ}{\Q}
+
+\newcommand{\rational}{\mathsf{rational}}
+\newcommand{\limit}{\mathsf{limit}}
+\newcommand{\cpath}{\mathsf{path}}
+\newcommand{\transport}{\mathsf{transport}}
+\newcommand{\induction}{\mathsf{induction}}
+\newcommand{\recursion}{\mathsf{recursion}}
+\newcommand{\IsCauchy}{\mathsf{IsCauchy}}
+\NewDocumentCommand{\dclose}{m o}{%
+  \mathrel{\IfNoValueTF{#2}{\frown_{#1}}{\frown_{#1}^{#2}}}%
+}
+\newcommand{\dclosesym}{\mathord\frown}
+\newcommand{\apart}{\mathrel{\#}}
+\newcommand{\unittype}{\mathbf{1}}
+\newcommand{\emptytype}{\mathbf{0}}
+\newcommand{\trunc}[2]{\mathopen{}\left\Vert #2\right\Vert_{#1}\mathclose{}}
+\newcommand{\bracket}[1]{\trunc{}{#1}}
+
+
+% Premetric spaces
+\NewDocumentCommand{\close}{g}{\mathrel{\approx\IfValueT{#1}{_{#1}}}}
+\NewDocumentCommand{\cclose}{g}{\mathrel{\sim\IfValueT{#1}{_{#1}}}}
+\newcommand{\completion}[1]{\mathfrak{C}\,#1}
+\newcommand{\lift}[1]{\overline{#1}}
+\newcommand{\closesym}{\approx}
+
+% Order
+\newcommand{\op}[1]{#1^{\mathrm{op}}}
+
+% Operators
+\DeclareMathOperator{\uncurry}{uncurry}
+\DeclareMathOperator{\flip}{flip}
+\DeclareMathOperator{\id}{id}
+
+\newcommand{\todoproof}[1]{\todo[inline]{TODO: Prove \agda{#1}}}
+
+\lstdefinestyle{mystyle}{
+%  backgroundcolor=\color{backcolour},
+%  commentstyle=\color{codegray},
+%  keywordstyle=\color{codepurple},
+%  numberstyle=\tiny\color{codegray},
+%  stringstyle=\color{codegreen},
+  basicstyle=\ttfamily\footnotesize,
+  breakatwhitespace=false,
+  breaklines=true,
+  captionpos=b,
+  keepspaces=true,
+  numbers=none,
+  numbersep=5pt,
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  tabsize=2
+}
+\lstset{style=mystyle}

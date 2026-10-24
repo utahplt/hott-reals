@@ -1,0 +1,276 @@
+\section{\texttt{Algebra.OrderedAbGroup.Properties}}
+
+Throughout this section $G$ is an ordered abelian group (\Cref{IsOrderedAbGroup}).
+
+\begin{lemma}[\agda{+PseudolatticeEquivR}]
+  \label{plusEquivR}
+  For every $z : G$, translation $x \mapsto x + z \colon G \to G$ is an order automorphism (\Cref{IsPseudolatticeEquiv}).
+\end{lemma}
+\begin{proof}
+  We show that $x \mapsto x + z$ has an inverse, is monotone, and reflects order. Its inverse is $x \mapsto x - z$, since
+  \[
+    (x + z) - z = x = (x - z) + z
+  \]
+  for all $x : G$, because $G$ is an abelian group under addition. Monotonicity of $x \mapsto x + z$ is an axiom of an ordered abelian group, and the same axiom at $-z$ says that the inverse is monotone too. So if $x + z \le y + z$, then
+  \[
+    x = (x + z) - z \le (y + z) - z = y,
+  \]
+  and thus $x \mapsto x + z$ reflects order.
+\end{proof}
+
+\begin{corollary}[\agda{+DistL⊓}]
+  \label{meetTranslate}
+  For all $x, y, z : G$, $(x \sqcap y) + z = (x + z) \sqcap (y + z)$.
+\end{corollary}
+\begin{proof}
+  By \Cref{plusEquivR}, $x \mapsto x + z$ is an order isomorphism, so it preserves meets by \Cref{presMeet}.
+\end{proof}
+
+\begin{corollary}[\agda{+DistL⊔}]
+  \label{joinTranslate}
+  For all $x, y, z : G$, $(x \sqcup y) + z = (x + z) \sqcup (y + z)$.
+\end{corollary}
+\begin{proof}
+  By \Cref{plusEquivR}, $x \mapsto x + z$ is an order isomorphism, so it preserves joins by \Cref{presJoin}.
+\end{proof}
+
+\begin{lemma}[\agda{+CancelR≤}]
+  \label{plusCancelRLe}
+  Addition on the right reflects order. For all $x, y, z : G$, if $x + z \le y + z$, then $x \le y$.
+\end{lemma}
+\begin{proof}
+  Adding $-z$ on the right (\Cref{IsOrderedAbGroup}) gives $(x + z) - z \le (y + z) - z$, and by the abelian group laws $(x + z) - z = x$ and $(y + z) - z = y$.
+\end{proof}
+
+\begin{lemma}[\agda{+CancelR<}]
+  \label{plusCancelRLt}
+  Addition on the right reflects strict order. For all $x, y, z : G$, if $x + z < y + z$, then $x < y$.
+\end{lemma}
+\begin{proof}
+  As in the proof of \Cref{plusCancelRLe}, with strict monotonicity of addition (\Cref{IsOrderedAbGroup}) in place of monotonicity.
+\end{proof}
+
+\begin{lemma}[\agda{-Flip≤}]
+  \label{negFlipLe}
+  For all $x, y : G$, if $x \le y$, then $-y \le -x$.
+\end{lemma}
+\begin{proof}
+  Adding $-x - y$ on the right (\Cref{IsOrderedAbGroup}) gives $x + (-x - y) \le y + (-x - y)$, and by the abelian group laws $x + (-x - y) = -y$ and $y + (-x - y) = -x$.
+\end{proof}
+
+\begin{lemma}[\agda{-Flip<}]
+  \label{negFlipLt}
+  For all $x, y : G$, if $x < y$, then $-y < -x$.
+\end{lemma}
+\begin{proof}
+  As in the proof of \Cref{negFlipLe}, with strict monotonicity of addition (\Cref{IsOrderedAbGroup}) in place of monotonicity.
+\end{proof}
+
+\begin{lemma}[\agda{-PseudolatticeEquiv}]
+  \label{negPseudolatticeEquiv}
+  Negation $x \mapsto -x$ is an order isomorphism $G \to \op{G}$ from $G$ to its dual (\Cref{DualPseudolattice}).
+\end{lemma}
+\begin{proof}
+  We show that negation has an inverse, is monotone, and reflects order. It is its own inverse, since $-(-x) = x$. It is monotone as a map $G \to \op{G}$: if $x \le y$, then $-y \le -x$ in $G$ (\Cref{negFlipLe}), which is $-x \le -y$ in $\op{G}$. Its inverse is monotone as a map $\op{G} \to G$: if $x \le y$ in $\op{G}$, then $y \le x$ in $G$, and negation gives $-x \le -y$ in $G$. Monotonicity of the inverse is order reflection of the original, as in \Cref{plusEquivR}.
+\end{proof}
+
+\begin{corollary}[\agda{-⊓}]
+  \label{negMeet}
+  For all $x, y : G$, $-(x \sqcap y) = (-x) \sqcup (-y)$.
+\end{corollary}
+\begin{proof}
+  Apply \Cref{presMeet} to negation $e \colon G \to \op{G}$, an order isomorphism by \Cref{negPseudolatticeEquiv}. This gives
+  \[
+    -(x \sqcap y) = e(x \sqcap_{G} y) = e(x) \sqcap_{\op{G}} e(y) = (-x) \sqcup (-y),
+  \]
+  because meets in $\op{G}$ are joins in $G$.
+\end{proof}
+
+\begin{corollary}[\agda{-⊔}]
+  \label{negJoin}
+  For all $x, y : G$, $-(x \sqcup y) = (-x) \sqcap (-y)$.
+\end{corollary}
+\begin{proof}
+  Apply \Cref{presJoin} to negation $e \colon G \to \op{G}$, an order isomorphism by \Cref{negPseudolatticeEquiv}. This gives
+  \[
+    -(x \sqcup y) = e(x \sqcup_{G} y) = e(x) \sqcup_{\op{G}} e(y) = (-x) \sqcap (-y),
+  \]
+  because joins in $\op{G}$ are meets in $G$.
+\end{proof}
+
+\begin{definition}[\agda{abs}]
+  \label{abs}
+  The \textbf{absolute value} of $z : G$ is $\lvert z \rvert := z \sqcup (-z)$.
+\end{definition}
+
+\begin{lemma}[\agda{≤abs}]
+  \label{leAbs}
+  For all $z : G$, $z \le \lvert z \rvert$.
+\end{lemma}
+\begin{proof}
+  $z$ is below its join with $-z$.
+\end{proof}
+
+\begin{lemma}[\agda{-≤abs}]
+  \label{negLeAbs}
+  For all $z : G$, $-z \le \lvert z \rvert$.
+\end{lemma}
+\begin{proof}
+  $-z$ is below its join with $z$.
+\end{proof}
+
+\begin{lemma}[\agda{0≤abs}]
+  \label{absNonNeg}
+  For all $z : G$, $0 \le \lvert z \rvert$.
+\end{lemma}
+\begin{proof}
+  By \Cref{IsOrderedAbGroup}, $0 \le \lvert z \rvert$ if and only if not $\lvert z \rvert < 0$, so suppose $\lvert z \rvert < 0$. Then $-0 < -\lvert z \rvert$ by \Cref{negFlipLt}, $-\lvert z \rvert \le -z$ by \Cref{negFlipLe} applied to \Cref{leAbs}, and $-z \le \lvert z \rvert$ by \Cref{negLeAbs}. Since $-0 = 0$, this reads
+  \[
+    0 < -\lvert z \rvert \le -z \le \lvert z \rvert < 0,
+  \]
+  contradicting irreflexivity.
+\end{proof}
+
+\begin{lemma}[\agda{abs-}]
+  \label{absNeg}
+  For all $x : G$, $\lvert -x \rvert = \lvert x \rvert$.
+\end{lemma}
+\begin{proof}
+  $\lvert -x \rvert = (-x) \sqcup (-(-x)) = (-x) \sqcup x = x \sqcup (-x)$, by $-(-x) = x$ and commutativity of $\sqcup$.
+\end{proof}
+
+\begin{lemma}[\agda{abs-Comm}]
+  \label{absSubComm}
+  For all $x, y : G$, $\lvert x - y \rvert = \lvert y - x \rvert$.
+\end{lemma}
+\begin{proof}
+  $\lvert x - y \rvert = (x - y) \sqcup (-(x - y)) = (-(x - y)) \sqcup (x - y)$ by commutativity of $\sqcup$, and $-(x - y) = y - x$ and $x - y = -(y - x)$ by the abelian group laws, so this is $(y - x) \sqcup (-(y - x)) = \lvert y - x \rvert$.
+\end{proof}
+
+\begin{lemma}[\agda{absΔ<→<+}]
+  \label{absDeltaLtLtPlus}
+  For all $x, y, z : G$, if $\lvert x - y \rvert < z$, then $y < x + z$.
+\end{lemma}
+\begin{proof}
+  Since $y = x + (-(x - y))$ and $-(x - y) \le \lvert x - y \rvert$, we have $y \le x + \lvert x - y \rvert < x + z$.
+\end{proof}
+
+\begin{lemma}[\agda{absΔ⊓≤R}]
+  \label{absDeltaMeetR}
+  For all $x, y, z : G$,
+  \[
+    \lvert (x \sqcap z) - (y \sqcap z) \rvert \le \lvert x - y \rvert.
+  \]
+\end{lemma}
+\begin{proof}
+  Let $d := \lvert x - y \rvert$. We have $x - d \le y$ because $x - y \le d$, and $z - d \le z$ because $0 \le d$ (\Cref{absNonNeg}). Then
+  \[
+    (x \sqcap z) - d = (x - d) \sqcap (z - d) \le y \sqcap z
+  \]
+  by \Cref{meetTranslate,meetMono}, that is, $(x \sqcap z) - (y \sqcap z) \le d$. The same argument with $x$ and $y$ exchanged gives $(y \sqcap z) - (x \sqcap z) \le \lvert y - x \rvert = d$ (\Cref{absSubComm}). So $d$ is an upper bound of $(x \sqcap z) - (y \sqcap z)$ and of its negation, hence of their join, which is $\lvert (x \sqcap z) - (y \sqcap z) \rvert$.
+\end{proof}
+
+\begin{corollary}[\agda{absΔ⊓≤L}]
+  \label{absDeltaMeetL}
+  For all $x, y, z : G$,
+  \[
+    \lvert (x \sqcap y) - (x \sqcap z) \rvert \le \lvert y - z \rvert.
+  \]
+\end{corollary}
+\begin{proof}
+  Apply \Cref{absDeltaMeetR} to $y$, $z$, $x$ and commute both meets.
+\end{proof}
+
+\begin{corollary}[\agda{absΔ⊔≤R}]
+  \label{absDeltaJoinR}
+  For all $x, y, z : G$,
+  \[
+    \lvert (x \sqcup z) - (y \sqcup z) \rvert \le \lvert x - y \rvert.
+  \]
+\end{corollary}
+\begin{proof}
+  By \Cref{negJoin}, $(-x) \sqcap (-z) = -(x \sqcup z)$ and $(-y) \sqcap (-z) = -(y \sqcup z)$. Also $\lvert -a - (-b) \rvert = \lvert -(a - b) \rvert = \lvert a - b \rvert$ for all $a, b : G$ (\Cref{absNeg}). So \Cref{absDeltaMeetR} applied to $-x$, $-y$ and $-z$ reads
+  \[
+    \lvert -(x \sqcup z) - (-(y \sqcup z)) \rvert
+    \le \lvert -x - (-y) \rvert,
+  \]
+  that is,
+  \[
+    \lvert (x \sqcup z) - (y \sqcup z) \rvert \le \lvert x - y \rvert.
+  \]
+\end{proof}
+
+\begin{corollary}[\agda{absΔ⊔≤L}]
+  \label{absDeltaJoinL}
+  For all $x, y, z : G$,
+  \[
+    \lvert (x \sqcup y) - (x \sqcup z) \rvert \le \lvert y - z \rvert.
+  \]
+\end{corollary}
+\begin{proof}
+  \Cref{absDeltaJoinR} applied to $y$, $z$ and $x$ gives $\lvert (y \sqcup x) - (z \sqcup x) \rvert \le \lvert y - z \rvert$, and joins commute.
+\end{proof}
+
+\begin{lemma}[\agda{0≤→abs≡id}]
+  \label{nonNegAbsEqId}
+  For all $x : G$, if $0 \le x$, then $\lvert x \rvert = x$.
+\end{lemma}
+\begin{proof}
+  By antisymmetry, it suffices to show $x \le \lvert x \rvert$ and $\lvert x \rvert \le x$. We obtain the first by \Cref{leAbs}. For the second, we have both $x \le x$ and $-x \le x$---the first by reflexivity and the second because $-x \le -0 = 0 \le x$ by \Cref{negFlipLe} and by assumption. So the join $\lvert x \rvert = x \sqcup (-x)$ is below $x$.
+\end{proof}
+
+\begin{corollary}[\agda{absAbs}]
+  \label{absAbs}
+  For all $x : G$, $\lvert \lvert x \rvert \rvert = \lvert x \rvert$.
+\end{corollary}
+\begin{proof}
+  $0 \le \lvert x \rvert$ by \Cref{absNonNeg}, so \Cref{nonNegAbsEqId} applies to $\lvert x \rvert$.
+\end{proof}
+
+\begin{corollary}[\agda{abs0}]
+  \label{absZero}
+  $\lvert 0 \rvert = 0$.
+\end{corollary}
+\begin{proof}
+  $0 \le 0$, so \Cref{nonNegAbsEqId} applies.
+\end{proof}
+
+\begin{lemma}[\agda{▵≤}]
+  \label{triangleLe}
+  For all $x, y : G$, $\lvert x + y \rvert \le \lvert x \rvert + \lvert y \rvert$.
+\end{lemma}
+\begin{proof}
+  The join $\lvert x + y \rvert = (x + y) \sqcup (-(x + y))$ is below $\lvert x \rvert + \lvert y \rvert$ if both of its arguments are. First, $x + y \le \lvert x \rvert + y \le \lvert x \rvert + \lvert y \rvert$ by monotonicity of addition on the right and then on the left (\Cref{IsOrderedAbGroup}) applied to \Cref{leAbs}. Second, $-(x + y) = (-x) + (-y)$ by the abelian group laws, and $(-x) + (-y) \le \lvert x \rvert + (-y) \le \lvert x \rvert + \lvert y \rvert$ likewise from \Cref{negLeAbs}.
+\end{proof}
+
+\begin{lemma}[\agda{abs≤≃}]
+  \label{absLeIff}
+  For all $x, y : G$, $\lvert x \rvert \le y$ if and only if $x \le y$ and $-x \le y$.
+\end{lemma}
+\begin{proof}
+  By definition, $\lvert x \rvert = x \sqcup (-x)$, and a join is below $y$ if and only if both of its arguments are (\Cref{IsPseudolattice}).
+\end{proof}
+
+\begin{lemma}[\agda{absΔabs≤}]
+  \label{absDeltaAbsLe}
+  For all $x, y : G$, $\lvert \lvert x \rvert - \lvert y \rvert \rvert \le \lvert x - y \rvert$.
+\end{lemma}
+\begin{proof}
+  By \Cref{absLeIff}, it suffices to show $\lvert x \rvert - \lvert y \rvert \le \lvert x - y \rvert$ and $-(\lvert x \rvert - \lvert y \rvert) \le \lvert x - y \rvert$. For the first, $x = (x - y) + y$ by the abelian group laws, so $\lvert x \rvert \le \lvert x - y \rvert + \lvert y \rvert$ by \Cref{triangleLe}, and adding $-\lvert y \rvert$ on the right (\Cref{IsOrderedAbGroup}) gives $\lvert x \rvert - \lvert y \rvert \le (\lvert x - y \rvert + \lvert y \rvert) - \lvert y \rvert = \lvert x - y \rvert$. For the second, $-(\lvert x \rvert - \lvert y \rvert) = \lvert y \rvert - \lvert x \rvert$ by the abelian group laws, and the same argument with $x$ and $y$ exchanged gives $\lvert y \rvert - \lvert x \rvert \le \lvert y - x \rvert = \lvert x - y \rvert$ by \Cref{absSubComm}.
+\end{proof}
+
+\begin{corollary}[\agda{abs<→<}]
+  \label{absLtLt}
+  For all $x, y : G$, if $\lvert x \rvert < y$, then $x < y$.
+\end{corollary}
+\begin{proof}
+  We have $x \le \lvert x \rvert < y$ (\Cref{leAbs}).
+\end{proof}
+
+\begin{corollary}[\agda{abs<→-<}]
+  \label{absLtNegLt}
+  For all $x, y : G$, if $\lvert x \rvert < y$, then $-y < x$.
+\end{corollary}
+\begin{proof}
+  We have $-x \le \lvert x \rvert < y$ (\Cref{negLeAbs}), which gives $-x < y$, and then \Cref{negFlipLt} gives $-y < -(-x) = x$.
+\end{proof}

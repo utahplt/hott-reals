@@ -1,0 +1,24 @@
+\section{\texttt{Algebra.OrderedAbGroup.Base}}
+
+\begin{definition}[\agda{IsOrderedAbGroup}]
+  \label{IsOrderedAbGroup}
+  An \textbf{ordered abelian group} is a set $G$ together with a constant $0$, operations $-$, $+$, $\sqcap$, $\sqcup$, and relations $\le$, $<$ such that:
+  \begin{itemize}
+  \item $(G, 0, +, -)$ is an abelian group.
+  \item $(G, \le, \sqcap, \sqcup)$ is a lattice (\Cref{IsPseudolattice}).
+  \item $(G, <)$ is a strict order (irreflexive, transitive, and weakly linear).
+  \item The two orders are compatible: $x < y$ implies $x \le y$; $x \le y$ if and only if $\neg(y < x)$; and $x < y \le z$ or $x \le y < z$ implies $x < z$.
+  \item Both orders are compatible with addition: $x \le y$ implies $x + z \le y + z$, and likewise for $<$. Moreover, if $0 < x + y$ then $0 < x$ or $0 < y$.
+  \end{itemize}
+  Monotonicity is only required on the right; the left versions follow from commutativity. These are exactly the axioms of an ordered commutative ring (\Cref{IsOrderedCommRing}) that do not mention multiplication.
+
+  Classically, these are the totally ordered abelian groups (lattice-ordered groups are not necessarily totally ordered). With excluded middle, the axiom $x \le y \iff \neg(y < x)$ implies strong totality of $\le$. The lattice operations are specified as data only because the order is not necessarily decidable, similarly to the ordered fields of \textcite[Definition 11.2.7]{univalentfoundationsprogram2013}.
+\end{definition}
+
+\begin{lemma}[\agda{OrderedCommRing→OrderedAbGroup}]
+  \label{OrderedCommRingToOrderedAbGroup}
+  Every ordered commutative ring (\Cref{IsOrderedCommRing}) is an ordered abelian group under its addition, with the same lattice and the same strict order.
+\end{lemma}
+\begin{proof}
+  The additive structure of a commutative ring is an abelian group, and the remaining axioms of \Cref{IsOrderedAbGroup} are among those of \Cref{IsOrderedCommRing} verbatim.
+\end{proof}

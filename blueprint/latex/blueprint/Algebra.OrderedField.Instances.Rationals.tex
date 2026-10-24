@@ -1,0 +1,9 @@
+\section{\texttt{Algebra.OrderedField.Instances.Rationals}}
+
+\begin{theorem}[\agda{ℚOrderedField}]
+  \label{QOrderedField}
+  $(\Q, 0, 1, +, -, \cdot, <, \le)$ is an ordered field (\Cref{IsOrderedField}).
+\end{theorem}
+\begin{proof}
+  $\Q$ is an ordered commutative ring, so it remains to show that $x : \Q$ is invertible if and only if $x < 0$ or $0 < x$. Suppose first that $x < 0$ or $0 < x$. Then $x \ne 0$, since $x = 0$ would make either disjunct read $0 < 0$, against irreflexivity of $<$, and a nonzero rational has a reciprocal. Conversely, suppose $x \cdot y = 1$. The order on $\Q$ is decidable, so $x < 0$, $x = 0$ or $0 < x$; the first and the third are the two sides of the conclusion, and the second is impossible, because $x = 0$ gives $1 = x \cdot y = 0 \cdot y = 0$ while $0 \ne 1$ in $\Q$.
+\end{proof}

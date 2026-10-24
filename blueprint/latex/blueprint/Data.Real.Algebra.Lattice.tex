@@ -1,0 +1,114 @@
+\section{\texttt{Data.Real.Algebra.Lattice}}
+
+\begin{definition}[\agda{minⁿ}; {\textcite[\S~11.3.3]{univalentfoundationsprogram2013}}]
+  \label{minNReal}
+  The map $\min \colon \Q \to \Q \to \Q$ is non-expansive in each argument separately (\Cref{minNE2}), so it lifts to a map $\min \colon \R \to \R \to \R$, again non-expansive in each argument separately, with
+  \[
+    \min(\iota(q),\iota(r)) = \iota(\min(q,r)).
+  \]
+\end{definition}
+\begin{proof}
+  Apply \Cref{liftNE2} to $(q, r) \mapsto \iota(\min(q, r))$; the computation rule is that of \Cref{liftNE2}.
+\end{proof}
+
+\begin{definition}[\agda{maxⁿ}; {\textcite[\S~11.3.3]{univalentfoundationsprogram2013}}]
+  \label{maxNReal}
+  The map $\max \colon \Q \to \Q \to \Q$ is non-expansive in each argument separately (\Cref{maxNE2}), so it lifts to a map $\max \colon \R \to \R \to \R$, again non-expansive in each argument separately, with
+  \[
+    \max(\iota(q),\iota(r)) = \iota(\max(q,r)).
+  \]
+\end{definition}
+\begin{proof}
+  Apply \Cref{liftNE2} to $(q, r) \mapsto \iota(\max(q, r))$; the computation rule is that of \Cref{liftNE2}.
+\end{proof}
+
+\begin{lemma}[\agda{minComm}]
+  \label{minCommReal}
+  For all $x, y : \R$, $\min(x, y) = \min(y, x)$.
+\end{lemma}
+\begin{proof}
+  Both sides are non-expansive in each argument separately, so by \Cref{nonExpansive2Eq} it suffices to show that they agree on rationals. Indeed, the computation rule \Cref{minNReal} and commutativity of $\min$ on $\Q$ give
+  \[
+    \min(\iota(q),\iota(r)) = \iota(\min(q,r)) = \iota(\min(r,q)) = \min(\iota(r),\iota(q)).
+  \]
+\end{proof}
+
+\begin{lemma}[\agda{maxComm}]
+  \label{maxCommReal}
+  For all $x, y : \R$, $\max(x, y) = \max(y, x)$.
+\end{lemma}
+\begin{proof}
+  The proof is analogous to \Cref{minCommReal}, with $\min$ and $\max$ interchanged.
+\end{proof}
+
+\begin{lemma}[\agda{maxIdem}]
+  \label{maxIdemReal}
+  For every $x : \R$, $\max(x, x) = x$.
+\end{lemma}
+\begin{proof}
+  By \Cref{composeNE2}, the map $x \mapsto \max(x,x)$ is $2$-Lipschitz. The identity map is also Lipschitz, so \Cref{lipschitzEq} reduces the claim to checking agreement on rationals. The computation rule in \Cref{maxNReal} and the idempotence of $\max$ on $\Q$ yield
+  \[
+    \max(\iota(q),\iota(q)) = \iota(\max(q,q)) = \iota(q).
+  \]
+\end{proof}
+
+\begin{lemma}[\agda{minAssoc}]
+  \label{minAssocReal}
+  For all $x, y, z : \R$, $\min(x, \min(y, z)) = \min(\min(x, y), z)$.
+\end{lemma}
+\begin{proof}
+  Fix $x : \R$. Each side is non-expansive as a function of $y$ and $z$ separately, so \Cref{nonExpansive2Eq} reduces the claim to checking $y = \iota(r)$ and $z = \iota(s)$ for $r, s : \Q$. For fixed $r,s : \Q$, the two resulting sides are non-expansive functions of $x$, so \Cref{nonExpansiveEq} further reduces the claim to $x = \iota(q)$ for $q : \Q$. The computation rule \Cref{minNReal} then reduces the required equality to
+  \[
+    \iota(\min(q,\min(r,s))) = \iota(\min(\min(q,r),s)),
+  \]
+  which follows from associativity of $\min$ on $\Q$.
+\end{proof}
+
+\begin{lemma}[\agda{maxAssoc}]
+  \label{maxAssocReal}
+  For all $x, y, z : \R$, $\max(x, \max(y, z)) = \max(\max(x, y), z)$.
+\end{lemma}
+\begin{proof}
+  The proof is analogous to \Cref{minAssocReal}, with $\min$ and $\max$ interchanged.
+\end{proof}
+
+\begin{lemma}[\agda{minAbsorbLMax}]
+  \label{minAbsorbLMaxReal}
+  For all $x, y : \R$, $\min(x, \max(x, y)) = x$.
+\end{lemma}
+\begin{proof}
+  Both sides are continuous in each argument separately. On the left side, for fixed $x$ the map $y \mapsto \min(x,\max(x,y))$ is non-expansive, and for fixed $y$ the map $x \mapsto \min(x,\max(x,y))$ is $2$-Lipschitz by \Cref{composeNE2}. On the right side, the sections are the constant map at $x$ and the identity map, both non-expansive. So by \Cref{continuous2Eq} it suffices to check the claim at $x = \iota(q)$ and $y = \iota(r)$ for $q, r : \Q$. There, the computation rules \Cref{minNReal,maxNReal} and absorption on $\Q$ yield
+  \[
+    \min(\iota(q),\max(\iota(q),\iota(r))) = \iota(\min(q,\max(q,r))) = \iota(q).
+  \]
+\end{proof}
+
+\begin{lemma}[\agda{maxAbsorbLMin}]
+  \label{maxAbsorbLMinReal}
+  For all $x, y : \R$, $\max(x, \min(x, y)) = x$.
+\end{lemma}
+\begin{proof}
+  The proof is analogous to \Cref{minAbsorbLMaxReal}, with $\min$ and $\max$ interchanged.
+\end{proof}
+
+\begin{lemma}[\agda{minAbsorbRMax}]
+  \label{minAbsorbRMaxReal}
+  For all $x, y : \R$, $\min(\max(x, y), x) = x$.
+\end{lemma}
+\begin{proof}
+  By \Cref{minCommReal,minAbsorbLMaxReal},
+  \[
+    \min(\max(x,y),x) = \min(x,\max(x,y)) = x.
+  \]
+\end{proof}
+
+\begin{lemma}[\agda{maxAbsorbRMin}]
+  \label{maxAbsorbRMinReal}
+  For all $x, y : \R$, $\max(\min(x, y), x) = x$.
+\end{lemma}
+\begin{proof}
+  By \Cref{maxCommReal,maxAbsorbLMinReal},
+  \[
+    \max(\min(x,y),x) = \max(x,\min(x,y)) = x.
+  \]
+\end{proof}

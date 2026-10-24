@@ -1,0 +1,59 @@
+\section{\texttt{Relation.Premetric.Properties}}
+
+Throughout this section $M$ is a premetric space.
+
+\begin{definition}[\agda{isCauchy}; {\textcite[Definition 2.3]{gilbert2017}}]
+  \label{isCauchy}
+  Let $A$ be a type with a family of relations $x \close{\varepsilon} y$ indexed by $\varepsilon : \Qp$, such as a premetric space. A \textbf{Cauchy approximation} in $A$ is a map $x \colon \Qp \to A$ such that
+  \[
+    x_\varepsilon \close{\varepsilon + \delta} x_\delta
+  \]
+  for all $\varepsilon, \delta : \Qp$.
+\end{definition}
+
+\begin{definition}[\agda{isLimit}; {\textcite[Definition 2.4]{gilbert2017}}]
+  \label{isLimit}
+  An element $l : M$ is a \textbf{limit} of a map $x \colon \Qp \to M$ if
+  \[
+    x_\varepsilon \close{\varepsilon + \theta} l
+  \]
+  for all $\varepsilon, \theta : \Qp$.
+\end{definition}
+
+\begin{lemma}[\agda{isLimit≈<}]
+  \label{isLimitApproxLt}
+  If $l$ is a limit of $x$ and $\varepsilon < \delta$, then $x_\varepsilon \close{\delta} l$.
+\end{lemma}
+
+\begin{lemma}[\agda{isLim≈+}; {\textcite[Lemma 2.8]{gilbert2017}}]
+  \label{isLimApproxPlus}
+  Let $l$ be a limit of $x \colon \Qp \to M$ and $u : M$. If $u \close{\delta} x_\varepsilon$, then $u \close{\varepsilon + \delta} l$.
+\end{lemma}
+
+\begin{lemma}[\agda{isLim≈+₂}; {\textcite[Lemma 2.9]{gilbert2017}}]
+  \label{isLimApproxPlus2}
+  Let $l$ be a limit of $x \colon \Qp \to M$ and $l'$ a limit of $y \colon \Qp \to M$. If $x_\delta \close{\varepsilon} y_\eta$, then $l \close{\delta + (\eta + \varepsilon)} l'$.
+\end{lemma}
+
+\begin{definition}[\agda{isComplete}; {\textcite[Definition 2.6]{gilbert2017}}]
+  \label{isComplete}
+  $M$ is \textbf{complete} if every Cauchy approximation in $M$ has a limit.
+\end{definition}
+
+\begin{lemma}[\agda{isPropIsComplete}]
+  \label{isPropIsComplete}
+  Completeness of $M$ is a proposition.
+\end{lemma}
+
+\begin{definition}[\agda{IsEventuallyConstantAt}]
+  \label{isEventuallyConstantAt}
+  A map $x \colon \Qp \to M$ is \textbf{eventually constant at} $c : M$ below $\theta : \Qp$ if $x_\delta = c$ for every $\delta < \theta$.
+\end{definition}
+
+\begin{lemma}[\agda{isLimit→isEventuallyConstantAt→≡}]
+  \label{isLimitEventuallyEq}
+  Let $l$ be a limit of $x \colon \Qp \to M$, and suppose $x$ is eventually constant at $c : M$ below $\theta : \Qp$. Then $l = c$.
+\end{lemma}
+\begin{proof}
+  By separatedness (\Cref{IsPremetric}), it suffices to show $l \close{\varepsilon} c$ for every $\varepsilon : \Qp$. Fix $\varepsilon$ and let $\delta := \min(\theta, \varepsilon) / 2$, so that $\delta < \theta$ and $\delta < \varepsilon$. Then $x_\delta = c$, since $x$ is eventually constant at $c$ below $\theta$, and $x_\delta \close{\varepsilon} l$ by \Cref{isLimitApproxLt}. Hence $c \close{\varepsilon} l$, and $l \close{\varepsilon} c$ by symmetry (\Cref{IsPremetric}).
+\end{proof}

@@ -1,0 +1,265 @@
+\section{\texttt{Data.Real.Order.Addition}}
+
+% TODO: Unreachable
+% \begin{lemma}[\agda{min+max≡+}]
+%   \label{minPlusMaxReal}
+%   For all $x, y : \R$,
+%   \[
+%     \min(x,y) + \max(x,y) = x + y.
+%   \]
+% \end{lemma}
+% \begin{proof}
+%   Both sides are continuous in each argument separately. Indeed, for fixed $y$, the map $x \mapsto \min(x,y)+\max(x,y)$ is $2$-Lipschitz by \Cref{composeNE2} and $x \mapsto x+y$ is non-expansive, and symmetrically for fixed $x$. So \Cref{continuous2Eq} reduces the claim to $x = \iota(q)$ and $y = \iota(r)$ for $q, r : \Q$, where the computation rules for addition, $\min$, and $\max$ reduce the required equality to
+%   \[
+%     \iota(\min(q,r)+\max(q,r))=\iota(q+r).
+%   \]
+%   On the rationals this follows by the totality of non-strict inequality. Indeed, if $q\le r$, the left side is $\iota(q+r)$, and otherwise, if $r\le q$, it is $\iota(r+q)=\iota(q+r)$.
+% \end{proof}
+
+\begin{lemma}[\agda{-DistMin}]
+  \label{negDistMinReal}
+  For all $x, y : \R$,
+  \[
+    -\min(x, y) = \max(-x, -y).
+  \]
+\end{lemma}
+\begin{proof}
+  Both sides are non-expansive in each argument separately (\Cref{negNReal,minNReal,maxNReal}), so \Cref{nonExpansive2Eq} reduces the claim to checking rational points. On the rationals this is an instance of the fact that negation exchanges meet and join (\Cref{negMeet}) in ordered abelian groups.
+\end{proof}
+
+% TODO: Unreachable 
+% \begin{lemma}[\agda{-DistMax}]
+%   \label{negDistMaxReal}
+%   For all $x, y : \R$,
+%   \[
+%     -\max(x,y)=\min(-x,-y).
+%   \]
+% \end{lemma}
+% \begin{proof}
+%   Analogous to \Cref{negDistMinReal}.
+% \end{proof}
+
+\begin{lemma}[\agda{-Flip≤}]
+  \label{negFlipLeReal}
+  Negation is antitone.\footnote{A map between ordered sets is \textbf{antitone} when it reverses the order and \textbf{strictly antitone} when it reverses the strict order (we pull the terminology from Lean Mathlib). The Cubical Agda library has \emph{isotone} and \emph{antitone} maps between posets only, but nothing for strict orders.} For all $x, y : \R$, if $x \le y$, then $-y \le -x$.
+  % TODO: Look into adding a strict order antitone definition and related infrastructure if it becomes relevant
+\end{lemma}
+\begin{proof}
+  By \Cref{leIffMinReal}, the hypothesis gives $\min(x,y)=x$. By \Cref{negDistMinReal},
+  \[
+    \max(-x,-y)=-\min(x,y)=-x.
+  \]
+  Commutativity of $\max$ therefore gives $\max(-y,-x)=-x$, which is $-y\le -x$ by definition.
+\end{proof}
+
+\begin{lemma}[\agda{+DistRMax}; {\textcite[Lemma 2.4.5]{brough2026}}]
+  \label{plusDistRMaxReal}
+  For all $a,x,y : \R$,
+  \[
+    a+\max(x,y)=\max(a+x,a+y).
+  \]
+\end{lemma}
+\begin{proof}
+  Fix $a : \R$. Both sides are non-expansive in $x$ and $y$ separately (\Cref{plusNReal,maxNReal}), so \Cref{nonExpansive2Eq} reduces the claim to $x=\iota(q)$ and $y=\iota(r)$ for $q, r : \Q$. Fixing $q,r : \Q$, the left side as a function of $a$ is non-expansive, while the right side is $2$-Lipschitz by \Cref{composeNE2}. Hence \Cref{lipschitzEq} further reduces the claim to $a=\iota(s)$ for $s : \Q$. The computation rules reduce the result to translation invariance of $\max$ on $\Q$, which is the instance at $\Q$ of \Cref{joinTranslate} after commuting the additions.
+\end{proof}
+
+% Unreachable from the ordered-ring fields on 2026-09-07; kept for a later root.
+% \begin{corollary}[\agda{+DistLMax}]
+%   \label{plusDistLMaxReal}
+%   For all $x,y,a : \R$,
+%   \[
+%     \max(x,y)+a=\max(x+a,y+a).
+%   \]
+% \end{corollary}
+% \begin{proof}
+%   Commute the first addition, apply \Cref{plusDistRMaxReal}, and commute the two additions under $\max$.
+% \end{proof}
+
+\begin{lemma}[\agda{+MonoL≤}; {\textcite[Lemma 2.4.6]{brough2026}}]
+  \label{plusMonoLLeReal}
+  Addition on the left is monotone. For all $a,x,y : \R$, if $x\le y$, then $a+x\le a+y$.
+\end{lemma}
+\begin{proof}
+  The hypothesis is $\max(x,y)=y$. By \Cref{plusDistRMaxReal},
+  \[
+    \max(a+x,a+y)=a+\max(x,y)=a+y,
+  \]
+  which is the desired inequality by definition.
+\end{proof}
+
+\begin{corollary}[\agda{+MonoR≤}; {\textcite[Lemma 2.4.6]{brough2026}}]
+  \label{plusMonoRLeReal}
+  Addition on the right is monotone. For all $a,x,y : \R$, if $x\le y$, then $x+a\le y+a$.
+\end{corollary}
+\begin{proof}
+  By commutativity of addition, $x+a = a+x$ and $y+a = a+y$, so the claim is \Cref{plusMonoLLeReal}.
+\end{proof}
+
+% TODO: Unreachable
+% \begin{lemma}[\agda{+ReflectL≤}; {\textcite[Lemma 2.4.6]{brough2026}}]
+%   \label{plusReflectLLeReal}
+%   For all $a,x,y : \R$, if $a+x\le a+y$, then $x\le y$.
+% \end{lemma}
+% \begin{proof}
+%   By \Cref{plusDistRMaxReal} and the hypothesis,
+%   \[
+%     a+\max(x,y)=\max(a+x,a+y)=a+y.
+%   \]
+%   Canceling $a$ in the abelian group (\Cref{RAbGroup}) gives $\max(x,y)=y$, which is $x\le y$.
+% \end{proof}
+
+% TODO: Unreachable
+% \begin{corollary}[\agda{+ReflectR≤}; {\textcite[Lemma 2.4.6]{brough2026}}]
+%   \label{plusReflectRLeReal}
+%   For all $a,x,y : \R$, if $x+a\le y+a$, then $x\le y$.
+% \end{corollary}
+% \begin{proof}
+%   Commute the additions and apply \Cref{plusReflectLLeReal}.
+% \end{proof}
+
+\begin{lemma}[\agda{-Flip<}]
+  \label{negFlipLtReal}
+  Negation is strictly antitone. For all $x, y : \R$, if $x < y$, then $-y < -x$.
+\end{lemma}
+\begin{proof}
+  Since the conclusion is a proposition (\Cref{isPropLtReal}), we may assume $q, r : \Q$ with $x \le \iota(q)$, $q < r$ and $\iota(r) \le y$. By \Cref{negFlipLeReal}, $-y \le -\iota(r) = \iota(-r)$ and $\iota(-q) = -\iota(q) \le -x$, and $-r < -q$ in $\Q$. Hence $-r$ and $-q$ witness $-y < -x$.
+\end{proof}
+
+\begin{lemma}[\agda{∼→≤+rat}; {\textcite[Lemma 4.2]{gilbert2017}}]
+  \label{closeLeAddRatReal}
+  For all $x, y : \R$ and $\varepsilon : \Qp$, if $x \cclose{\varepsilon} y$, then $y \le x + \iota(\varepsilon)$.
+\end{lemma}
+\begin{proof}
+  Translation by $-x$ is non-expansive (\Cref{plusNReal}), so $x \cclose{\varepsilon} y$ gives $x - x \cclose{\varepsilon} y - x$, that is, $\iota(0) \cclose{\varepsilon} y - x$ (\Cref{+InvR}). Then \Cref{ratCloseLeRatPlusReal} with $q := 0$ gives $y - x \le \iota(0 + \varepsilon) = \iota(\varepsilon)$. Adding $x$ on the right (\Cref{plusMonoRLeReal}) yields $(y - x) + x \le \iota(\varepsilon) + x$, and the abelian group laws (\Cref{RAbGroup}) turn this into $y \le x + \iota(\varepsilon)$.
+\end{proof}
+
+\begin{lemma}[\agda{<→∼→<+rat}; {\textcite[Lemma 4.3]{gilbert2017}}]
+  \label{ltCloseLtAddRatReal}
+  For all $x, y, z : \R$ and $\varepsilon : \Qp$, if $x < y$ and $x \cclose{\varepsilon} z$, then $z < y + \iota(\varepsilon)$.
+\end{lemma}
+\begin{proof}
+  Since the conclusion is a proposition (\Cref{isPropLtReal}), by the Archimedean principle (\Cref{isArchimedeanLtReal}) we may assume $q : \Q$ with $x < \iota(q) < y$. Applying \Cref{ltRatCloseLtRatPlusReal} to $x < \iota(q)$ and $x \cclose{\varepsilon} z$ gives $z < \iota(q + \varepsilon) = \iota(q) + \iota(\varepsilon)$. Weakening $\iota(q) < y$ to $\iota(q) \le y$ (\Cref{ltWeakenLeReal}) and adding $\iota(\varepsilon)$ on the right (\Cref{plusMonoRLeReal}) gives $\iota(q) + \iota(\varepsilon) \le y + \iota(\varepsilon)$, so $z < y + \iota(\varepsilon)$ by \Cref{isTransLtLeReal}.
+\end{proof}
+
+\begin{corollary}[\agda{<→∼→-rat<}; {\textcite[Corollary 2.4.13]{brough2026}}]
+  \label{ltCloseSubRatLtReal}
+  For all $x, y, z : \R$ and $\varepsilon : \Qp$, if $x < y$ and $y \cclose{\varepsilon} z$, then $x - \iota(\varepsilon) < z$.
+\end{corollary}
+\begin{proof}
+  By \Cref{negFlipLtReal}, $-y < -x$, and since negation is non-expansive (\Cref{negNReal}), $-y \cclose{\varepsilon} -z$. So \Cref{ltCloseLtAddRatReal} gives $-z < -x + \iota(\varepsilon)$, and \Cref{negFlipLtReal} again gives $-(-x + \iota(\varepsilon)) < -(-z)$, which is $x - \iota(\varepsilon) < z$ by the abelian group laws (\Cref{RAbGroup}).
+\end{proof}
+
+\begin{lemma}[\agda{<→rat<∨<rat}]
+  \label{ltRatLtOrLtRatReal}
+  For all $q, r : \Q$ with $q < r$ and every $x : \R$, $\iota(q) < x$ or $x < \iota(r)$.
+\end{lemma}
+\begin{proof}
+  We proceed by induction on $x$ (\Cref{ElimCompletionProp}), showing that for all $q, r : \Q$ with $q < r$, $\iota(q) < x$ or $x < \iota(r)$. The desired statement is a proposition.
+
+  If $x = \iota(s)$ is rational, then $q < s$ or $s < r$ by weak linearity of the strict order on $\Q$, and \Cref{ltIffRatLtReal} gives $\iota(q) < \iota(s)$ or $\iota(s) < \iota(r)$.
+
+  If $x = \lim y$ for a Cauchy approximation $y$, assume inductively that for every $\delta : \Qp$ and all $s, t : \Q$ with $s < t$, $\iota(s) < y_\delta$ or $y_\delta < \iota(t)$, and let $q < r$. Put $\eta := (r - q)/3$, $s := q + \eta$ and $t := r - \eta$, so that $t - s = \eta > 0$ and hence $s < t$, and put $\delta := \eta/2$, so that $\delta < \eta$. By \Cref{isLimitLim,isLimitApproxLt}, $y_\delta \cclose{\eta} \lim y$. Since the conclusion is a proposition, the inductive hypothesis at $s < t$ and $\delta$ leaves two cases.
+  \begin{enumerate}
+  \item If $\iota(s) < y_\delta$, then \Cref{ltCloseSubRatLtReal} gives $\iota(s) - \iota(\eta) < \lim y$, and $\iota(s) - \iota(\eta) = \iota(s - \eta) = \iota(q)$.
+  \item If $y_\delta < \iota(t)$, then \Cref{ltCloseLtAddRatReal} gives $\lim y < \iota(t) + \iota(\eta) = \iota(t + \eta) = \iota(r)$.
+  \end{enumerate}
+  In either case, $\iota(q) < \lim y$ or $\lim y < \iota(r)$.
+\end{proof}
+
+\begin{lemma}[\agda{isWeaklyLinear<}; {\textcite[Lemma 4.4]{gilbert2017}}]
+  \label{isWeaklyLinearLtReal}
+  Strict inequality is weakly linear. For all $x, y, z : \R$, if $x < y$, then $x < z$ or $z < y$.
+\end{lemma}
+\begin{proof}
+  Since the conclusion is a proposition, we may assume $q, r : \Q$ with $x \le \iota(q)$, $q < r$ and $\iota(r) \le y$. By \Cref{ltRatLtOrLtRatReal}, $\iota(q) < z$ or $z < \iota(r)$. In the first case $x < z$ by \Cref{isTransLeLtReal}, and in the second $z < y$ by \Cref{isTransLtLeReal}.
+\end{proof}
+
+\begin{corollary}[\agda{ℝ<StrictOrder}]
+  \label{RLtStrictOrder}
+  $(\R, <)$ is a set with a propositionally valued, irreflexive, transitive and weakly linear relation.\footnote{The Cubical Agda library calls this a \emph{strict order}. Its record also asks for asymmetry explicitly, but this follows from irreflexivity and transitivity.}
+\end{corollary}
+\begin{proof}
+  $\R$ is a set, and $<$ is propositionally valued, irreflexive, transitive and weakly linear by \Cref{isPropLtReal,isIrreflLtReal,isTransLtReal,isWeaklyLinearLtReal}.
+\end{proof}
+
+\begin{lemma}[\agda{<+rat}; {\textcite[Lemma 4.5]{gilbert2017}}]
+  \label{ltAddRatReal}
+  For every $x : \R$ and every $\varepsilon : \Qp$, $x < x + \iota(\varepsilon)$.
+\end{lemma}
+\begin{proof}
+  We proceed by induction on $x$ (\Cref{ElimCompletionProp}), showing that $x < x + \iota(\varepsilon)$ for every $\varepsilon : \Qp$. The desired statement is a proposition by \Cref{isPropLtReal}.
+
+  If $x = \iota(q)$ is rational, then $q < q + \varepsilon$ in $\Q$, so $\iota(q) < \iota(q + \varepsilon) = \iota(q) + \iota(\varepsilon)$ by \Cref{ltIffRatLtReal}.
+
+  If $x = \lim y$ for a Cauchy approximation $y$, assume inductively that $y_\eta < y_\eta + \iota(\theta)$ for all $\eta, \theta : \Qp$, and let $\varepsilon : \Qp$. Put $\delta := \varepsilon/5$. Since $\delta < 2\delta$, \Cref{isLimitLim,isLimitApproxLt} give $y_\delta \cclose{2\delta} \lim y$. The inductive hypothesis gives $y_\delta < y_\delta + \iota(\delta)$, so \Cref{ltCloseLtAddRatReal} gives
+  \[
+    \lim y < (y_\delta + \iota(\delta)) + \iota(2\delta) = y_\delta + \iota(3\delta).
+  \]
+  By weak linearity (\Cref{isWeaklyLinearLtReal}) with $\lim y + \iota(\varepsilon)$, either $\lim y < \lim y + \iota(\varepsilon)$, which is the claim, or $\lim y + \iota(\varepsilon) < y_\delta + \iota(3\delta)$. We show that the second case is contradictory. By symmetry (\Cref{isSymClose}), $\lim y \cclose{2\delta} y_\delta$, so \Cref{closeLeAddRatReal} gives $y_\delta \le \lim y + \iota(2\delta)$. Adding $\iota(3\delta)$ on the right (\Cref{plusMonoRLeReal}),
+  \[
+    y_\delta + \iota(3\delta) \le (\lim y + \iota(2\delta)) + \iota(3\delta) = \lim y + \iota(\varepsilon).
+  \]
+  Together with the assumed inequality, \Cref{isTransLeLtReal} gives $y_\delta + \iota(3\delta) < y_\delta + \iota(3\delta)$, contradicting irreflexivity (\Cref{isIrreflLtReal}).
+\end{proof}
+
+\begin{theorem}[\agda{<≃∃+rat≤}; {\textcite[Lemma 4.1]{gilbert2017}}]
+  \label{ltIffExistsAddRatLeReal}
+  For all $x, y : \R$, $x < y$ if and only if there merely exists $\varepsilon : \Qp$ with $x + \iota(\varepsilon) \le y$.
+\end{theorem}
+\begin{proof}
+  Suppose $x < y$. Since the conclusion is a proposition, we may assume $q, r : \Q$ with $x \le \iota(q)$, $q < r$ and $\iota(r) \le y$. Let $\varepsilon := r - q$, which is positive since $q < r$. Adding $\iota(\varepsilon)$ on the right (\Cref{plusMonoRLeReal}),
+  \[
+    x + \iota(\varepsilon) \le \iota(q) + \iota(\varepsilon) = \iota(q + (r - q)) = \iota(r) \le y.
+  \]
+  Conversely, since $x < y$ is a proposition (\Cref{isPropLtReal}), we may assume $\varepsilon : \Qp$ with $x + \iota(\varepsilon) \le y$. Then $x < x + \iota(\varepsilon) \le y$ by \Cref{ltAddRatReal}, so $x < y$ by \Cref{isTransLtLeReal}.
+\end{proof}
+
+\begin{lemma}[\agda{+MonoL<}; {\textcite[Lemma 2.4.17]{brough2026}}]
+  \label{plusMonoLLtReal}
+  Addition on the left is strictly monotone. For all $a, x, y : \R$, if $x < y$, then $a + x < a + y$.
+\end{lemma}
+\begin{proof}
+  By \Cref{ltIffExistsAddRatLeReal}, since the conclusion is a proposition, we may assume $\varepsilon : \Qp$ with $x + \iota(\varepsilon) \le y$. By monotonicity of addition with respect to the non-strict order (\Cref{plusMonoLLeReal}) and associativity, $(a + x) + \iota(\varepsilon) = a + (x + \iota(\varepsilon)) \le a + y$, so $a + x < a + y$ by \Cref{ltIffExistsAddRatLeReal} again.
+\end{proof}
+
+\begin{corollary}[\agda{+MonoR<}; {\textcite[Lemma 2.4.17]{brough2026}}]
+  \label{plusMonoRLtReal}
+  Addition on the right is strictly monotone. For all $a, x, y : \R$, if $x < y$, then $x + a < y + a$.
+\end{corollary}
+\begin{proof}
+  By commutativity of addition, $x + a = a + x$ and $y + a = a + y$, so the claim is \Cref{plusMonoLLtReal}.
+\end{proof}
+
+\begin{corollary}[\agda{+ReflectL<}; {\textcite[Lemma 2.4.17]{brough2026}}]
+  \label{plusReflectLLtReal}
+  Addition on the left reflects strict inequality. For all $a, x, y : \R$, if $a + x < a + y$, then $x < y$.
+\end{corollary}
+\begin{proof}
+  By \Cref{plusMonoLLtReal} with $-a$, $-a + (a + x) < -a + (a + y)$, and both sides simplify by the group laws (\Cref{RAbGroup}): $-a + (a + x) = x$ and $-a + (a + y) = y$.
+\end{proof}
+
+\begin{lemma}[\agda{posSum→pos∨pos}]
+  \label{posSumPosOrPosReal}
+  For all $x, y : \R$, if $0 < x + y$, then $0 < x$ or $0 < y$.
+\end{lemma}
+\begin{proof}
+  By weak linearity (\Cref{isWeaklyLinearLtReal}) applied to $0 < x + y$ with $x$, either $0 < x$ or $x < x + y$. In the second case, $x + 0 < x + y$ by the unit law, so $0 < y$ by \Cref{plusReflectLLtReal}.
+\end{proof}
+
+\begin{lemma}[\agda{-rat≤→≤}]
+  \label{subRatLeLeReal}
+  For all $x, y : \R$, if $x - \iota(\varepsilon) \le y$ for every $\varepsilon : \Qp$, then $x \le y$.
+\end{lemma}
+\begin{proof}
+  By definition, we must show $\max(x, y) = y$, and by separatedness (\Cref{IsPremetric,completionPremetricSpace}) it suffices to show $\max(x, y) \cclose{\varepsilon} y$ for every $\varepsilon : \Qp$. So let $\varepsilon : \Qp$ and put $\eta := \varepsilon/2$. In $\Q$ we have $\lvert 0 - (-\eta) \rvert = \eta < \varepsilon$, so $\iota(0) \cclose{\varepsilon} \iota(-\eta)$ by \Cref{closeIffBall}. Translation by $x$ is non-expansive (\Cref{plusNReal}), so $x = x + \iota(0) \cclose{\varepsilon} x + \iota(-\eta) = x - \iota(\eta)$. Since $\max(-, y)$ is non-expansive (\Cref{maxNReal}), $\max(x, y) \cclose{\varepsilon} \max(x - \iota(\eta), y)$, and the right side is $y$ by the hypothesis at $\eta$.
+\end{proof}
+
+\begin{lemma}[\agda{≤≃¬>}; {\textcite[Lemma 4.8]{gilbert2017}}]
+  \label{leIffNotGtReal}
+  For all $x, y : \R$, $x \le y$ if and only if not $y < x$.
+\end{lemma}
+\begin{proof}
+  Suppose $x \le y$ and $y < x$. Then $y < y$ by \Cref{isTransLtLeReal}, contradicting irreflexivity (\Cref{isIrreflLtReal}).
+
+  Conversely, suppose $y < x$ does not hold. By \Cref{subRatLeLeReal}, it suffices to show $x - \iota(\varepsilon) \le y$ for every $\varepsilon : \Qp$. By \Cref{ltAddRatReal} at $x - \iota(\varepsilon)$ and the group laws (\Cref{RAbGroup}), $x - \iota(\varepsilon) < (x - \iota(\varepsilon)) + \iota(\varepsilon) = x$. Weak linearity (\Cref{isWeaklyLinearLtReal}) with $y$ then gives $x - \iota(\varepsilon) < y$ or $y < x$; the second is excluded, so $x - \iota(\varepsilon) < y$, and we conclude by weakening to $x - \iota(\varepsilon) \le y$ (\Cref{ltWeakenLeReal}).
+\end{proof}

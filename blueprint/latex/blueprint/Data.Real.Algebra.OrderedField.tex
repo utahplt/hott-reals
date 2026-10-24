@@ -1,0 +1,22 @@
+\section{\texttt{Data.Real.Algebra.OrderedField}}
+
+\begin{theorem}[\agda{ℝOrderedField}]
+  \label{ROrderedField}
+  $(\R, 0, 1, +, \cdot, -, <, \le)$ is an ordered field (\Cref{IsOrderedField}).
+\end{theorem}
+\begin{proof}
+  $(\R, 0, 1, +, \cdot, -, <, \le)$ is an ordered commutative ring (\Cref{ROrderedCommRing}), and the two remaining axioms are \Cref{apartZeroIsInv} and \Cref{isInvApartZero}.
+\end{proof}
+
+\begin{corollary}[\agda{ℝHeytingField}]
+  \label{RHeytingField}
+  $(\R, 0, 1, +, \cdot, -, \#)$ is a Heyting field (\Cref{IsHeytingField}), where $x \# y$ is $x < y$ or $y < x$.
+\end{corollary}
+\begin{proof}
+  \Cref{OrderedFieldToHeytingField} applied to \Cref{ROrderedField}.
+\end{proof}
+
+\begin{definition}[\agda{\_⁻¹}, \agda{·-rinv}, \agda{0<→0<⁻¹}]
+  \label{recipAtInstance}
+  For $x : \R$ apart from zero we write $x^{-1}$ for the \textbf{reciprocal} given in \Cref{ROrderedField}. It satisfies $x \cdot x^{-1} = 1$, and $0 < x^{-1}$ whenever $0 < x$. For positive $x$ it is the reciprocal of \Cref{recip}, that is, $x^{-1} = 1/x$.
+\end{definition}

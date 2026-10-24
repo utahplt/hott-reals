@@ -1,0 +1,90 @@
+\documentclass[11pt]{article}
+
+\usepackage[letterpaper, margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{thmtools}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{tikz-cd}
+\usepackage{fontspec}
+\usepackage{xcolor}
+\usepackage{todonotes}
+\usepackage[backend=biber, style=ieee, sorting=none]{biblatex}
+\usepackage{hyperref}
+\usepackage[nameinlink, capitalise]{cleveref}
+\usepackage{listings}
+
+\addbibresource{references.bib}
+\input{macros}
+
+% thmtools rather than bare \newtheorem: environments sharing the theorem counter otherwise all come out as "Theorem" under \cref.
+\declaretheorem[numberwithin=section]{theorem}
+% hyperref names the anchor of a theorem after \theHtheorem, which thmtools leaves without the section, so Lemma 1.2 and Lemma 2.2 collide.
+\renewcommand{\theHtheorem}{\theHsection.\arabic{theorem}}
+\declaretheorem[sibling=theorem]{lemma}
+\declaretheorem[sibling=theorem]{corollary}
+\declaretheorem[sibling=theorem]{proposition}
+\declaretheorem[sibling=theorem, style=definition]{definition}
+\declaretheorem[sibling=theorem, style=remark]{remark}
+
+\title{Blueprint\\
+  \large HoTT book reals on top of premetric spaces}
+\author{Jackson Brough}
+\date{}
+
+\begin{document}
+\maketitle
+\listoftodos
+
+\section*{Notation}
+
+Sections are named after Agda modules and ordered by dependency, so a definition precedes its uses. Following the HoTT book, ``there merely exists'', the symbol $\exists$ and ``or'' mean the propositionally truncated existential and disjunction.
+% TODO: unless we state otherwise because we want to mean the non-truncated version
+We write the type of positive rationals, a rational together with a proof that it is positive, as $\Qp$. We are purposefully loose and write a positive rational and its underlying rational the same.
+In the sections on the completion, $a$ and $b$ range over $M$; $u$, $v$ and $w$ over $\completion{M}$; $x$ and $y$ over Cauchy approximations in $\completion{M}$; and $\varepsilon$, $\delta$, $\eta$ and $\theta$ over $\Qp$. In \texttt{Relation.Premetric.Properties} likewise, $x$ is a Cauchy approximation, there in $M$.
+
+\input{blueprint/HITs.PropositionalTruncation.Properties.tex}
+\input{blueprint/Relation.Binary.Order.Proset.Properties.tex}
+\input{blueprint/Relation.Binary.Order.Pseudolattice.Base.tex}
+\input{blueprint/Relation.Binary.Order.Pseudolattice.Properties.tex}
+\input{blueprint/Algebra.OrderedCommRing.Base.tex}
+\input{blueprint/Algebra.OrderedAbGroup.Base.tex}
+\input{blueprint/Algebra.OrderedAbGroup.Properties.tex}
+\input{blueprint/Algebra.OrderedCommRing.Properties.tex}
+\input{blueprint/Algebra.HeytingField.Base.tex}
+\input{blueprint/Algebra.OrderedField.Base.tex}
+\input{blueprint/Algebra.OrderedField.Properties.tex}
+\input{blueprint/Algebra.OrderedField.Instances.Rationals.tex}
+\input{blueprint/Algebra.ArchimedeanField.Base.tex}
+\input{blueprint/Algebra.OrderedField.Book.tex}
+\input{blueprint/Algebra.OrderedAbGroup.Instances.Rationals.tex}
+\input{blueprint/Algebra.OrderedCommRing.Instances.Rationals.tex}
+\input{blueprint/Relation.Premetric.Base.tex}
+\input{blueprint/Relation.Premetric.Properties.tex}
+\input{blueprint/Relation.Premetric.Mappings.tex}
+\input{blueprint/Relation.Premetric.Instances.FunctionSpace.tex}
+\input{blueprint/Relation.Premetric.Instances.Product.tex}
+\input{blueprint/Relation.Premetric.Instances.Rationals.tex}
+\input{blueprint/Relation.Premetric.Instances.ArchimedeanField.tex}
+\input{blueprint/Relation.Premetric.Completion.Base.tex}
+\input{blueprint/Relation.Premetric.Completion.Elim.tex}
+\input{blueprint/Relation.Premetric.Completion.Closeness.tex}
+\input{blueprint/Relation.Premetric.Completion.Properties.tex}
+\input{blueprint/Relation.Premetric.Completion.Lift.tex}
+\input{blueprint/Relation.Premetric.Completion.Instances.HIITReals.tex}
+\input{blueprint/Data.Real.Algebra.Addition.tex}
+\input{blueprint/Data.Real.Algebra.Lattice.tex}
+\input{blueprint/Data.Real.Order.Base.tex}
+\input{blueprint/Data.Real.Order.Addition.tex}
+\input{blueprint/Data.Real.Algebra.OrderedAbGroup.tex}
+\input{blueprint/Data.Real.Order.Magnitude.tex}
+\input{blueprint/Data.Real.Algebra.Multiplication.tex}
+\input{blueprint/Data.Real.Order.Multiplication.tex}
+\input{blueprint/Data.Real.Algebra.OrderedCommRing.tex}
+\input{blueprint/Data.Real.Algebra.Reciprocal.tex}
+\input{blueprint/Data.Real.Algebra.OrderedField.tex}
+\input{blueprint/Data.Real.Algebra.ArchimedeanField.tex}
+
+\printbibliography
+\end{document}

@@ -1,0 +1,45 @@
+\section{\texttt{Algebra.OrderedCommRing.Properties}}
+
+Throughout this section $R$ is an ordered commutative ring (\Cref{IsOrderedCommRing}), an ordered abelian group under its addition by \Cref{OrderedCommRingToOrderedAbGroup}, and $\lvert x \rvert = x \sqcup (-x)$ is its absolute value (\Cref{abs}).
+
+\begin{lemma}[\agda{0≤·}]
+  \label{mulNonNeg}
+  For all $x, y : R$, if $0 \le x$ and $0 \le y$, then $0 \le x \cdot y$.
+\end{lemma}
+\begin{proof}
+  By monotonicity of multiplication on the right by the nonnegative $y$ (\Cref{IsOrderedCommRing}), $0 \le x$ gives $0 \cdot y \le x \cdot y$, and $0 \cdot y = 0$ by the ring laws.
+\end{proof}
+
+\begin{lemma}[\agda{0≤→<→²<²}]
+  \label{sqMonoLt}
+  For all $x, y : R$, if $0 \le x$ and $x < y$, then $x \cdot x < y \cdot y$.
+\end{lemma}
+\begin{proof}
+  Since $0 \le x < y$, we have $0 < y$ by mixed transitivity (\Cref{IsOrderedCommRing}). Then $x \cdot x \le x \cdot y$ by monotonicity on the left by the nonnegative $x$, and $x \cdot y < y \cdot y$ by strict monotonicity on the right by the positive $y$. The conclusion follows by mixed transitivity.
+\end{proof}
+
+\begin{lemma}[\agda{0≤→0≤→²≡²→≡}]
+  \label{sqInj}
+  For all $x, y : R$, if $0 \le x$, $0 \le y$ and $x \cdot x = y \cdot y$, then $x = y$.
+\end{lemma}
+\begin{proof}
+  By antisymmetry of $\le$ it suffices to show $x \le y$ and $y \le x$, and by the axiom $x \le y \Leftrightarrow \neg(y < x)$ (\Cref{IsOrderedCommRing}) it suffices to refute $y < x$ and $x < y$. If $y < x$, then $y \cdot y < x \cdot x$ by \Cref{sqMonoLt} at the nonnegative $y$, contradicting $x \cdot x = y \cdot y$ by irreflexivity of $<$; symmetrically if $x < y$.
+\end{proof}
+
+\begin{lemma}[\agda{abs·}]
+  \label{absMul}
+  For all $x, y : R$, $\lvert x \cdot y \rvert = \lvert x \rvert \cdot \lvert y \rvert$.
+\end{lemma}
+\begin{proof}
+  Both sides are nonnegative. The left is nonnegative by \Cref{absNonNeg}, and the right is nonnegative by \Cref{mulNonNeg} applied to \Cref{absNonNeg} twice. Their squares also agree. The square of an absolute value is the square of its argument, $\lvert z \rvert \cdot \lvert z \rvert = z \cdot z$, so $\lvert x \cdot y \rvert \cdot \lvert x \cdot y \rvert = (x \cdot y) \cdot (x \cdot y)$, and $(\lvert x \rvert \cdot \lvert y \rvert) \cdot (\lvert x \rvert \cdot \lvert y \rvert) = (\lvert x \rvert \cdot \lvert x \rvert) \cdot (\lvert y \rvert \cdot \lvert y \rvert) = (x \cdot x) \cdot (y \cdot y) = (x \cdot y) \cdot (x \cdot y)$ by the commutative ring laws. So applying \Cref{sqInj} gives $\lvert x \cdot y \rvert = \lvert x \rvert \cdot \lvert y \rvert$.
+\end{proof}
+
+\begin{lemma}[\agda{triangularInequality-}]
+  \label{triangleSubLe}
+  For all $x, y, z : R$, $\lvert x - y \rvert \le \lvert x - z \rvert + \lvert z - y \rvert$.
+\end{lemma}
+
+\begin{lemma}[\agda{selfSeparated}]
+  \label{selfSeparated}
+  For all $x, y : R$, if $\lvert x - y \rvert < z$ for every $z : R$ with $0 < z$, then $x = y$.
+\end{lemma}

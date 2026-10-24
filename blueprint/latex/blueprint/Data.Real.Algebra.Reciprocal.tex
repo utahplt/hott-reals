@@ -1,0 +1,163 @@
+\section{\texttt{Data.Real.Algebra.Reciprocal}}
+
+Throughout this section $\lvert x \rvert$ is the absolute value of \Cref{abs} in the ordered abelian group $\R$ (\Cref{ROrderedAbGroup}) and, on $\Q$, in the ordered abelian group $\Q$ (\Cref{QOrderedAbGroup}), and $\delta^{-1}$ is the reciprocal of a positive rational (\Cref{invPos}). The reciprocal on $\Q$ is not Lipschitz near $0$, so it cannot be lifted directly. Following \textcite[\S~4.3]{gilbert2017}, and the pattern for the construction of multiplication, we lift the reciprocal clamped below by a positive rational $\delta$. We show that this map is Lipschitz, we show that two clamps agree on all reals that are bounded from below, and then we remove the clamp on the positive reals. The result is the reciprocal $1/x$ of a positive real (\Cref{recip}). We finish by showing that a real is invertible if and only if it is apart from zero.
+
+\begin{definition}[\agda{boundedRecipℚ}; {\textcite[Definition 4.26]{gilbert2017}}]
+  \label{boundedRecipQ}
+  For $\delta : \Qp$, the \textbf{clamped reciprocal} on $\Q$ is the map
+  \[
+    q \mapsto \max(q, \delta)^{-1} \colon \Q \to \Q,
+  \]
+  where $\max(q, \delta)$ is a positive rational since $0 < \delta \le \max(q, \delta)$.
+\end{definition}
+
+\begin{lemma}[\agda{boundedRecipℚIsLipschitzWith}; {\textcite[Definition 4.26]{gilbert2017}}]
+  \label{boundedRecipQIsLipschitzWith}
+  Let $\delta : \Qp$. The map $q \mapsto \iota(\max(q, \delta)^{-1}) \colon \Q \to \R$ is $(\delta^{-1} \cdot \delta^{-1})$-Lipschitz.
+\end{lemma}
+\begin{proof}
+  Let $q, r : \Q$ and $\varepsilon : \Qp$ with $q \close{\varepsilon} r$, that is, $\lvert q - r \rvert < \varepsilon$ in $\Q$ (\Cref{QPremetricSpace}). Write $a := \max(q, \delta)$ and $b := \max(r, \delta)$, which are positive rationals (\Cref{boundedRecipQ}), and put $u := a^{-1}$ and $v := b^{-1}$. By \Cref{closeIffBall} it suffices to show that
+  \[
+    \lvert u - v \rvert < (\delta^{-1} \cdot \delta^{-1}) \cdot \varepsilon
+  \]
+  in $\Q$.
+
+  Since $a \cdot u = 1$ and $b \cdot v = 1$ (\Cref{invPos}), the commutative ring laws give
+  \[
+    u - v = u \cdot (b \cdot v) - (a \cdot u) \cdot v = (b - a) \cdot (u \cdot v).
+  \]
+  The product $u \cdot v$ is a positive rational, hence nonnegative, so $\lvert u \cdot v \rvert = u \cdot v$ (\Cref{nonNegAbsEqId}) and \Cref{absMul} gives $\lvert u - v \rvert = \lvert b - a \rvert \cdot (u \cdot v)$. Now $\lvert b - a \rvert \le \lvert r - q \rvert$ by \Cref{absDeltaJoinR} in $\Q$, and $\lvert r - q \rvert = \lvert q - r \rvert$ by \Cref{absSubComm}, so monotonicity of multiplication by the nonnegative $u \cdot v$ (\Cref{IsOrderedCommRing}) gives
+  \[
+    \lvert u - v \rvert \le \lvert q - r \rvert \cdot (u \cdot v).
+  \]
+  Next, $\delta \le a$ and $\delta \le b$, a join being above each of its arguments (\Cref{IsPseudolattice}), so $u \le \delta^{-1}$ and $v \le \delta^{-1}$ by \Cref{invPosFlipLe}. Two applications of monotonicity of multiplication give $u \cdot v \le \delta^{-1} \cdot \delta^{-1}$, and monotonicity by the nonnegative $\lvert q - r \rvert$ (\Cref{absNonNeg}) gives
+  \[
+    \lvert q - r \rvert \cdot (u \cdot v) \le \lvert q - r \rvert \cdot (\delta^{-1} \cdot \delta^{-1}).
+  \]
+  Finally $\delta^{-1} \cdot \delta^{-1}$ is positive, so $\lvert q - r \rvert < \varepsilon$ gives
+  \[
+    \lvert q - r \rvert \cdot (\delta^{-1} \cdot \delta^{-1}) < \varepsilon \cdot (\delta^{-1} \cdot \delta^{-1}) = (\delta^{-1} \cdot \delta^{-1}) \cdot \varepsilon
+  \]
+  by strict monotonicity of multiplication by a positive element (\Cref{IsOrderedCommRing}) and commutativity. Mixed transitivity now gives the required bound.
+\end{proof}
+
+\begin{definition}[\agda{boundedRecip}, \agda{boundedRecipIsLipschitzWith}, \agda{boundedRecip∘rat}; {\textcite[Definition 4.26]{gilbert2017}}]
+  \label{boundedRecip}
+  For $\delta : \Qp$, the map $q \mapsto \iota(\max(q, \delta)^{-1})$ is $\delta^{-1} \cdot \delta^{-1}$-Lipschitz (\Cref{boundedRecipQIsLipschitzWith}), so by \Cref{liftLipschitzWith} it lifts to a map $r_\delta \colon \R \to \R$, again $\delta^{-1} \cdot \delta^{-1}$-Lipschitz, with
+  \[
+    r_\delta(\iota(q)) = \iota(\max(q, \delta)^{-1})
+  \]
+  for all $q : \Q$. We call $r_\delta(x)$ the \textbf{reciprocal of $x$ clamped at $\delta$}.
+\end{definition}
+\begin{proof}
+  Apply \Cref{liftLipschitzWith} to \Cref{boundedRecipQIsLipschitzWith}. The computation rule is that of \Cref{liftLipschitzWith}.
+\end{proof}
+
+\begin{lemma}[\agda{boundedRecipMax}]
+  \label{boundedRecipMax}
+  For all $\delta, \varepsilon : \Qp$ with $\delta \le \varepsilon$ and every $x : \R$, $r_\delta(\max(x, \iota(\varepsilon))) = r_\varepsilon(x)$.
+\end{lemma}
+\begin{proof}
+  The map $x \mapsto \max(x, \iota(\varepsilon))$ is non-expansive (\Cref{maxNReal}), hence $1$-Lipschitz, and $r_\delta$ is Lipschitz (\Cref{boundedRecip}), so their composite is Lipschitz (\Cref{composeIsLipschitzWith}); and $r_\varepsilon$ is Lipschitz (\Cref{boundedRecip}). So \Cref{lipschitzEq} reduces the claim to $x = \iota(q)$ for $q : \Q$, where the computation rules in \Cref{maxNReal,boundedRecip} give
+  \[
+    r_\delta(\max(\iota(q), \iota(\varepsilon))) = r_\delta(\iota(\max(q, \varepsilon))) = \iota(\max(\max(q, \varepsilon), \delta)^{-1})
+  \]
+  and $r_\varepsilon(\iota(q)) = \iota(\max(q, \varepsilon)^{-1})$. So it suffices that $\max(\max(q, \varepsilon), \delta) = \max(q, \varepsilon)$ in $\Q$, which holds because $\delta \le \varepsilon \le \max(q, \varepsilon)$, by assumption and because a join is above each of its arguments (\Cref{IsPseudolattice}), so that the join absorbs $\delta$.
+\end{proof}
+
+\begin{lemma}[\agda{boundedRecip≡}]
+  \label{boundedRecipEq}
+  Let $\delta, \varepsilon : \Qp$ and $x : \R$ with $\iota(\delta) \le x$ and $\iota(\varepsilon) \le x$. Then $r_\delta(x) = r_\varepsilon(x)$.
+\end{lemma}
+\begin{proof}
+  Put $\theta := \min(\delta, \varepsilon)$, a positive rational with $\theta \le \delta$ and $\theta \le \varepsilon$ (\Cref{IsPseudolattice}). By definition (\Cref{leReal}) the hypothesis $\iota(\delta) \le x$ reads $\max(\iota(\delta), x) = x$, so $\max(x, \iota(\delta)) = x$ by \Cref{maxCommReal}, and likewise $\max(x, \iota(\varepsilon)) = x$. Two applications of \Cref{boundedRecipMax}, at $\theta \le \delta$ and at $\theta \le \varepsilon$, therefore give
+  \[
+    r_\delta(x) = r_\theta(\max(x, \iota(\delta))) = r_\theta(x) = r_\theta(\max(x, \iota(\varepsilon))) = r_\varepsilon(x).
+  \]
+\end{proof}
+
+\begin{lemma}[\agda{0<→∃rat≤}]
+  \label{posExistsRatLeReal}
+  For every $x : \R$ with $0 < x$ there merely exists $\delta : \Qp$ with $\iota(\delta) \le x$.
+\end{lemma}
+\begin{proof}
+  Since the conclusion is a proposition, by the Archimedean principle (\Cref{isArchimedeanLtReal}) applied to $0 < x$ we may assume $q : \Q$ with $0 < \iota(q)$ and $\iota(q) < x$. The first gives $0 < q$ in $\Q$ by \Cref{ltIffRatLtReal}, so that $q$ is a positive rational, and the second gives $\iota(q) \le x$ by \Cref{ltWeakenLeReal}.
+\end{proof}
+
+\begin{definition}[\agda{recip}; {\textcite[Definition 4.27]{gilbert2017}}]
+  \label{recip}
+  For $x : \R$ with $0 < x$, consider the map
+  \[
+    h_x \colon \left(\textstyle\sum_{\delta : \Qp} \iota(\delta) \le x\right) \to \R, \qquad h_x(\delta, p) := r_\delta(x).
+  \]
+  By \Cref{boundedRecipEq} it is weakly constant, and $\R$ is a set (\Cref{reals}), so by \Cref{recSet} it extends to the propositional truncation of its domain, which is inhabited by \Cref{posExistsRatLeReal}. We define the \textbf{reciprocal} $1/x$ of the positive real $x$ to be the value of that extension at the witness of \Cref{posExistsRatLeReal}.
+\end{definition}
+
+\begin{lemma}[\agda{recip≡boundedRecip}; {\textcite[Lemma 4.29]{gilbert2017}}]
+  \label{recipEqBoundedRecip}
+  For all $\delta : \Qp$ and $x : \R$ with $0 < x$ and $\iota(\delta) \le x$, $1/x = r_\delta(x)$.
+\end{lemma}
+\begin{proof}
+  The extension of \Cref{recSet} takes the same value at every element of the truncation, since the truncation is a proposition, and at the element $\eta(\delta, p)$, where $p$ witnesses $\iota(\delta) \le x$, its value is $h_x(\delta, p) = r_\delta(x)$ by the computation rule of \Cref{recSet}.
+\end{proof}
+
+\begin{lemma}[\agda{boundedRecipInvR}; {\textcite[Lemma 4.30]{gilbert2017}}]
+  \label{boundedRecipInvR}
+  For all $\delta : \Qp$ and $x : \R$, $\max(x, \iota(\delta)) \cdot r_\delta(x) = 1$.
+\end{lemma}
+\begin{proof}
+  Both sides are continuous in $x$. The left is the pointwise product (\Cref{mulC}) of $x \mapsto \max(x, \iota(\delta))$, non-expansive (\Cref{maxNReal}) and hence continuous, with $r_\delta$, Lipschitz (\Cref{boundedRecip}) and hence continuous; the right is the constant map at $1$. So \Cref{continuousEq} reduces the claim to $x = \iota(q)$ for $q : \Q$, where the computation rules in \Cref{maxNReal,boundedRecip} and \Cref{ratMulRat} give
+  \[
+    \max(\iota(q), \iota(\delta)) \cdot r_\delta(\iota(q))
+      = \iota(\max(q, \delta)) \cdot \iota(\max(q, \delta)^{-1})
+      = \iota(\max(q, \delta) \cdot \max(q, \delta)^{-1})
+      = \iota(1) = 1,
+  \]
+  the last equality but one by \Cref{invPos} at the positive rational $\max(q, \delta)$ (\Cref{boundedRecipQ}).
+\end{proof}
+
+\begin{lemma}[\agda{recipInvR}; {\textcite[Lemma 4.30]{gilbert2017}}]
+  \label{recipInvR}
+  For every $x : \R$ with $0 < x$, $x \cdot (1/x) = 1$.
+\end{lemma}
+\begin{proof}
+  Since $\R$ is a set (\Cref{reals}), the conclusion is a proposition, so by \Cref{posExistsRatLeReal} we may assume $\delta : \Qp$ with $\iota(\delta) \le x$. Then $1/x = r_\delta(x)$ by \Cref{recipEqBoundedRecip}. Moreover $\iota(\delta) \le x$ reads $\max(\iota(\delta), x) = x$ by definition (\Cref{leReal}), so $x = \max(x, \iota(\delta))$ by \Cref{maxCommReal}. Hence
+  \[
+    x \cdot (1/x) = \max(x, \iota(\delta)) \cdot r_\delta(x) = 1
+  \]
+  by \Cref{boundedRecipInvR}.
+\end{proof}
+
+\begin{lemma}[\agda{\#0→isInv}; {\textcite[Lemma 4.30]{gilbert2017}}]
+  \label{apartZeroIsInv}
+  Every real apart from zero is invertible. For every $x : \R$, if $x < 0$ or $0 < x$, then there is $y : \R$ with $x \cdot y = 1$. The disjunction here need not be truncated, since at most one of the two sides holds.
+\end{lemma}
+\begin{proof}
+  If $0 < x$, take $y := 1/x$ (\Cref{recip}); then $x \cdot y = 1$ by \Cref{recipInvR}.
+
+  If $x < 0$, then $-0 < -x$ by \Cref{negFlipLtReal}, that is, $0 < -x$, so $1/(-x)$ is defined; take $y := -(1/(-x))$. By \Cref{negDistRMulReal} and the commutative ring laws (\Cref{RCommRing}),
+  \[
+    x \cdot \left(-(1/(-x))\right) = -\left(x \cdot (1/(-x))\right) = (-x) \cdot (1/(-x)),
+  \]
+  which is $1$ by \Cref{recipInvR}.
+\end{proof}
+
+\begin{lemma}[\agda{isInv→\#0}]
+  \label{isInvApartZero}
+  Every invertible real is apart from zero. For all $x, y : \R$, if $x \cdot y = 1$, then $x < 0$ or $0 < x$, and again the disjunction need not be truncated.
+\end{lemma}
+\begin{proof}
+  At most one of $x < 0$ and $0 < x$ holds, since $<$ is asymmetric (\Cref{RLtStrictOrder}), and each of them is a proposition (\Cref{isPropLtReal}), so the conclusion is a proposition. By \Cref{existsAbsLeRatReal} we may therefore assume $M : \Qp$ with $\lvert y \rvert \le \iota(M)$, and we put $\varepsilon := (M + M)^{-1}$, a positive rational (\Cref{invPos}).
+
+  Since $-\varepsilon < 0$ and $0 < \varepsilon$ in $\Q$, two applications of \Cref{ltRatLtOrLtRatReal} give $\iota(-\varepsilon) < x$ or $x < 0$, and $0 < x$ or $x < \iota(\varepsilon)$. Eliminating both into the conclusion, the cases $x < 0$ and $0 < x$ are what we want, so it remains to rule out the case in which $\iota(-\varepsilon) < x$ and $x < \iota(\varepsilon)$.
+
+  There $\iota(-\varepsilon) = -\iota(\varepsilon)$ (\Cref{negNReal}), so $-\iota(\varepsilon) < x$ gives $-x < \iota(\varepsilon)$ by \Cref{negFlipLtReal} and the abelian group laws (\Cref{RAbGroup}). With $x < \iota(\varepsilon)$, weakening both (\Cref{ltWeakenLeReal}) and applying \Cref{absLeIff} gives $\lvert x \rvert \le \iota(\varepsilon)$. Now
+  \[
+    1 = \lvert 1 \rvert = \lvert x \cdot y \rvert = \lvert x \rvert \cdot \lvert y \rvert,
+  \]
+  the first equality by \Cref{absRatReal} and $\lvert 1 \rvert = 1$ in $\Q$, the second by the hypothesis and the third by \Cref{absMulReal}. Since $0 \le \lvert y \rvert$ (\Cref{absNonNeg}), \Cref{mulMonoRLeReal} gives $\lvert x \rvert \cdot \lvert y \rvert \le \iota(\varepsilon) \cdot \lvert y \rvert$, and since $0 \le \iota(\varepsilon)$, \Cref{mulMonoLLeReal} gives
+  \[
+    \iota(\varepsilon) \cdot \lvert y \rvert \le \iota(\varepsilon) \cdot \iota(M) = \iota(\varepsilon \cdot M)
+  \]
+  by \Cref{ratMulRat}. In $\Q$ we have $M < M + M$, since $0 < M$, so $\varepsilon \cdot M < \varepsilon \cdot (M + M)$ by strict monotonicity of multiplication by the positive $\varepsilon$ (\Cref{IsOrderedCommRing}), and $\varepsilon \cdot (M + M) = (M + M) \cdot \varepsilon = 1$ by commutativity and \Cref{invPos}. So $\iota(\varepsilon \cdot M) < 1$ by \Cref{ltIffRatLtReal}, and mixed transitivity gives $1 < 1$, which is impossible (\Cref{isIrreflLtReal}).
+\end{proof}

@@ -1,0 +1,17 @@
+\section{\texttt{HITs.PropositionalTruncation.Properties}}
+
+\begin{theorem}[\agda{rec→Set}, \agda{trunc→Set≃}; {\textcite[Proposition 2.2]{kraus2015}}]
+  \label{recSet}
+  Let $A$ be a type and $B$ a set. A map $f \colon A \to B$ is \textbf{weakly constant} if $f(x) = f(y)$ for all $x, y : A$. Every weakly constant map $f : A \to B$ extends uniquely to a map $\lift{f} \colon \lVert A \rVert \to B$, with
+  \[
+    \lift{f} \circ \eta = f,
+  \]
+  where $\eta : A \to \lVert A \rVert$ is the canonical map into the propositional truncation.
+  This is summarized by the commutative diagram:
+  \[
+    \begin{tikzcd}[column sep=huge, row sep=huge]
+      \lVert A \rVert \arrow[r, dashed, "\lift{f}"] & B \\
+      A \arrow[u, "\eta"] \arrow[ur, "f"']
+    \end{tikzcd}
+  \]
+\end{theorem}

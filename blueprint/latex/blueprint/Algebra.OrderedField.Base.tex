@@ -1,0 +1,11 @@
+\section{\texttt{Algebra.OrderedField.Base}}
+
+\begin{definition}[\agda{IsOrderedField}]
+  \label{IsOrderedField}
+  An \textbf{ordered field} is an ordered commutative ring $F$ (\Cref{IsOrderedCommRing}) in which $x$ is invertible (\Cref{IsHeytingField}) if and only if $x < 0$ or $0 < x$. The disjunction here need not be truncated, since at most one of the two sides holds.
+\end{definition}
+
+\begin{theorem}[\agda{OrderedField→HeytingField}]
+  \label{OrderedFieldToHeytingField}
+  Every ordered field $F$ is a Heyting field (\Cref{IsHeytingField}) with the apartness $x \# y := (x < y) + (y < x)$.
+\end{theorem}

@@ -1,0 +1,26 @@
+\section{\texttt{Relation.Binary.Order.Pseudolattice.Base}}
+
+\begin{definition}[\agda{IsPseudolattice}]
+  \label{IsPseudolattice}
+  A \textbf{lattice}\footnote{The Cubical Agda library calls this a \emph{pseudolattice} and reserves \emph{lattice} for one with a greatest and a least element, which is typically referred to as a bounded lattice. This appears to be nonstandard, and we follow the more traditional convention.} is a partially ordered set $(L, \le)$ in which any two elements $x, y$ have a greatest lower bound $x \sqcap y$ and a least upper bound $x \sqcup y$. That is, for all $z$,
+  \[
+    z \le x \sqcap y \iff z \le x \text{ and } z \le y,
+    \qquad
+    x \sqcup y \le z \iff x \le z \text{ and } y \le z.
+  \]
+\end{definition}
+
+\begin{lemma}[\agda{makePseudolatticeFromPoset}]
+  \label{makePseudolatticeFromPoset}
+  Let $(P, \le)$ be a partially ordered set with binary operations $\sqcap$ and $\sqcup$ such that for all $a, b, x : P$,
+  \begin{itemize}
+  \item $a \sqcap b \le a$ and $a \sqcap b \le b$, and if $x \le a$ and $x \le b$ then $x \le a \sqcap b$;
+  \item $a \le a \sqcup b$ and $b \le a \sqcup b$, and if $a \le x$ and $b \le x$ then $a \sqcup b \le x$.
+  \end{itemize}
+  Then $(P, \le)$ is a lattice with meet $\sqcap$ and join $\sqcup$.
+\end{lemma}
+
+\begin{definition}[\agda{IsPseudolatticeEquiv}]
+  \label{IsPseudolatticeEquiv}
+  An \textbf{order isomorphism} between lattices $(L, \le)$ and $(M, \le)$ is an equivalence $e \colon L \to M$ such that $x \le y$ if and only if $e(x) \le e(y)$ for all $x, y : L$.
+\end{definition}

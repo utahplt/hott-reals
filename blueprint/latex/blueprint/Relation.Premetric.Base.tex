@@ -1,0 +1,18 @@
+\section{\texttt{Relation.Premetric.Base}}
+
+\begin{definition}[\agda{IsPremetric}; {\textcite[Definition 2.1]{gilbert2017}}]
+  \label{IsPremetric}
+  A \textbf{premetric space} is a set $M$ together with a family of mere relations $x \close{\varepsilon} y$ on $M$, indexed by $\varepsilon : \Qp$ and read ``$x$ and $y$ are $\varepsilon$-close'', such that:
+  \begin{itemize}
+  \item (reflexivity) $x \close{\varepsilon} x$;
+  \item (symmetry) $x \close{\varepsilon} y$ implies $y \close{\varepsilon} x$;
+  \item (separatedness) if $x \close{\varepsilon} y$ for every $\varepsilon$, then $x = y$;
+  \item (triangularity) $x \close{\varepsilon} y$ and $y \close{\delta} z$ imply $x \close{\varepsilon + \delta} z$;
+  \item (roundedness) if $x \close{\varepsilon} y$, then there merely exists some $\delta < \varepsilon$ such that $x \close{\delta} y$.
+  \end{itemize}
+\end{definition}
+
+\begin{lemma}[\agda{isPropIsPremetric}]
+  \label{isPropIsPremetric}
+  For a set $M$ with a family of mere relations $x \close{\varepsilon} y$, being a premetric space is a proposition.
+\end{lemma}

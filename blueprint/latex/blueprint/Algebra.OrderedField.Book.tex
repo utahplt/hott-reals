@@ -1,0 +1,65 @@
+\section{\texttt{Algebra.OrderedField.Book}}
+
+This section states the HoTT book's definition of an ordered field verbatim and shows it equivalent in content to \Cref{IsOrderedField}. It is the bridge by which our theorems about ordered fields in the sense of \Cref{IsOrderedField} are the book's theorems. In this section, ``or'' is the truncated disjunction as everywhere, and $P + Q$ is the untruncated sum.
+
+\begin{definition}[\agda{IsOrderedFieldBook}; {\textcite[Definition 11.2.7]{univalentfoundationsprogram2013}}]
+  \label{IsOrderedFieldBook}
+  An \textbf{ordered field in the sense of the HoTT book} is a set $F$ together with constants $0$, $1$, operations $+$, $-$, $\cdot$, $\min$, $\max$, and mere relations $\le$, $<$, $\#$ such that:
+  \begin{enumerate}
+  \item $(F, 0, 1, +, -, \cdot)$ is a commutative ring;
+  \item $x : F$ is invertible (\Cref{IsHeytingField}) if and only if $x \# 0$;
+  \item $(F, \le)$ is a lattice (\Cref{IsPseudolattice}) with meet $\min$ and join $\max$;
+  \item the strict order $<$ is transitive, irreflexive, and weakly linear ($x < y$ implies $x < z$ or $z < y$);
+  \item apartness $\#$ is irreflexive, symmetric and cotransitive ($x \# y$ implies $x \# z$ or $y \# z$);
+  \item for all $x, y, z : F$:
+    \[
+      \begin{array}{r c l @{\qquad} r c l}
+        x \le y & \iff & \neg (y < x), & x < y \le z & \implies & x < z, \\
+        x \# y & \iff & (x < y) \lor (y < x), & x \le y < z & \implies & x < z, \\
+        x \le y & \iff & x + z \le y + z, & x \le y \text{ and } 0 \le z & \implies & x z \le y z, \\
+        x < y & \iff & x + z < y + z, & 0 < z & \implies & (x < y \iff x z < y z), \\
+        0 < x + y & \implies & 0 < x \lor 0 < y, & 0 & < & 1.
+      \end{array}
+    \]
+  \end{enumerate}
+\end{definition}
+
+\begin{lemma}[\agda{<∨>≃<⊎>}]
+  \label{ltOrGtIffLtSumGt}
+  Let $<$ be a strict order on $F$. For all $x, y : F$, $(x < y) \lor (y < x)$ if and only if $(x < y) + (y < x)$.
+\end{lemma}
+\begin{proof}
+  The sum $(x < y) + (y < x)$ is a proposition, since $<$ is a mere relation, and its two summands cannot be simultaneously inhabited, as $<$ is asymmetric---were $x < y$ and $y < x$, transitivity would give $x < x$, against irreflexivity. The propositional truncation of a proposition is equivalent to the proposition.
+\end{proof}
+
+\begin{theorem}[\agda{IsOrderedField→IsOrderedFieldBook}]
+  \label{IsOrderedFieldToIsOrderedFieldBook}
+  Every ordered field $F$ (\Cref{IsOrderedField}) is an ordered field in the sense of the HoTT book (\Cref{IsOrderedFieldBook}), with $\min := \sqcap$, $\max := \sqcup$, and $x \# y := (x < y) + (y < x)$.
+\end{theorem}
+\begin{proof}
+  Items (i), (iii) and (iv) and the laws $x \le y \iff \neg(y < x)$, $x < y \le z \implies x < z$, $x \le y < z \implies x < z$, $0 < x + y \implies 0 < x \lor 0 < y$, $x \le y \text{ and } 0 \le z \implies xz \le yz$, and $0 < 1$ are axioms of an ordered commutative ring (\Cref{IsOrderedCommRing}) verbatim. For item (iii), $\sqcap$ and $\sqcup$ are the meet and join.
+
+  For item (v), the relation $x \# y := (x < y) + (y < x)$ is the symmetric closure of the strict order. It is irreflexive because $<$ is, and symmetric by exchanging the two summands. It is cotransitive by weak linearity of $<$ (\Cref{IsOrderedCommRing}): given $x \# y$, say $x < y$, weak linearity gives $x < z$ or $z < y$, which are $x \# z$ and $y \# z$. The case $y < x$ is symmetric. And it is a mere relation, since $<$ is and, $<$ being asymmetric, its two summands are not both inhabited.
+
+  For item (ii), $x$ is invertible if and only if $x < 0$ or $0 < x$ (\Cref{IsOrderedField}), which is $x \# 0$. Both sides are propositions: invertibility because inverses are unique (\Cref{IsHeytingField}), and $x \# 0$ because $\#$ is a mere relation by item (v).
+
+  Of the remaining laws of item (vi), $x \# y \iff (x < y) \lor (y < x)$ is \Cref{ltOrGtIffLtSumGt}. In $x \le y \iff x + z \le y + z$ the forward direction is monotonicity of addition (\Cref{IsOrderedCommRing}) and the backward direction is \Cref{plusCancelRLe}, $F$ being an ordered abelian group under its addition (\Cref{OrderedCommRingToOrderedAbGroup}); likewise $x < y \iff x + z < y + z$, with strict monotonicity and \Cref{plusCancelRLt}. In $0 < z \implies (x < y \iff xz < yz)$ the forward direction is strict monotonicity of multiplication by a positive element (\Cref{IsOrderedCommRing}) and the backward direction is \Cref{mulCancelRLt}.
+\end{proof}
+
+\begin{lemma}[\agda{<-≤-weaken}]
+  \label{ltWeakenLeBook}
+  Let $F$ be an ordered field in the sense of the HoTT book (\Cref{IsOrderedFieldBook}). For all $x, y : F$, if $x < y$ then $x \le y$.
+\end{lemma}
+\begin{proof}
+  By the law $x \le y \iff \neg(y < x)$ it suffices to refute $y < x$. If $y < x$, then with $x < y$ transitivity gives $x < x$, contradicting irreflexivity (item (iv)).
+\end{proof}
+
+\begin{theorem}[\agda{IsOrderedFieldBook→IsOrderedField}]
+  \label{IsOrderedFieldBookToIsOrderedField}
+  Every ordered field in the sense of the HoTT book (\Cref{IsOrderedFieldBook}) is an ordered field (\Cref{IsOrderedField}) under its ring operations and its two orders, forgetting $\min$, $\max$ and $\#$.
+\end{theorem}
+\begin{proof}
+  First, $F$ is an ordered commutative ring (\Cref{IsOrderedCommRing}). The commutative ring is item (i); the lattice is item (iii), with $\min$ and $\max$ as the meet and join; the strict order is item (iv); $x < y$ implies $x \le y$ by \Cref{ltWeakenLeBook}; the two additive monotonicity axioms are the forward directions of $x \le y \iff x + z \le y + z$ and $x < y \iff x + z < y + z$; strict monotonicity of multiplication by a positive element is the forward direction of $0 < z \implies (x < y \iff xz < yz)$; and the remaining six axioms are laws of item (vi) verbatim.
+
+  It remains to show that $x$ is invertible if and only if $x < 0$ or $0 < x$. If $x < 0$ or $0 < x$, then in particular $(x < 0) \lor (0 < x)$, so $x \# 0$ by the law $x \# y \iff (x < y) \lor (y < x)$, and $x$ is invertible by item (ii). Conversely, if $x \cdot y = 1$, then $x \# 0$ by item (ii), so $(x < 0) \lor (0 < x)$ by the same law, and \Cref{ltOrGtIffLtSumGt} removes the truncation.
+\end{proof}

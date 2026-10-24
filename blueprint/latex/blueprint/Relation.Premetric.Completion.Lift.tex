@@ -1,0 +1,73 @@
+\section{\texttt{Relation.Premetric.Completion.Lift}}
+
+\begin{theorem}[\agda{continuous≡}; {\textcite[Theorem 3.19]{gilbert2017}}]
+  \label{continuousEq}
+  Let $M$ and $N$ be premetric spaces and $f, g \colon \completion{M} \to N$ be continuous. If $f(\iota(a)) = g(\iota(a))$ for every $a : M$, then $f(u) = g(u)$ for every $u : \completion{M}$.
+\end{theorem}
+
+\begin{corollary}[\agda{lipschitz≡}]
+  \label{lipschitzEq}
+  Let $M$ and $N$ be premetric spaces and $f, g \colon \completion{M} \to N$ be Lipschitz. If $f(\iota(a)) = g(\iota(a))$ for every $a : M$, then $f(u) = g(u)$ for every $u : \completion{M}$.
+\end{corollary}
+
+\begin{corollary}[\agda{nonExpansive≡}]
+  \label{nonExpansiveEq}
+  Let $M$ and $N$ be premetric spaces and $f, g \colon \completion{M} \to N$ be non-expansive. If $f(\iota(a)) = g(\iota(a))$ for every $a : M$, then $f(u) = g(u)$ for every $u : \completion{M}$.
+\end{corollary}
+
+\begin{lemma}[\agda{continuous₂≡}; {\textcite[Lemma 2.3.4]{brough2026}}]
+  \label{continuous2Eq}
+  Let $A$, $B$ and $N$ be premetric spaces and let $f, g \colon \completion{A} \to \completion{B} \to N$ be continuous in each argument separately. If $f(\iota(a), \iota(b)) = g(\iota(a), \iota(b))$ for every $a : A$ and $b : B$, then $f(u, v) = g(u, v)$ for every $u : \completion{A}$ and $v : \completion{B}$.
+\end{lemma}
+\begin{proof}
+  Fix $u : \completion{A}$. The maps $f(u, -)$ and $g(u, -)$ are continuous, so by \Cref{continuousEq} it suffices to show that $f(u, \iota(b)) = g(u, \iota(b))$ for every $b : B$. Fix $b : B$. The maps $f(-, \iota(b))$ and $g(-, \iota(b))$ are continuous, and by hypothesis they agree at $\iota(a)$ for every $a : A$, so \Cref{continuousEq} gives $f(w, \iota(b)) = g(w, \iota(b))$ for every $w : \completion{A}$, and in particular at $w = u$.
+\end{proof}
+
+\begin{lemma}[\agda{continuous₃≡}]
+  \label{continuous3Eq}
+  Let $A$, $B$, $C$ and $N$ be premetric spaces and let $f, g \colon \completion{A} \to \completion{B} \to \completion{C} \to N$ be continuous in each argument separately. If $f(\iota(a), \iota(b), \iota(c)) = g(\iota(a), \iota(b), \iota(c))$ for every $a : A$, $b : B$ and $c : C$, then $f(u, v, w) = g(u, v, w)$ for every $u : \completion{A}$, $v : \completion{B}$ and $w : \completion{C}$.
+\end{lemma}
+\begin{proof}
+  Fix $u : \completion{A}$ and $v : \completion{B}$. The maps $f(u, v, -)$ and $g(u, v, -)$ are continuous, so by \Cref{continuousEq} it suffices to show that $f(u, v, \iota(c)) = g(u, v, \iota(c))$ for every $c : C$. Fix $c : C$. The maps $f(-, -, \iota(c))$ and $g(-, -, \iota(c))$ are continuous in each argument separately, and by hypothesis they agree at $(\iota(a), \iota(b))$ for every $a : A$ and $b : B$, so \Cref{continuous2Eq} gives $f(u, v, \iota(c)) = g(u, v, \iota(c))$.
+\end{proof}
+
+\begin{theorem}[\agda{liftNE}, \agda{liftNE∘ι}; {\textcite[Theorem 3.20]{gilbert2017}}]
+  \label{liftNE}
+  Let $M$ be a premetric space and $N$ a complete premetric space. A non-expansive map $f \colon M \to N$ lifts to a non-expansive map $\lift{f} \colon \completion{M} \to N$ with
+  \[
+    \lift{f}(\iota(a)) = f(a)
+  \]
+  for all $a : M$.
+\end{theorem}
+
+\begin{theorem}[\agda{liftLipschitzWith}, \agda{liftLipschitzWith∘ι}; {\textcite[Theorem 3.20]{gilbert2017}}]
+  \label{liftLipschitzWith}
+  Let $M$ be a premetric space, $N$ a complete premetric space and $L : \Qp$. An $L$-Lipschitz map $f \colon M \to N$ lifts to an $L$-Lipschitz map $\lift{f} \colon \completion{M} \to N$ with
+  \[
+    \lift{f}(\iota(a)) = f(a)
+  \]
+  for all $a : M$.
+\end{theorem}
+\begin{proof}
+  We apply \Cref{RecCompletionSym} with $A := N$ and $B_\varepsilon(s, t) := (s \close{L \varepsilon} t)$, a symmetric family of mere relations since the closeness of $N$ is (\Cref{IsPremetric}).
+
+  Take $f_\iota := f$. For the limit clause, let $g \colon \Qp \to N$ satisfy $g_\varepsilon \close{L(\varepsilon + \delta)} g_\delta$ for all $\varepsilon, \delta$. Then $\varepsilon \mapsto g_{\varepsilon/L}$ is a Cauchy approximation in $N$ (\Cref{isCauchy}), since $L(\varepsilon/L + \delta/L) = \varepsilon + \delta$, and as $N$ is complete (\Cref{isComplete}) it has a limit, which we take as $f_{\lim}(g)$. For separatedness, if $s \close{L \varepsilon} t$ for every $\varepsilon$, then $s \close{\varepsilon} t$ for every $\varepsilon$, the hypothesis at $\varepsilon/L$, so $s = t$ by separatedness of $N$.
+
+  Of the three conditions, the first, that $a \close{\varepsilon} b$ gives $f(a) \close{L \varepsilon} f(b)$, is that $f$ is $L$-Lipschitz. For the second, suppose $f(a) \close{L \varepsilon} g_\delta$. Now $g_\delta$ is the term at $L \delta$ of the approximation $\varepsilon \mapsto g_{\varepsilon/L}$, of which $f_{\lim}(g)$ is a limit, so \Cref{isLimApproxPlus} gives $f(a) \close{L \delta + L \varepsilon} f_{\lim}(g)$, and $L \delta + L \varepsilon = L(\varepsilon + \delta)$. For the third, suppose $g_\delta \close{L \varepsilon} h_\eta$; these are the terms at $L \delta$ and $L \eta$ of the two reindexed approximations, so \Cref{isLimApproxPlus2} gives $f_{\lim}(g) \close{L \delta + (L \eta + L \varepsilon)} f_{\lim}(h)$, and $L \delta + (L \eta + L \varepsilon) = L(\varepsilon + \delta + \eta)$.
+
+  The recursion principle then yields $\lift{f} \colon \completion{M} \to N$ with $\lift{f}(\iota(a)) = f_\iota(a) = f(a)$, its first computation rule, and with $\lift{f}(u) \close{L \varepsilon} \lift{f}(v)$ whenever $u \cclose{\varepsilon} v$, which is to say that $\lift{f}$ is $L$-Lipschitz.
+\end{proof}
+
+\begin{corollary}[\agda{nonExpansive₂≡}]
+  \label{nonExpansive2Eq}
+  Let $A$, $B$ and $N$ be premetric spaces and let $f, g \colon \completion{A} \to \completion{B} \to N$ be non-expansive in each argument separately. If $f(\iota(a), \iota(b)) = g(\iota(a), \iota(b))$ for every $a : A$ and $b : B$, then $f(u, v) = g(u, v)$ for every $u : \completion{A}$ and $v : \completion{B}$.
+\end{corollary}
+
+\begin{theorem}[\agda{liftNE₂}, \agda{liftNE₂∘ι}; {\textcite[Theorem 3.25]{gilbert2017}}]
+  \label{liftNE2}
+  Let $A$ and $B$ be premetric spaces and $N$ a complete premetric space. A map $f \colon A \to B \to N$ that is non-expansive in each argument separately lifts to a map $\lift{f} \colon \completion{A} \to \completion{B} \to N$ that is again non-expansive in each argument separately, with
+  \[
+    \lift{f}(\iota(a), \iota(b)) = f(a, b)
+  \]
+  for all $a : A$ and $b : B$.
+\end{theorem}

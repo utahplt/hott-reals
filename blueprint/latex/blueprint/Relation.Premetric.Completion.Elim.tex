@@ -1,0 +1,31 @@
+\section{\texttt{Relation.Premetric.Completion.Elim}}
+
+\begin{definition}[\agda{Elimℭ-Prop}; {\textcite[Definition 3.2]{gilbert2017}}]
+  \label{ElimCompletionProp}
+  Let $M$ be a premetric space, and let $A$ be a family of propositions over the completion $\completion{M}$. Suppose that $A(\iota(a))$ holds for every $a : M$, and that $A(\lim x)$ holds for every Cauchy approximation $x$ in $\completion{M}$ such that $A(x_\varepsilon)$ holds for every $\varepsilon : \Qp$. Then $A(u)$ holds for every $u : \completion{M}$.
+\end{definition}
+
+\begin{definition}[\agda{RecℭSym}; {\textcite[Definition 3.4]{gilbert2017}}]
+  \label{RecCompletionSym}
+  Let $M$ be a premetric space, $A$ a type, and $B_\varepsilon(s, t)$ a family of mere relations on $A$ indexed by $\varepsilon : \Qp$ that is symmetric. Suppose we are given
+  \begin{itemize}
+  \item a map $f_\iota \colon M \to A$;
+  \item for every $g \colon \Qp \to A$ with $B_{\varepsilon + \delta}(g_\varepsilon, g_\delta)$ for all $\varepsilon, \delta : \Qp$, an element $f_{\lim}(g) : A$;
+  \item (separatedness) if $B_\varepsilon(s, t)$ for every $\varepsilon$, then $s = t$;
+  \end{itemize}
+  such that
+  \begin{itemize}
+  \item if $a \close{\varepsilon} b$ in $M$, then $B_\varepsilon(f_\iota(a), f_\iota(b))$;
+  \item if $B_\varepsilon(f_\iota(a), g_\delta)$, then $B_{\varepsilon + \delta}(f_\iota(a), f_{\lim}(g))$;
+  \item if $B_\varepsilon(g_\delta, h_\eta)$, then $B_{\varepsilon + \delta + \eta}(f_{\lim}(g), f_{\lim}(h))$.
+  \end{itemize}
+  Then there is a map $f \colon \completion{M} \to A$ with
+  \[
+    f(\iota(a)) = f_\iota(a)
+  \]
+  for all $a : M$ and
+  \[
+    f(\lim x) = f_{\lim}(f \circ x)
+  \]
+  for every Cauchy approximation $x$. Moreover, $u \cclose{\varepsilon} v$ implies $B_\varepsilon(f(u), f(v))$ for all $u, v : \completion{M}$ and $\varepsilon : \Qp$.
+\end{definition}

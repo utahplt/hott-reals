@@ -1,0 +1,62 @@
+\section{\texttt{Data.Real.Order.Magnitude}}
+
+Throughout this section $\lvert x \rvert = \max(x, -x)$ is the absolute value of \Cref{abs} in the ordered abelian group $\R$ (\Cref{ROrderedAbGroup}). Likewise, the absolute value on $\Q$ is \Cref{abs} in the ordered abelian group $\Q$ (\Cref{QOrderedAbGroup}), which is $\lvert q \rvert = \max(q, -q)$.
+
+\begin{lemma}[\agda{abs∘rat}]
+  \label{absRatReal}
+  For all $q : \Q$, $\lvert \iota(q) \rvert = \iota(\lvert q \rvert)$.
+\end{lemma}
+\begin{proof}
+  By definition, $\lvert \iota(q) \rvert = \max(\iota(q), -\iota(q))$, and $-\iota(q) = \iota(-q)$ (\Cref{negNReal}) and $\max(\iota(q), \iota(-q)) = \iota(\max(q, -q)) = \iota(\lvert q \rvert)$ (\Cref{maxNReal}).
+\end{proof}
+
+\begin{corollary}[\agda{∼→Δ≤rat}]
+  \label{closeDeltaLeRatReal}
+  For all $x, y : \R$ and $\varepsilon : \Qp$, if $x \cclose{\varepsilon} y$, then $y - x \le \iota(\varepsilon)$.
+\end{corollary}
+\begin{proof}
+  By \Cref{closeLeAddRatReal}, $y \le x + \iota(\varepsilon)$. Adding $-x$ on the right (\Cref{plusMonoRLeReal}) gives $y - x \le (x + \iota(\varepsilon)) - x = \iota(\varepsilon)$ by the abelian group laws (\Cref{RAbGroup}).
+\end{proof}
+
+\begin{lemma}[\agda{-rat<→<rat→∼0}]
+  \label{negRatLtLtRatCloseZeroReal}
+  For all $d : \R$ and $\varepsilon : \Qp$, if $-\iota(\varepsilon) < d$ and $d < \iota(\varepsilon)$, then $d \cclose{\varepsilon} 0$.
+\end{lemma}
+\begin{proof}
+  We proceed by induction on $d$ (\Cref{ElimCompletionProp}), showing that for every $\varepsilon : \Qp$, $-\iota(\varepsilon) < d$ and $d < \iota(\varepsilon)$ imply $d \cclose{\varepsilon} 0$. The desired statement is a proposition.
+
+  If $d = \iota(r)$ is rational, then $-\varepsilon < r$ and $r < \varepsilon$ in $\Q$ by \Cref{ltIffRatLtReal}, since $-\iota(\varepsilon) = \iota(-\varepsilon)$ (\Cref{negNReal}), and hence also $-r < \varepsilon$ (\Cref{negFlipLt}). Since $\le$ on $\Q$ is total, either $r \le -r$, in which case $\lvert r \rvert = \max(r, -r) = -r < \varepsilon$, or $-r \le r$, in which case $\lvert r \rvert = r < \varepsilon$. So $\lvert r - 0 \rvert < \varepsilon$, that is, $r \close{\varepsilon} 0$ in $\Q$ (\Cref{QPremetricSpace}), and $\iota(r) \cclose{\varepsilon} \iota(0)$ by \Cref{closeIffBall}.
+
+  If $d = \lim y$ for a Cauchy approximation $y$, assume inductively that for every $\delta, \varepsilon' : \Qp$, $-\iota(\varepsilon') < y_\delta$ and $y_\delta < \iota(\varepsilon')$ imply $y_\delta \cclose{\varepsilon'} 0$, and suppose $-\iota(\varepsilon) < \lim y$ and $\lim y < \iota(\varepsilon)$. Since the conclusion is a proposition, by \Cref{ltIffExistsAddRatLeReal} we may assume $\eta_1, \eta_2 : \Qp$ with $\lim y + \iota(\eta_1) \le \iota(\varepsilon)$ and $-\iota(\varepsilon) + \iota(\eta_2) \le \lim y$. Put $\eta := \min(\eta_1, \eta_2, \varepsilon)/2$, so that $\eta < \eta_1$, $\eta < \eta_2$ and $\eta < \varepsilon$, and $\theta := \varepsilon - \eta$, positive since $\eta < \varepsilon$. We show that $\lim y$ lies strictly between $-\iota(\theta)$ and $\iota(\theta)$. Adding $-\iota(\eta_1)$ on the right of the first bound (\Cref{plusMonoRLeReal}) gives $\lim y \le \iota(\varepsilon - \eta_1)$, and $\varepsilon - \eta_1 < \varepsilon - \eta = \theta$ since $\eta < \eta_1$, so $\lim y < \iota(\theta)$ by \Cref{ltIffRatLtReal,isTransLeLtReal}. Symmetrically, $-\iota(\theta) = \iota(-\varepsilon + \eta) < \iota(-\varepsilon + \eta_2) \le \lim y$ since $\eta < \eta_2$, so $-\iota(\theta) < \lim y$ by \Cref{isTransLtLeReal}.
+
+  Now put $\delta := \eta/2$. Since $\eta/4 < \delta$, \Cref{isLimitLim,isLimitApproxLt} give $y_{\eta/4} \cclose{\delta} \lim y$, and $\lim y \cclose{\delta} y_{\eta/4}$ by symmetry (\Cref{isSymClose}). By \Cref{ltRatCloseLtRatPlusReal}, $\lim y < \iota(\theta)$ gives $y_{\eta/4} < \iota(\theta + \delta)$, and by \Cref{ltCloseSubRatLtReal}, $-\iota(\theta) < \lim y$ gives $-\iota(\theta) - \iota(\delta) < y_{\eta/4}$, where $-\iota(\theta) - \iota(\delta) = -\iota(\theta + \delta)$. So the inductive hypothesis at $\eta/4$ and $\theta + \delta$ gives $y_{\eta/4} \cclose{\theta + \delta} 0$, and \Cref{isTriangularClose} gives $\lim y \cclose{\delta + (\theta + \delta)} 0$. Finally
+  \[
+    \delta + (\theta + \delta) = \eta/2 + ((\varepsilon - \eta) + \eta/2) = \varepsilon.
+  \]
+\end{proof}
+
+\begin{theorem}[\agda{∼≃abs<}; {\textcite[Theorem 11.3.44]{univalentfoundationsprogram2013}}]
+  \label{closeIffAbsLtReal}
+  For all $x, y : \R$ and $\varepsilon : \Qp$, $x \cclose{\varepsilon} y$ if and only if $\lvert x - y \rvert < \iota(\varepsilon)$.
+\end{theorem}
+\begin{proof}
+  Suppose $x \cclose{\varepsilon} y$. Since the conclusion is a proposition (\Cref{isPropLtReal}), by roundedness (\Cref{isRoundedClose}) we may assume $\theta < \varepsilon$ with $x \cclose{\theta} y$. Then $y - x \le \iota(\theta)$ by \Cref{closeDeltaLeRatReal}, and $x - y \le \iota(\theta)$ by the same after symmetry (\Cref{isSymClose}). Since $-(x - y) = y - x$ by the abelian group laws (\Cref{RAbGroup}), \Cref{absLeIff} gives $\lvert x - y \rvert \le \iota(\theta)$, and $\iota(\theta) < \iota(\varepsilon)$ by \Cref{ltIffRatLtReal}, so $\lvert x - y \rvert < \iota(\varepsilon)$ by \Cref{isTransLeLtReal}.
+
+  Conversely, suppose $\lvert x - y \rvert < \iota(\varepsilon)$. Then $-\iota(\varepsilon) < x - y$ and $x - y < \iota(\varepsilon)$ by \Cref{absLtNegLt,absLtLt}, so $x - y \cclose{\varepsilon} 0$ by \Cref{negRatLtLtRatCloseZeroReal}. Translation by $y$ is non-expansive (\Cref{plusNReal}), so $(x - y) + y \cclose{\varepsilon} 0 + y$, and the abelian group laws give $(x - y) + y = x$ and $0 + y = y$.
+\end{proof}
+
+\begin{lemma}[\agda{absⁿ}]
+  \label{absNReal}
+  The absolute value $x \mapsto \lvert x \rvert \colon \R \to \R$ is non-expansive (\Cref{IsNonExpansive}).
+\end{lemma}
+\begin{proof}
+  Let $x \cclose{\varepsilon} y$. By \Cref{closeIffAbsLtReal}, $\lvert x - y \rvert < \iota(\varepsilon)$. By the reverse triangle inequality (\Cref{absDeltaAbsLe}), $\lvert \lvert x \rvert - \lvert y \rvert \rvert \le \lvert x - y \rvert$, so $\lvert \lvert x \rvert - \lvert y \rvert \rvert < \iota(\varepsilon)$ by \Cref{isTransLeLtReal}, which is $\lvert x \rvert \cclose{\varepsilon} \lvert y \rvert$ by \Cref{closeIffAbsLtReal} again.
+\end{proof}
+
+\begin{lemma}[\agda{∃abs<rat}; {\textcite[Lemma 4.13]{gilbert2017}}]
+  \label{existsAbsLtRatReal}
+  For every $x : \R$ there merely exists $q : \Qp$ with $\lvert x \rvert < \iota(q)$.
+\end{lemma}
+\begin{proof}
+  By \Cref{ltAddRatReal} with $\varepsilon := 1$, $\lvert x \rvert < \lvert x \rvert + 1$. Since the conclusion is a proposition, by the Archimedean principle (\Cref{isArchimedeanLtReal}) we may assume $q : \Q$ with $\lvert x \rvert < \iota(q) < \lvert x \rvert + 1$. Since $0 \le \lvert x \rvert$ (\Cref{absNonNeg}), $0 < \iota(q)$ by \Cref{isTransLeLtReal}, so $0 < q$ in $\Q$ by \Cref{ltIffRatLtReal}. Thus $q$, with this positivity and the bound $\lvert x \rvert < \iota(q)$ from the Archimedean principle, witnesses the claim.
+\end{proof}

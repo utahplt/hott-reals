@@ -8,3 +8,5 @@
 #let cclose(..tolerance) = tolerance-relation(sym.tilde.op, tolerance)
 
 #let completion(M) = $frak(C) thin #M$
+
+#let op(P) = $#P^"op"$

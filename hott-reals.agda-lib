@@ -1,5 +1,0 @@
-name: hott-reals
-include: source
-depend:
-  cubical
-flags: --cubical --no-import-sorts --guardedness --safe

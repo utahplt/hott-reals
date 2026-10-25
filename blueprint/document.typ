@@ -1,7 +1,9 @@
 #import "lib.typ": statements
 #import "content.typ": chapters, chapter
 
-#set document(title: [Constructive Analysis in Cubical Agda], author: "Jackson Brough")
+#let blueprint-title = "Constructive Analysis in Cubical Agda"
+#let authors = ("Jackson Brough", "Lorenzo Molena")
+#set document(title: blueprint-title, author: authors)
 #set page(paper: "us-letter", margin: 1in, numbering: "1")
 #set text(font: "New Computer Modern", size: 12pt)
 #show math.equation: set text(font: "New Computer Modern Math")
@@ -12,9 +14,10 @@
 
 #align(center)[
   #title[Blueprint]
-  #text(size: 1.2em)[HoTT book reals on top of premetric spaces]
+  #text(size: 1.2em)[#blueprint-title]
 
-  Jackson Brough, Lorenzo Molena
+  // Jackson Brough, Lorenzo Molena
+  #authors.join(", ")
 ]
 
 #outline(depth: 2)

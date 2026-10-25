@@ -11,12 +11,11 @@
 
 #let statement(supplement, key, agda: none, source: none, body) = {
   let names = if agda == none { () } else if type(agda) == str { (agda,) } else { agda }
-  let note = (if names != () { names.map(raw).join(", ") }, source).filter(part => part != none)
   [#figure(
     kind: statement-kind,
     supplement: supplement,
     numbering: statement-numbering,
-    caption: if note.len() > 0 { note.join("; ") },
+    caption: metadata((agda: names, source: source)),
     outlined: false,
     body,
   )#key]
@@ -58,14 +57,15 @@
   _Proof._ #append-qed(body)
 ]
 
+#let agda-tag(names) = text(names.map(name => raw(name.split(".").last())).join(", "))
+
 #let show-statement(it) = {
+  let info = it.caption.body.value
   let head = [*#it.supplement #it.counter.display(it.numbering)*]
-  if it.caption != none { head += [ (#it.caption.body)] }
+  if info.source != none { head += [ (#info.source)] }
   let body = if it.supplement.text in upright-kinds { it.body } else { emph(it.body) }
-  block(breakable: true, above: 1.2em, below: 1.2em, width: 100%)[
-    #set align(left)
-    #head. #body
-  ]
+  let content = if info.agda == () { [#head. #body] } else { [#head. #h(1fr) #agda-tag(info.agda) \ #body] }
+  block(breakable: true, above: 1.2em, below: 1.2em, width: 100%, align(left, content))
 }
 
 #let statements(document) = {

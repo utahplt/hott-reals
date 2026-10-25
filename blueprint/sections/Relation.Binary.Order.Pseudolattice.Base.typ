@@ -11,12 +11,16 @@
   $
 ]
 
+We provide a "smart constructor" for building lattices from posets.
+
 #lemma(<makePseudolatticeFromPoset>, agda: "makePseudolatticeFromPoset")[
   Let $(P, <=)$ be a partially ordered set with binary operations $inter.sq$ and $union.sq$ such that for all $a, b, x : P$,
-  - $a inter.sq b <= a$ and $a inter.sq b <= b$, and if $x <= a$ and $x <= b$ then $x <= a inter.sq b$;
-  - $a <= a union.sq b$ and $b <= a union.sq b$, and if $a <= x$ and $b <= x$ then $a union.sq b <= x$.
+  - we have $a inter.sq b <= a$ and $a inter.sq b <= b$, and if $x <= a$ and $x <= b$ then $x <= a inter.sq b$;
+  - we have $a <= a union.sq b$ and $b <= a union.sq b$, and if $a <= x$ and $b <= x$ then $a union.sq b <= x$.
   Then $(P, <=)$ is a lattice with meet $inter.sq$ and join $union.sq$.
 ]
+
+// TODO: Is this inconsistent with the cubical library? It uses contractible fibers as the definition of equivalence and inverses with equal functions (non-pointwise) as the definition of isomorphism, right? What ought we to do in the context of univalent foundations in this case?
 
 #definition(<IsPseudolatticeEquiv>, agda: "IsPseudolatticeEquiv")[
   An *order isomorphism* between lattices $(L, <=)$ and $(M, <=)$ is an equivalence $e colon L -> M$ such that $x <= y$ if and only if $e(x) <= e(y)$ for all $x, y : L$.

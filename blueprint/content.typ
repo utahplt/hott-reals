@@ -6,6 +6,20 @@
       "Relation.Binary.Order.Pseudolattice.Properties",
     ),
   ),
+  (
+    title: [Ordered abelian groups],
+    sections: (
+      "Algebra.OrderedAbGroup.Base",
+      "Algebra.OrderedAbGroup.Properties",
+    ),
+  ),
+  (
+    title: [Ordered commutative rings],
+    sections: (
+      "Algebra.OrderedCommRing.Base",
+      "Algebra.OrderedCommRing.Properties",
+    ),
+  ),
 )
 
 #let chapter(c) = {

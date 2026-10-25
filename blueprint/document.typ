@@ -23,3 +23,5 @@
 #include "sections/preface.typ"
 
 #for c in chapters { chapter(c) }
+
+#bibliography("references.bib", style: "ieee")

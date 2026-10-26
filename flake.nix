@@ -5,7 +5,7 @@
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
     cubical = {
-      url = "github:broughjt/cubical/16c158d20a45b055318887fc65dba3d609232b2b";
+      url = "github:agda/cubical/c37782bb4e382dc41035e0970409a0c17b55e6ce";
       flake = false;
     };
     agda-mcp = {
@@ -21,15 +21,25 @@
         let
           pkgs = nixpkgs.legacyPackages.${system};
           cubical' = pkgs.agdaPackages.cubical.overrideAttrs (_: {
-            version = "beans-16c158d20";
+            version = "master-c37782bb";
             src = cubical;
           });
+          hott-reals-order = pkgs.agdaPackages.mkDerivation {
+            pname = "hott-reals-order";
+            version = "0.1.0";
+            src = ./libraries/hott-reals-order;
+            buildInputs = [ cubical' ];
+            meta = { };
+          };
           libraries = [ cubical' ];
           agda = pkgs.agda.withPackages libraries;
           agda-interact' = agda-mcp.packages.${system}.agda-interact.withPackages libraries;
         in
           {
-            packages.agda-interact = agda-interact';
+            packages = {
+              inherit hott-reals-order;
+              agda-interact = agda-interact';
+            };
 
             devShells.default = pkgs.mkShell {
               buildInputs = [

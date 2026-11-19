@@ -39,6 +39,7 @@
           {
             packages = libraries // {
               cubical = cubical';
+              default = libraries.hott-reals;
             };
 
             checks = libraries;

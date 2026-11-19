@@ -69,7 +69,7 @@ The provided dev shell includes Agda and writes a `.agda/libraries` file so that
 Editors:
 
 - Emacs: use [envrc](https://github.com/purcell/envrc) or [direnv.el](https://github.com/wbolster/emacs-direnv) if you want to avoid having to launch Emacs from within the dev shell.
-- VSCode: use the agda-mode (banacorn) and direnv (mkhl) extensions, and use `agda` from the shell instead of the Agda language server that the agda-mode extension might offer to download.
+- VSCode: use the agda-mode (banacorn) and direnv (mkhl) extensions, and use `agda` from the dev shell instead of the Agda language server that the agda-mode extension might offer to download.
 
 Development
 ---

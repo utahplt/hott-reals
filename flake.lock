@@ -1,43 +1,19 @@
 {
   "nodes": {
-    "agda-mcp": {
-      "inputs": {
-        "flake-utils": [
-          "flake-utils"
-        ],
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1788672255,
-        "narHash": "sha256-MYGqe7vEOugcJ7IsS6rIHTdPl0AbZ7bKjQHcUvvDd58=",
-        "owner": "broughjt",
-        "repo": "agda-mcp",
-        "rev": "4dfc77c6878df0e42fde24f0e6b1fcf22abb948d",
-        "type": "github"
-      },
-      "original": {
-        "owner": "broughjt",
-        "ref": "cli-daemon-fixes",
-        "repo": "agda-mcp",
-        "type": "github"
-      }
-    },
     "cubical": {
       "flake": false,
       "locked": {
-        "lastModified": 1788864174,
-        "narHash": "sha256-pp0Ouh7gb9U87rvLV7ELY4X2IdFXnjZxtMsG2HAcqEI=",
-        "owner": "broughjt",
+        "lastModified": 1795047760,
+        "narHash": "sha256-zUQkdBXTIwKXtYpV1Mylemeoa0puXPxQ6KgMApNBh9o=",
+        "owner": "utahplt",
         "repo": "cubical",
-        "rev": "16c158d20a45b055318887fc65dba3d609232b2b",
+        "rev": "5a4673ebaf97fb5021b8665a3c80f893ab062283",
         "type": "github"
       },
       "original": {
-        "owner": "broughjt",
+        "owner": "utahplt",
+        "ref": "hott-reals",
         "repo": "cubical",
-        "rev": "16c158d20a45b055318887fc65dba3d609232b2b",
         "type": "github"
       }
     },
@@ -77,7 +53,6 @@
     },
     "root": {
       "inputs": {
-        "agda-mcp": "agda-mcp",
         "cubical": "cubical",
         "flake-utils": "flake-utils",
         "nixpkgs": "nixpkgs"

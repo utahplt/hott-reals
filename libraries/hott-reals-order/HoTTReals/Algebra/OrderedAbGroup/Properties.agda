@@ -313,6 +313,9 @@ module _ (G' : OrderedAbGroup ℓ ℓ') where
     absAbs : (x : G) → abs (abs x) ≡ abs x
     absAbs x = 0≤→abs≡id $ 0≤abs x
 
+    abs0 : abs 0g ≡ 0g
+    abs0 = 0≤→abs≡id (is-refl 0g)
+
     ▵≤ : (x y : G) → abs (x + y) ≤ abs x + abs y
     ▵≤ x y =
       ⊔LUB

@@ -9,15 +9,36 @@ open import Cubical.Algebra.OrderedCommRing.Base
 open import Cubical.Algebra.OrderedCommRing.Morphisms
 import Cubical.Algebra.OrderedCommRing.Properties as
   CubicalOrderedCommRingProperties
-open import Cubical.Algebra.Ring
 
 open import Cubical.Relation.Binary.Order.Pseudolattice
+
+open import HoTTReals.Algebra.OrderedAbGroup.Base
 
 open import Cubical.Tactics.CommRingSolver
 
 private
   variable
     ℓ ℓ' ℓ<≤ ℓ<≤' : Level
+
+OrderedCommRing→OrderedAbGroup : OrderedCommRing ℓ ℓ' → OrderedAbGroup ℓ ℓ'
+OrderedCommRing→OrderedAbGroup R .fst = R .fst
+OrderedCommRing→OrderedAbGroup R .snd = orderedabgroupstr _ _ _ _ _ OAG
+  where
+  open OrderedCommRingStr (str R)
+
+  OAG : IsOrderedAbGroup 0r _+_ -_ _<_ _≤_
+  OAG =
+    isorderedabgroup
+      ( +IsAbGroup)
+      ( isPseudolattice)
+      ( isStrictOrder)
+      ( <-≤-weaken)
+      ( ≤≃¬>)
+      ( <-≤-trans)
+      ( ≤-<-trans)
+      ( +MonoR≤)
+      ( +MonoR<)
+      ( posSum→pos∨pos)
 
 module _ (R' : OrderedCommRing ℓ ℓ') where
   private
@@ -27,13 +48,7 @@ module _ (R' : OrderedCommRing ℓ ℓ') where
 
   module OrderedCommRingTheory where
     open CubicalOrderedCommRingProperties.OrderedCommRingTheory R' using
-      ( abs ; 0≤abs ; ²∘abs≡² ; ·MonoL≤ ; ¬<→≥)
-    open RingTheory (CommRing→Ring RCR) using
-      ( 0LeftAnnihilates )
-
-    0≤· : {x y : R} → 0r ≤ x → 0r ≤ y → 0r ≤ x · y
-    0≤· {x} {y} 0≤x 0≤y =
-      subst (_≤ x · y) (0LeftAnnihilates y) (·MonoR≤ 0r x y 0≤y 0≤x)
+      ( abs ; 0≤abs ; ²∘abs≡² ; ·MonoL≤ ; ¬<→≥ ; 0≤·Closed)
 
     0≤→<→²<² : {x y : R} → 0r ≤ x → x < y → x · x < y · y
     0≤→<→²<² {x} {y} 0≤x x<y =
@@ -52,7 +67,10 @@ module _ (R' : OrderedCommRing ℓ ℓ') where
 
     abs· : (x y : R) → abs (x · y) ≡ abs x · abs y
     abs· x y =
-      0≤→0≤→²≡²→≡ (0≤abs $ x · y) (0≤· (0≤abs x) (0≤abs y)) squares
+      0≤→0≤→²≡²→≡
+        ( 0≤abs $ x · y)
+        ( 0≤·Closed (abs x) (abs y) (0≤abs x) (0≤abs y))
+        squares
       where
       squares :
         abs (x · y) · abs (x · y) ≡ (abs x · abs y) · (abs x · abs y)

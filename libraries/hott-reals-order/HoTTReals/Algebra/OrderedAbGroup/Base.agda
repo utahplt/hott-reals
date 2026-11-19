@@ -9,7 +9,6 @@ open import Cubical.Foundations.SIP
 open import Cubical.Algebra.AbGroup.Base
 open import Cubical.Algebra.CommMonoid.Base
 open import Cubical.Algebra.OrderedCommMonoid.Base
-open import Cubical.Algebra.OrderedCommRing.Base
 
 import Cubical.Functions.Logic as L
 
@@ -190,26 +189,6 @@ OrderedAbGroup→OrderedCommMonoid G .snd = OCM
   IsOrderedCommMonoid.MonotoneL
     ( OrderedCommMonoidStr.isOrderedCommMonoid OCM) {x} {y} {z} x≤y =
     subst2 _≤_ (+Comm x z) (+Comm y z) (+MonoR≤ x y z x≤y)
-
-OrderedCommRing→OrderedAbGroup : OrderedCommRing ℓ ℓ' → OrderedAbGroup ℓ ℓ'
-OrderedCommRing→OrderedAbGroup R .fst = R .fst
-OrderedCommRing→OrderedAbGroup R .snd = orderedabgroupstr _ _ _ _ _ OAG
-  where
-  open OrderedCommRingStr (str R)
-
-  OAG : IsOrderedAbGroup 0r _+_ -_ _<_ _≤_
-  OAG =
-    isorderedabgroup
-      ( +IsAbGroup)
-      ( isPseudolattice)
-      ( isStrictOrder)
-      ( <-≤-weaken)
-      ( ≤≃¬>)
-      ( <-≤-trans)
-      ( ≤-<-trans)
-      ( +MonoR≤)
-      ( +MonoR<)
-      ( posSum→pos∨pos)
 
 isPropIsOrderedAbGroup :
   {G : Type ℓ} (0g : G) (_+_ : G → G → G) (-_ : G → G)

@@ -32,6 +32,8 @@
           };
           libraries = rec {
             hott-reals-order = library "hott-reals-order" [ cubical' ];
+            hott-reals-completion = library "hott-reals-completion" [ cubical' ];
+            hott-reals = library "hott-reals" [ cubical' hott-reals-order ];
           };
         in
           {

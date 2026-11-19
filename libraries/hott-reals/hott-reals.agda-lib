@@ -1,0 +1,6 @@
+name: hott-reals
+include: .
+depend:
+  cubical
+  hott-reals-order
+flags: --cubical --no-import-sorts --guardedness --safe

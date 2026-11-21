@@ -31,8 +31,8 @@ We need to go through the Agda on the `beans` branch and port it here, cleaning 
 
 Premetric completions
 
-- [ ] Eliminators
-- [ ] Properties of closeness, for example that the completion is a complete premetric space
+- [x] Eliminators
+- [x] Properties of closeness, for example that the completion is a complete premetric space
 - [ ] Extension principles for various classes of functions
 
 Reals

@@ -288,15 +288,15 @@ record Casesℭ (A : Type ℓA) (B : A → A → ℚ₊ → Type ℓB)
                → B (funι x) (funι y) ε
     ι︵lim   : ∀ x y ε δ yc
                → ι x ∼[ ε ] y δ
-               → (a∘x : ℚ₊ → A)
-               → ((ε' δ' : ℚ₊) → B (a∘x ε') (a∘x δ') (ε' +₊ δ'))
-               → B (funι x) (a∘x δ) ε
+               → (a∘y : ℚ₊ → A)
+               → ((ε' δ' : ℚ₊) → B (a∘y ε') (a∘y δ') (ε' +₊ δ'))
+               → B (funι x) (a∘y δ) ε
                → B (funι x) (funLim y yc) (ε +₊ δ)
     lim︵ι   : ∀ x y ε δ xc
                → x δ ∼[ ε ] ι y
-               → (a∘y : ℚ₊ → A)
-               → ((ε' δ' : ℚ₊) → B (a∘y ε') (a∘y δ') (ε' +₊ δ'))
-               → B (a∘y δ) (funι y) ε
+               → (a∘x : ℚ₊ → A)
+               → ((ε' δ' : ℚ₊) → B (a∘x ε') (a∘x δ') (ε' +₊ δ'))
+               → B (a∘x δ) (funι y) ε
                → B (funLim x xc) (funι y) (ε +₊ δ)
     lim︵lim : ∀ x y ε δ η xc yc
                → x δ ∼[ ε ] y η
@@ -353,9 +353,9 @@ record CasesℭSym (A : Type ℓA) (B : A → A → ℚ₊ → Type ℓB)
                → B (funι x) (funι y) ε
     ι︵lim   : ∀ x y ε δ yc
                → ι x ∼[ ε ] y δ
-               → (a∘x : ℚ₊ → A)
-               → ((ε' δ' : ℚ₊) → B (a∘x ε') (a∘x δ') (ε' +₊ δ'))
-               → B (funι x) (a∘x δ) ε
+               → (a∘y : ℚ₊ → A)
+               → ((ε' δ' : ℚ₊) → B (a∘y ε') (a∘y δ') (ε' +₊ δ'))
+               → B (funι x) (a∘y δ) ε
                → B (funι x) (funLim y yc) (ε +₊ δ)
     lim︵lim : ∀ x y ε δ η xc yc
                → x δ ∼[ ε ] y η

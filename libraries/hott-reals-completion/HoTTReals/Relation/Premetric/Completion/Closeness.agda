@@ -126,7 +126,7 @@ isProp≈ᴮ (B , isBallB) (B' , isBallB') ε =
 isSym≈ᴮ : ∀ B B' ε → B ≈ᴮ[ ε ] B' → B' ≈ᴮ[ ε ] B
 isSym≈ᴮ B B' ε B≈B' δ y = fst Σ-swap-≃ (B≈B' δ y)
 
--- Defintion 3.9
+-- Definition 3.9
 -- NOTE : The definition of UpperCut present in Gilpert's paper requires
 -- an equivalence in the field `isRoundedUpperCut`.
 -- However, in order to construct `B[_]⟨_,_⟩`, we only need one implication.
@@ -344,7 +344,7 @@ BallsAtι[Rec] x .lim︵lim = B⟨ι,lim⟩≈ᵁB⟨ι,lim⟩ x
 BallsAtι[Rec] x .isSym︵  = isSym≈ᵁ
 BallsAtι[Rec] x .isProp︵ = isProp≈ᵁ
 
--- Defintion 3.13 (first part)
+-- Definition 3.13 (first part)
 B⟨ι_,_⟩ : ⟨ M ⟩ → ℭM → UpperCuts
 B⟨ι_,_⟩ = RecℭSym.go ∘ BallsAtι[Rec]
 
@@ -613,7 +613,7 @@ BallsAt[Rec] .lim︵lim = B⟨lim,⟩≈ᴮB⟨lim,⟩
 BallsAt[Rec] .isSym︵  = isSym≈ᴮ
 BallsAt[Rec] .isProp︵ = isProp≈ᴮ
 
--- Defintion 3.13 (second part)
+-- Definition 3.13 (second part)
 B⟨_,⟩ : ℭM → Balls
 B⟨_,⟩ = RecℭSym.go BallsAt[Rec]
 

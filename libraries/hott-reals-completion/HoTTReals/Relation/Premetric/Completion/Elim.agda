@@ -200,7 +200,7 @@ record Recℭ (A : Type ℓA) (B : A → A → ℚ₊ → Type ℓB)
   go : ℭM → A
   go = Elimℭ.go GO.e
 
-  go∼ : {x y : ℭM} {ε : ℚ₊} (r : x ∼[ ε ] y) → B (go x) (go y) ε
+  go∼ : {x y : ℭM} {ε : ℚ₊} → x ∼[ ε ] y → B (go x) (go y) ε
   go∼ = Elimℭ.go∼ GO.e
 
 {-# DISPLAY Recℭ.GO.e r = r #-}
@@ -241,7 +241,7 @@ record RecℭSym (A : Type ℓA) (B : A → A → ℚ₊ → Type ℓB)
   go : ℭM → A
   go = Recℭ.go GO.r
 
-  go∼ : {x y : ℭM} {ε : ℚ₊} (r : x ∼[ ε ] y) → B (go x) (go y) ε
+  go∼ : {x y : ℭM} {ε : ℚ₊} → x ∼[ ε ] y → B (go x) (go y) ε
   go∼ = Recℭ.go∼ GO.r
 
 {-# DISPLAY RecℭSym.GO.r r = r #-}

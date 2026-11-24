@@ -17,8 +17,9 @@ open import Cubical.Relation.Premetric.Instances.Rationals as ℚ
 open import HoTTReals.Relation.Premetric.Completion.Base ℚPrSpace public renaming (
   ℭ to ℝ ; ι to rat ; eqℭ to eqℝ ; ι-ι to rat-rat ; ι-lim to rat-lim ; lim-ι to lim-rat)
 open import HoTTReals.Relation.Premetric.Completion.Properties _ ℚPrSpace
-  public using () renaming (
-    ℭPremetricSpace to ℝPremetricSpace ; isCompleteℭ to isCompleteℝ
+  public renaming (
+    isSetℭ to isSetℝ ; ℭPremetricSpace to ℝPremetricSpace ; isCompleteℭ to isCompleteℝ
+  ; isInjectiveι to isInjectiveRat ; isEmbeddingι to isEmbeddingRat
   ; ιᴵ to ratᴵ ; ιⁿ to ratⁿ ; ιᶜ to ratᶜ ; ιᵘᶜ to ratᵘᶜ ; ιᴸ to ratᴸ)
 
 pattern Δrat< p = rat-rat (ℚ.pos<pos p)
